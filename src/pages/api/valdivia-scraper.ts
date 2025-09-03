@@ -88,9 +88,7 @@ class ValdiviaScraperService {
         '[class*="libro"]',
         '[class*="book"]',
         '.item',
-        '.resultado',
-        '.search-result',
-        '.publication'
+        '.resultado'
       ];
 
       let contenidoEncontrado = false;
@@ -157,40 +155,32 @@ class ValdiviaScraperService {
       // Estructuras específicas para el sistema de bibliotecas de Valdivia
       const estructurasValdivia = [
         {
-          container: '.libro-item, .book-item, .item-libro, .book-card, .publication',
-          titulo: '.titulo, .title, h2, h3, .book-title, .nombre, .publication-title',
-          autor: '.autor, .author, .book-author, .by, .creator',
-          disponibilidad: '.disponibilidad, .availability, .status, .estado, .disponible, .location',
-          enlace: 'a[href*="bncatalogo"], a[href*="disponibilidad"], .ver-disponibilidad, .link-disponibilidad'
+          container: '.libro-item, .book-item, .item-libro',
+          titulo: '.titulo, .title, h2, h3, .book-title',
+          autor: '.autor, .author, .book-author',
+          disponibilidad: '.disponibilidad, .availability, .status, .estado',
+          enlace: 'a, .link, .ver-mas'
         },
         {
-          container: '.result-item, .resultado, .card, .search-result, .item',
-          titulo: 'h2, h3, h4, .title, .titulo-libro, strong, .main-title',
-          autor: '.author, .autor, .by-author, .writer, .creator',
-          disponibilidad: '.status, .disponible, .estado-libro, .availability, .library-info',
-          enlace: 'a[href*="bncatalogo"], a[href*="disponibilidad"]'
+          container: '.result-item, .resultado, .card',
+          titulo: 'h2, h3, h4, .title, .titulo-libro',
+          autor: '.author, .autor, .by-author',
+          disponibilidad: '.status, .disponible, .estado-libro',
+          enlace: 'a'
         },
         {
-          container: '[class*="libro"], [class*="book"], [data-libro], .item, .entry',
-          titulo: 'h1, h2, h3, h4, h5, .title, strong, b, .nombre, .entry-title',
-          autor: '.author, .autor, .writer, .by, .creador, .creator',
-          disponibilidad: '.status, .disponible, .available, .estado, .disponibilidad, .location',
-          enlace: 'a[href*="bncatalogo"], a[href*="disponibilidad"], a[title*="disponibilidad"]'
+          container: '[class*="libro"], [class*="book"], [data-libro]',
+          titulo: 'h1, h2, h3, h4, h5, .title, strong, b',
+          autor: '.author, .autor, .writer, .by',
+          disponibilidad: '.status, .disponible, .available, .estado',
+          enlace: 'a, [href]'
         },
         {
-          container: 'div, article, section, li, .content',
-          titulo: 'h1, h2, h3, h4, .title, .book-title, strong, .main-title',
-          autor: '.author, .autor, .by, .creator',
-          disponibilidad: '.status, .disponibilidad, .disponible, .library',
-          enlace: 'a[href*="bncatalogo"], a[href*="F?func="]'
-        },
-        // Nueva estructura más amplia para capturar contenido que se nos escape
-        {
-          container: '*',
-          titulo: 'h1, h2, h3, h4, h5, h6, strong, b, .title',
-          autor: '.author, .autor, .by, .creator, .writer',
-          disponibilidad: '.status, .disponibilidad, .disponible, .library, .location',
-          enlace: 'a[href*="bncatalogo"], a[href*="F?func="]'
+          container: 'div, article, section',
+          titulo: 'h2, h3, .title, .book-title',
+          autor: '.author, .autor',
+          disponibilidad: '.status, .disponibilidad',
+          enlace: 'a'
         }
       ];
 
@@ -232,38 +222,16 @@ class ValdiviaScraperService {
             
             const autor = $container.find(estructura.autor).first().text().trim();
             const disponibilidad = $container.find(estructura.disponibilidad).first().text().trim();
-            
-            // Buscar específicamente enlaces de disponibilidad
             const enlaceElement = $container.find(estructura.enlace).first();
-            let enlace = enlaceElement.attr('href') || '';
-            
-            // Si no encontramos enlace específico, buscar cualquier enlace que vaya a bncatalogo
-            if (!enlace) {
-              const todoLosEnlaces = $container.find('a');
-              todoLosEnlaces.each((i, el) => {
-                const href = $(el).attr('href') || '';
-                if (href.includes('bncatalogo') || href.includes('F?func=') || href.toLowerCase().includes('disponibilidad')) {
-                  enlace = href;
-                  return false; // Break the loop
-                }
-              });
-            }
+            const enlace = enlaceElement.attr('href') || '';
             
             // Extraer información adicional del texto completo
             const isbn = extraerISBN(textoCompleto);
             const año = extraerAño(textoCompleto);
             const editorial = this.extraerEditorial($container, textoCompleto);
             
-            // Determinar biblioteca específica
+            // Determinar biblioteca específica (todas serán de Valdivia)
             const biblioteca = this.determinarBibliotecaValdivia(textoCompleto, enlace);
-            
-            // FILTRO IMPORTANTE: Solo incluir libros que están en Valdivia
-            const esLibroDeValdivia = this.esDeValdivia(textoCompleto, disponibilidad, enlace);
-            
-            if (!esLibroDeValdivia && !biblioteca) {
-              console.log(`Libro descartado - no es de Valdivia: ${titulo.substring(0, 50)}...`);
-              return; // Skip libros que no son de Valdivia
-            }
             
             const libro: Libro = {
               titulo,
@@ -273,7 +241,7 @@ class ValdiviaScraperService {
               año,
               disponibilidad: disponibilidad || 'Estado no especificado',
               urlDisponibilidad: this.construirURLCompleta(enlace),
-              biblioteca: biblioteca || 'Biblioteca Pública de Valdivia',
+              biblioteca,
               htmlOriginal: $container.html()?.substring(0, 500) || ''
             };
             
@@ -294,17 +262,11 @@ class ValdiviaScraperService {
         librosEncontrados.push(...analisisGeneral);
       }
 
-      // Filtrar resultados finales para asegurar que solo sean de Valdivia
-      const librosSoloValdivia = librosEncontrados.filter(libro => {
-        const textoCompleto = `${libro.titulo} ${libro.disponibilidad} ${libro.urlDisponibilidad}`;
-        return this.esDeValdivia(textoCompleto, libro.disponibilidad, libro.urlDisponibilidad);
-      });
-
       // Limpiar y validar resultados
-      const librosLimpios = this.limpiarResultadosValdivia(librosSoloValdivia);
+      const librosLimpios = this.limpiarResultadosValdivia(librosEncontrados);
       
       this.librosData.push(...librosLimpios);
-      console.log(`Total libros extraídos de Valdivia: ${librosLimpios.length} (filtrados de ${librosEncontrados.length} totales)`);
+      console.log(`Total libros extraídos de Valdivia: ${librosLimpios.length}`);
       
       return librosLimpios;
       
@@ -343,19 +305,14 @@ class ValdiviaScraperService {
     const bibliotecasValdivia = [
       'Biblioteca Municipal de Valdivia',
       'Biblioteca Pública de Valdivia', 
-      'Biblioteca Regional de Valdivia',
+      'Biblioteca Regional',
       'BiblioRed Valdivia',
-      'Biblioteca Central Valdivia',
-      'BP. Valdivia',
-      'B.P. Valdivia',
-      'Bib. Valdivia',
-      'Valdivia'
+      'Biblioteca Central Valdivia'
     ];
     
     const textoLower = texto.toLowerCase();
     const enlaceLower = enlace.toLowerCase();
     
-    // Verificar si menciona específicamente Valdivia
     for (const biblioteca of bibliotecasValdivia) {
       if (textoLower.includes(biblioteca.toLowerCase()) || 
           enlaceLower.includes(biblioteca.toLowerCase())) {
@@ -363,64 +320,16 @@ class ValdiviaScraperService {
       }
     }
     
-    return ''; // Devolver vacío si no es de Valdivia
-  }
-
-  // Nueva función para verificar si un libro está en Valdivia
-  private esDeValdivia(textoCompleto: string, disponibilidad: string, enlace: string): boolean {
-    const textoTotal = `${textoCompleto} ${disponibilidad} ${enlace}`.toLowerCase();
-    
-    // Palabras clave que indican que es de Valdivia
-    const indicadoresValdivia = [
-      'valdivia',
-      'bp. valdivia',
-      'b.p. valdivia',
-      'biblioteca valdivia',
-      'municipal valdivia',
-      'regional valdivia'
-    ];
-    
-    // Verificar si contiene algún indicador de Valdivia
-    const tieneValdivia = indicadoresValdivia.some(indicador => 
-      textoTotal.includes(indicador)
-    );
-    
-    // Palabras que indican que NO es de Valdivia
-    const indicadoresOtrasComunas = [
-      'lago ranco',
-      'panguipulli',
-      'corral',
-      'lanco',
-      'los lagos',
-      'paillaco',
-      'máfil',
-      'mariquina',
-      'futrono'
-    ];
-    
-    // Verificar si es de otra comuna
-    const esDeOtraComuna = indicadoresOtrasComunas.some(indicador => 
-      textoTotal.includes(indicador)
-    );
-    
-    // Solo es de Valdivia si tiene indicadores de Valdivia Y NO es de otra comuna
-    return tieneValdivia && !esDeOtraComuna;
+    return 'Biblioteca Pública de Valdivia'; // Default para Valdivia
   }
 
   private construirURLCompleta(enlace: string): string {
     if (!enlace) return '';
     
-    // Si ya es una URL completa, devolverla tal como está
     if (enlace.startsWith('http')) {
       return enlace;
     }
     
-    // Si es una URL de bncatalogo, agregar el dominio correcto
-    if (enlace.includes('bncatalogo') || enlace.includes('F?func=')) {
-      return enlace.startsWith('/') ? `http://www.bncatalogo.cl${enlace}` : `http://www.bncatalogo.cl/${enlace}`;
-    }
-    
-    // Para otros enlaces, usar el dominio de bibliotecaspublicas
     if (enlace.startsWith('/')) {
       return `https://www.bibliotecaspublicas.gob.cl${enlace}`;
     }
@@ -538,71 +447,23 @@ class ValdiviaScraperService {
     return this.limpiarResultadosValdivia(todosLosLibros);
   }
 
-  // FUNCIÓN DE DEBUG MEJORADA
   async debugHTML() {
     try {
       const html = await this.page.content();
       const $ = cheerio.load(html);
       
-      // Información más detallada
-      const debugInfo = {
+      return {
         titulo: $('title').text() || 'No encontrado',
         url: this.page.url(),
-        totalElementos: {
-          divs: $('div').length,
-          articles: $('article').length,
-          sections: $('section').length,
-          links: $('a').length,
-          headings: $('h1, h2, h3, h4, h5, h6').length
-        },
+        totalDivs: $('div').length,
+        totalLinks: $('a').length,
         clasesRelevantes: this.encontrarClasesRelevantes($),
-        estructuraBasica: this.analizarEstructura($),
-        // NUEVO: Buscar texto que contenga palabras clave
-        textoConLibros: this.buscarTextoRelevante($),
-        // NUEVO: Enlaces que van a bncatalogo
-        enlacesBncatalogo: this.encontrarEnlacesBncatalogo($),
-        // NUEVO: Muestra de HTML para análisis
-        muestraHTML: $('body').html()?.substring(0, 1000) || 'No HTML encontrado'
+        estructuraBasica: this.analizarEstructura($)
       };
-      
-      return debugInfo;
     } catch (error) {
       console.error('Error en debug HTML:', error);
       return { error: 'No se pudo obtener información de debug' };
     }
-  }
-
-  // Nuevas funciones auxiliares para debug
-  private buscarTextoRelevante($: any): string[] {
-    const textosRelevantes: string[] = [];
-    const palabrasClave = ['libro', 'autor', 'título', 'disponible', 'biblioteca', 'valdivia'];
-    
-    $('*').each((index: number, element: any) => {
-      const texto = $(element).text().trim();
-      if (texto.length > 20 && texto.length < 200) {
-        const tieneRelevancia = palabrasClave.some(palabra => 
-          texto.toLowerCase().includes(palabra)
-        );
-        if (tieneRelevancia) {
-          textosRelevantes.push(texto.substring(0, 150));
-        }
-      }
-    });
-    
-    return textosRelevantes.slice(0, 10); // Primeros 10 textos relevantes
-  }
-
-  private encontrarEnlacesBncatalogo($: any): string[] {
-    const enlaces: string[] = [];
-    
-    $('a[href]').each((index: number, element: any) => {
-      const href = $(element).attr('href') || '';
-      if (href.includes('bncatalogo') || href.includes('F?func=')) {
-        enlaces.push(href);
-      }
-    });
-    
-    return enlaces.slice(0, 5); // Primeros 5 enlaces
   }
 
   // FUNCIÓN CORREGIDA
