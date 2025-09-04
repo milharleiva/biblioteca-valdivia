@@ -1,5 +1,5 @@
 // src/components/LibroCard.tsx
-import { Book, User, Calendar, ExternalLink, MapPin } from 'lucide-react';
+import { Book, User, Calendar, ExternalLink, MapPin, Hash } from 'lucide-react';
 import type { Libro } from '@/types/biblioteca';
 
 interface LibroCardProps {
@@ -8,7 +8,7 @@ interface LibroCardProps {
 
 export const LibroCard: React.FC<LibroCardProps> = ({ libro }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-100">
       {/* Header del libro */}
       <div className="flex items-start gap-3 mb-4">
         <Book className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
@@ -54,6 +54,14 @@ export const LibroCard: React.FC<LibroCardProps> = ({ libro }) => {
             <strong>ISBN:</strong> {libro.isbn}
           </div>
         )}
+
+        {/* Número de documento del catálogo */}
+        {libro.docNumber && (
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Hash className="h-4 w-4" />
+            <span>Doc: {libro.docNumber}</span>
+          </div>
+        )}
       </div>
 
       {/* Estado de disponibilidad */}
@@ -71,9 +79,9 @@ export const LibroCard: React.FC<LibroCardProps> = ({ libro }) => {
         </div>
       )}
 
-      {/* Enlace de disponibilidad detallada */}
-      {libro.urlDisponibilidad && (
-        <div className="pt-4 border-t border-gray-200">
+      {/* Enlaces de disponibilidad */}
+      <div className="pt-4 border-t border-gray-200">
+        {libro.urlDisponibilidad ? (
           <a
             href={libro.urlDisponibilidad}
             target="_blank"
@@ -81,10 +89,14 @@ export const LibroCard: React.FC<LibroCardProps> = ({ libro }) => {
             className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
           >
             <ExternalLink className="h-4 w-4" />
-            Ver disponibilidad en bibliotecas de Valdivia
+            Ver disponibilidad en catálogo
           </a>
-        </div>
-      )}
+        ) : (
+          <div className="text-sm text-gray-500 italic">
+            Enlace de disponibilidad no disponible
+          </div>
+        )}
+      </div>
     </div>
   );
 };

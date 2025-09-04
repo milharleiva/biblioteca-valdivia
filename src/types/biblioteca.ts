@@ -8,6 +8,8 @@ export interface Libro {
   disponibilidad: string;
   urlDisponibilidad: string;
   biblioteca?: string; // Biblioteca específica en Valdivia
+  docNumber?: string; // Número de documento para el catálogo
+  subLibrary?: string; // Sub-biblioteca específica
   htmlOriginal?: string;
 }
 
