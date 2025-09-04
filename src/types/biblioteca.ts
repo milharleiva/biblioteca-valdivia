@@ -11,6 +11,17 @@ export interface Libro {
   docNumber?: string; // Número de documento para el catálogo
   subLibrary?: string; // Sub-biblioteca específica
   htmlOriginal?: string;
+  
+  // Campos adicionales del catálogo detallado
+  traductor?: string; // Traductor del libro
+  lugarPublicacion?: string; // Ciudad de publicación
+  paginas?: string; // Número de páginas
+  tamaño?: string; // Tamaño físico (ej: "20 cm")
+  clasificacion?: string; // Clasificación bibliotecaria (ej: "823/ROW/ha")
+  codigoBarras?: string; // Código de barras
+  coleccion?: string; // Colección a la que pertenece
+  fechaEntrega?: string; // Fecha de entrega del préstamo
+  tipoPresta?: string; // Tipo de préstamo (Domicilio, Sala, etc.)
 }
 
 export interface ScrapingRequest {
