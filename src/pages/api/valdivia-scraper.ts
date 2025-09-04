@@ -1,150 +1,240 @@
 // src/pages/api/valdivia-scraper.ts
 import { NextApiRequest, NextApiResponse } from 'next';
-import puppeteer from 'puppeteer';
-import * as cheerio from 'cheerio';
 import { VALDIVIA_CONFIG, buildValdiviaURL, buildCatalogURL } from '@/utils/valdivia-config';
 import { extraerISBN, extraerAño } from '@/utils/scraper-helpers';
 import type { Libro, ScrapingRequest, ScrapingResponse } from '@/types/biblioteca';
 
 class ValdiviaScraperService {
-  private browser: any = null;
-  private page: any = null;
 
-  async initBrowser() {
+  async buscarLibrosDirecto(termino: string): Promise<Libro[]> {
     try {
-      this.browser = await puppeteer.launch({
-        headless: true,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--no-first-run',
-          '--no-zygote',
-          '--disable-gpu',
-          '--disable-web-security',
-          '--disable-features=VizDisplayCompositor'
-        ]
-      });
+      console.log(`🎯 Buscando libros directamente: "${termino}"`);
       
-      this.page = await this.browser.newPage();
+      // Intentar diferentes endpoints de API que la página podría usar
+      const posiblesAPIs = [
+        // Posibles endpoints basados en la estructura típica de bibliotecas
+        `https://www.bibliotecaspublicas.gob.cl/wp-admin/admin-ajax.php`,
+        `https://www.bibliotecaspublicas.gob.cl/api/buscar`,
+        `https://www.bibliotecaspublicas.gob.cl/ajax/search`,
+        `https://api.bibliotecas.cl/search`,
+        `https://www.bibliotecaspublicas.gob.cl/wp-json/wp/v2/books`
+      ];
       
-      await this.page.setUserAgent(
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      );
+      for (const baseUrl of posiblesAPIs) {
+        const libros = await this.intentarAPI(baseUrl, termino);
+        if (libros.length > 0) {
+          console.log(`✅ Éxito con API: ${baseUrl}`);
+          return libros;
+        }
+      }
       
-      await this.page.setViewport({ width: 1366, height: 768 });
+      // Si las APIs no funcionan, usar método de parsing directo del HTML
+      console.log('🔄 APIs no funcionaron, intentando parsing directo...');
+      return await this.parsearHTMLDirecto(termino);
       
-      console.log('Browser inicializado para Valdivia');
     } catch (error) {
-      console.error('Error inicializando browser:', error);
-      throw new Error('No se pudo inicializar el navegador');
+      console.error('Error en búsqueda directa:', error);
+      throw error;
     }
   }
-
-  async navegarAValdivia(query: string = '') {
+  
+  async intentarAPI(baseUrl: string, termino: string): Promise<Libro[]> {
     try {
-      const url = buildValdiviaURL(query);
-      console.log(`Navegando a Valdivia: ${url}`);
-
-      await this.page.goto(url, {
-        waitUntil: 'networkidle0',
-        timeout: 60000
-      });
-
-      console.log('Página de Valdivia cargada exitosamente');
-    } catch (error) {
-      console.error('Error navegando a Valdivia:', error);
-      throw new Error('No se pudo cargar la página de bibliotecas de Valdivia');
-    }
-  }
-
-  async esperarContenidoDinamico() {
-    try {
-      console.log('Esperando contenido dinámico de libros...');
+      const libros: Libro[] = [];
       
-      // Esperar a que aparezcan los resultados
-      await this.page.waitForFunction(
-        () => {
-          const texto = document.body.textContent || '';
-          return texto.includes('Harry Potter') || 
-                 texto.includes('Autor:') || 
-                 texto.includes('El ejemplar se encuentra') ||
-                 texto.includes('Resultados de búsqueda') ||
-                 document.querySelectorAll('*').length > 100;
+      // Diferentes formatos de parámetros que podría usar la API
+      const parametros = [
+        {
+          action: 'search_books',
+          query: termino,
+          region_id: VALDIVIA_CONFIG.regionId,
+          commune_id: VALDIVIA_CONFIG.communeId
         },
-        { timeout: 30000 }
-      );
-
-      // Scroll para asegurar que todo el contenido se cargue
-      await this.scrollParaCargarTodo();
+        {
+          q: termino,
+          region: VALDIVIA_CONFIG.regionId,
+          comuna: VALDIVIA_CONFIG.communeId,
+          format: 'json'
+        },
+        {
+          search: termino,
+          location: 'valdivia',
+          type: 'books'
+        }
+      ];
       
-      // Tiempo adicional para asegurar carga completa
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      
-      console.log('Contenido dinámico cargado');
-      
-    } catch (error) {
-      console.log('Timeout esperando contenido específico, continuando...');
-      await new Promise(resolve => setTimeout(resolve, 10000)); // Esperar al menos 10 segundos
-    }
-  }
-
-  async scrollParaCargarTodo() {
-    try {
-      await this.page.evaluate(async () => {
-        await new Promise<void>((resolve) => {
-          let totalHeight = 0;
-          const distance = 100;
-          const timer = setInterval(() => {
-            const scrollHeight = document.body.scrollHeight;
-            window.scrollBy(0, distance);
-            totalHeight += distance;
-
-            if(totalHeight >= scrollHeight){
-              clearInterval(timer);
-              resolve();
+      for (const params of parametros) {
+        try {
+          // Intentar POST
+          const responsePost = await fetch(baseUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+              'Accept': 'application/json, text/html, */*',
+              'Referer': 'https://www.bibliotecaspublicas.gob.cl/'
+            },
+            body: new URLSearchParams(Object.fromEntries(
+              Object.entries(params).map(([key, value]) => [key, String(value)])
+            )).toString()
+          });
+          
+          if (responsePost.ok) {
+            const datos = await responsePost.json();
+            const librosDeAPI = this.procesarRespuestaAPI(datos);
+            if (librosDeAPI.length > 0) {
+              libros.push(...librosDeAPI);
+              console.log(`📚 POST exitoso: ${librosDeAPI.length} libros de ${baseUrl}`);
             }
-          }, 200);
-        });
-      });
-      console.log('Scroll completado');
+          }
+          
+          // Intentar GET
+          const queryString = new URLSearchParams(Object.fromEntries(
+            Object.entries(params).map(([key, value]) => [key, String(value)])
+          )).toString();
+          const responseGet = await fetch(`${baseUrl}?${queryString}`, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+              'Accept': 'application/json, text/html, */*',
+              'Referer': 'https://www.bibliotecaspublicas.gob.cl/'
+            }
+          });
+          
+          if (responseGet.ok) {
+            const datos = await responseGet.json();
+            const librosDeAPI = this.procesarRespuestaAPI(datos);
+            if (librosDeAPI.length > 0) {
+              libros.push(...librosDeAPI);
+              console.log(`📚 GET exitoso: ${librosDeAPI.length} libros de ${baseUrl}`);
+            }
+          }
+          
+        } catch (apiError) {
+          // Continuar con el siguiente conjunto de parámetros
+          continue;
+        }
+      }
+      
+      return libros;
+      
     } catch (error) {
-      console.error('Error durante scroll:', error);
+      console.log(`❌ Error con API ${baseUrl}:`, error);
+      return [];
     }
   }
-
-  async extraerLibrosValdivia(): Promise<Libro[]> {
+  
+  private procesarRespuestaAPI(datos: any): Libro[] {
+    const libros: Libro[] = [];
+    
     try {
-      console.log('Extrayendo libros de las bibliotecas de Valdivia...');
+      let items = datos;
       
-      const html = await this.page.content();
-      const $ = cheerio.load(html);
+      // Buscar en diferentes estructuras de respuesta
+      if (datos.results) items = datos.results;
+      if (datos.data) items = datos.data;
+      if (datos.books) items = datos.books;
+      if (datos.libros) items = datos.libros;
+      if (datos.items) items = datos.items;
       
-      console.log('HTML length:', html.length);
-      console.log('Texto que contiene Harry Potter:', html.includes('Harry Potter'));
+      if (Array.isArray(items)) {
+        for (const item of items) {
+          if (this.esLibroValido(item)) {
+            const libro = this.crearLibroDesdeAPI(item);
+            if (libro) {
+              libros.push(libro);
+            }
+          }
+        }
+      }
       
-      const librosEncontrados: Libro[] = [];
+    } catch (error) {
+      console.error('Error procesando respuesta API:', error);
+    }
+    
+    return libros;
+  }
+  
+  private esLibroValido(item: any): boolean {
+    return item && 
+           typeof item === 'object' && 
+           (item.title || item.titulo || item.name) &&
+           (item.title || item.titulo || item.name).length > 2;
+  }
+  
+  private crearLibroDesdeAPI(item: any): Libro | null {
+    try {
+      const titulo = item.title || item.titulo || item.name || '';
+      const autor = item.author || item.autor || item.writer || '';
+      const docNumber = item.doc_number || item.document_id || item.id || '';
       
-      // Buscar el patrón específico que vemos en el contenido
-      const textoCompleto = $.root().text();
-      console.log('Texto completo length:', textoCompleto.length);
+      return {
+        titulo: titulo.trim(),
+        autor: autor.trim() || 'Autor no especificado',
+        isbn: item.isbn || '',
+        editorial: item.publisher || item.editorial || '',
+        año: item.year || item.año || item.date || '',
+        disponibilidad: item.availability || 'Disponible en biblioteca',
+        urlDisponibilidad: docNumber ? buildCatalogURL(docNumber.toString().padStart(9, '0')) : '',
+        biblioteca: 'Biblioteca Pública de Valdivia',
+        docNumber: docNumber ? docNumber.toString().padStart(9, '0') : '',
+        subLibrary: 'D207'
+      };
+    } catch (error) {
+      console.error('Error creando libro desde API:', error);
+      return null;
+    }
+  }
+  
+  async parsearHTMLDirecto(termino: string): Promise<Libro[]> {
+    try {
+      console.log(`🌐 Parseando HTML directamente para: "${termino}"`);
       
-      // Dividir el contenido por los patrones de libros
-      const patronLibro = /([^\.]+)\s*Autor:\s*([^\.]+)\s*El ejemplar se encuentra en las siguientes bibliotecas:/g;
+      const url = buildValdiviaURL(termino);
+      
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'es-ES,es;q=0.9',
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const html = await response.text();
+      console.log(`📄 HTML recibido: ${html.length} caracteres`);
+      
+      return this.extraerLibrosDeHTML(html);
+      
+    } catch (error) {
+      console.error('Error parseando HTML directo:', error);
+      throw error;
+    }
+  }
+  
+  private extraerLibrosDeHTML(html: string): Libro[] {
+    const libros: Libro[] = [];
+    
+    try {
+      // Buscar patrones específicos en el HTML
+      const patronLibro = /([^\.]+?)\s*Autor:\s*([^\.]+?)\s*(?:El ejemplar se encuentra|ISBN|Editorial)/gi;
       
       let match;
-      let numeroLibro = 0;
+      let contador = 0;
       
-      while ((match = patronLibro.exec(textoCompleto)) !== null && numeroLibro < 50) {
+      while ((match = patronLibro.exec(html)) !== null && contador < 50) {
         const titulo = this.limpiarTexto(match[1]);
         const autor = this.limpiarTexto(match[2]);
         
         if (this.esTituloValido(titulo)) {
-          numeroLibro++;
+          contador++;
           
-          // Generar un número de documento simulado (en un caso real, tendríamos que extraerlo)
-          const docNumber = (1000000 + numeroLibro).toString().padStart(9, '0');
+          // Buscar números de documento cerca de este match
+          const contexto = html.substring(Math.max(0, match.index - 500), match.index + 500);
+          const docNumber = this.buscarDocNumberEnContexto(contexto);
           
           const libro: Libro = {
             titulo,
@@ -153,143 +243,103 @@ class ValdiviaScraperService {
             editorial: '',
             año: '',
             disponibilidad: 'Disponible en biblioteca',
-            urlDisponibilidad: buildCatalogURL(docNumber),
+            urlDisponibilidad: docNumber ? buildCatalogURL(docNumber) : '',
             biblioteca: 'Biblioteca Pública de Valdivia',
-            docNumber,
+            docNumber: docNumber || '',
             subLibrary: 'D207'
           };
           
-          librosEncontrados.push(libro);
+          libros.push(libro);
+          console.log(`📖 Libro extraído: ${titulo} ${docNumber ? `-> ${docNumber}` : '(sin enlace)'}`);
         }
       }
       
-      // Si no encontramos libros con el patrón, intentar búsqueda alternativa
-      if (librosEncontrados.length === 0) {
-        console.log('Intentando método alternativo de extracción...');
-        const librosAlternativos = this.extraerLibrosMetodoAlternativo($);
-        librosEncontrados.push(...librosAlternativos);
+      // Si no encontramos libros con el patrón, intentar otros métodos
+      if (libros.length === 0) {
+        console.log('🔍 Intentando patrones alternativos...');
+        return this.extraerConPatronesAlternativos(html);
       }
-
-      console.log(`Total libros extraídos: ${librosEncontrados.length}`);
-      
-      return this.limpiarResultados(librosEncontrados);
       
     } catch (error) {
-      console.error('Error extrayendo libros:', error);
-      throw new Error('No se pudieron extraer los libros');
+      console.error('Error extrayendo libros de HTML:', error);
     }
-  }
-
-  private extraerLibrosMetodoAlternativo($: any): Libro[] {
-    const libros: Libro[] = [];
-    
-    // Buscar todos los elementos que contengan texto relacionado con libros
-    const elementos = $('*').filter(function(this: any) {
-      const texto = $(this).text();
-      return texto.includes('Autor:') && texto.length > 50 && texto.length < 1000;
-    });
-    
-    elementos.each((index: number, element: any) => {
-      const $element = $(element);
-      const textoElemento = $element.text();
-      
-      // Extraer información usando expresiones regulares
-      const tituloMatch = textoElemento.match(/^([^A]+?)(?=Autor:)/);
-      const autorMatch = textoElemento.match(/Autor:\s*([^E]+?)(?=El ejemplar|$)/);
-      
-      if (tituloMatch && autorMatch) {
-        const titulo = this.limpiarTexto(tituloMatch[1]);
-        const autor = this.limpiarTexto(autorMatch[1]);
-        
-        if (this.esTituloValido(titulo)) {
-          const docNumber = (1000000 + index).toString().padStart(9, '0');
-          
-          libros.push({
-            titulo,
-            autor,
-            isbn: '',
-            editorial: '',
-            año: '',
-            disponibilidad: 'Disponible en biblioteca',
-            urlDisponibilidad: buildCatalogURL(docNumber),
-            biblioteca: 'Biblioteca Pública de Valdivia',
-            docNumber,
-            subLibrary: 'D207'
-          });
-        }
-      }
-    });
     
     return libros;
   }
-
+  
+  private buscarDocNumberEnContexto(contexto: string): string {
+    // Buscar diferentes patrones de números de documento
+    const patrones = [
+      /Doc:\s*(\d{9})/i,
+      /doc_number[=:](\d{6,9})/i,
+      /\b(000\d{6})\b/,
+      /\b(\d{9})\b/,
+      /catalog[^"]*?(\d{8,9})/i,
+      /#\s*Doc:\s*(\d{9})/i
+    ];
+    
+    for (const patron of patrones) {
+      const match = contexto.match(patron);
+      if (match) {
+        console.log(`🔢 Número encontrado con patrón ${patron.source}: ${match[1]}`);
+        return match[1].padStart(9, '0');
+      }
+    }
+    
+    return '';
+  }
+  
+  private extraerConPatronesAlternativos(html: string): Libro[] {
+    const libros: Libro[] = [];
+    
+    // Buscar enlaces directos al catálogo
+    const patronEnlaces = /href="[^"]*bncatalogo\.cl[^"]*doc_number=(\d+)[^"]*"[^>]*>([^<]+)/gi;
+    
+    let match;
+    while ((match = patronEnlaces.exec(html)) !== null) {
+      const docNumber = match[1].padStart(9, '0');
+      const textoEnlace = this.limpiarTexto(match[2]);
+      
+      if (textoEnlace && textoEnlace.length > 3) {
+        libros.push({
+          titulo: textoEnlace,
+          autor: 'Autor no especificado',
+          isbn: '',
+          editorial: '',
+          año: '',
+          disponibilidad: 'Disponible en biblioteca',
+          urlDisponibilidad: buildCatalogURL(docNumber),
+          biblioteca: 'Biblioteca Pública de Valdivia',
+          docNumber,
+          subLibrary: 'D207'
+        });
+      }
+    }
+    
+    return libros;
+  }
+  
   private limpiarTexto(texto: string): string {
     return texto
       .replace(/\s+/g, ' ')
-      .replace(/\n+/g, ' ')
+      .replace(/[\r\n\t]/g, ' ')
       .trim()
-      .replace(/^[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]+/, '')
-      .replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-\.\,\:\(\)]+$/, '');
+      .replace(/^[^\w\s]+|[^\w\s]+$/g, '');
   }
-
+  
   private esTituloValido(titulo: string): boolean {
     if (!titulo || titulo.length < 3 || titulo.length > 200) {
       return false;
     }
     
-    const titulosExcluir = [
-      'puedes revisar',
-      'menú', 'navegación', 'header', 'footer', 'inicio', 'buscar', 
-      'contacto', 'biblioteca', 'catálogo', 'resultados',
-      'el ejemplar se encuentra',
-      'autor:',
-      'no obstante'
-    ];
-    
+    const exclusiones = ['menú', 'navegación', 'buscar', 'contacto', 'header', 'footer'];
     const tituloLower = titulo.toLowerCase();
-    return !titulosExcluir.some(excluir => tituloLower.includes(excluir));
-  }
-
-  private limpiarResultados(libros: Libro[]): Libro[] {
-    const librosUnicos = new Map<string, Libro>();
     
-    for (const libro of libros) {
-      const clave = libro.titulo.toLowerCase().trim();
-      
-      if (!librosUnicos.has(clave)) {
-        const libroLimpio: Libro = {
-          titulo: libro.titulo.trim(),
-          autor: libro.autor.trim() || 'Autor no especificado',
-          isbn: libro.isbn.trim(),
-          editorial: libro.editorial.trim(),
-          año: libro.año.trim(),
-          disponibilidad: libro.disponibilidad.trim() || 'Consultar disponibilidad',
-          urlDisponibilidad: libro.urlDisponibilidad.trim(),
-          biblioteca: libro.biblioteca || 'Biblioteca Pública de Valdivia',
-          docNumber: libro.docNumber,
-          subLibrary: libro.subLibrary || 'D207'
-        };
-        
-        librosUnicos.set(clave, libroLimpio);
-      }
-    }
-    
-    return Array.from(librosUnicos.values());
+    return !exclusiones.some(ex => tituloLower.includes(ex));
   }
 
   async buscarPorTermino(termino: string): Promise<Libro[]> {
-    try {
-      console.log(`Buscando en Valdivia: "${termino}"`);
-      
-      await this.navegarAValdivia(termino);
-      await this.esperarContenidoDinamico();
-      const libros = await this.extraerLibrosValdivia();
-      
-      return libros;
-    } catch (error) {
-      console.error('Error en búsqueda por término:', error);
-      throw error;
-    }
+    return await this.buscarLibrosDirecto(termino);
   }
 
   async buscarMultiplesTerminos(terminos: string[]): Promise<Libro[]> {
@@ -301,21 +351,28 @@ class ValdiviaScraperService {
         const libros = await this.buscarPorTermino(termino);
         todosLosLibros.push(...libros);
         
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        // Pausa entre búsquedas
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
       } catch (error) {
         console.error(`Error buscando término "${termino}":`, error);
       }
     }
     
-    return this.limpiarResultados(todosLosLibros);
+    return this.eliminarDuplicados(todosLosLibros);
   }
-
-  async cerrar() {
-    if (this.browser) {
-      await this.browser.close();
-      console.log('Browser cerrado');
+  
+  private eliminarDuplicados(libros: Libro[]): Libro[] {
+    const librosUnicos = new Map<string, Libro>();
+    
+    for (const libro of libros) {
+      const clave = libro.titulo.toLowerCase().trim();
+      if (!librosUnicos.has(clave)) {
+        librosUnicos.set(clave, libro);
+      }
     }
+    
+    return Array.from(librosUnicos.values());
   }
 }
 
@@ -338,21 +395,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       terminos = []
     }: ScrapingRequest = req.body;
 
-    if (!accion || !['buscar_general', 'buscar_termino', 'buscar_multiples'].includes(accion)) {
-      throw new Error('Acción no válida');
-    }
-
-    console.log(`Iniciando scraping para Valdivia - Acción: ${accion}`);
-    
-    await scraper.initBrowser();
+    console.log(`🚀 Iniciando búsqueda directa - Acción: ${accion}`);
 
     let resultado: ScrapingResponse;
 
     switch (accion) {
       case 'buscar_general':
-        await scraper.navegarAValdivia('literatura');
-        await scraper.esperarContenidoDinamico();
-        const librosGenerales = await scraper.extraerLibrosValdivia();
+        const librosGenerales = await scraper.buscarPorTermino('literatura');
         
         resultado = {
           exito: true,
@@ -398,21 +447,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         throw new Error('Acción no reconocida');
     }
 
-    console.log(`Scraping completado. Libros encontrados: ${resultado.total || 0}`);
+    console.log(`✅ Búsqueda completada. Libros encontrados: ${resultado.total || 0}`);
     
     res.status(200).json(resultado);
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    console.error('Error en scraping:', error);
+    console.error('❌ Error en búsqueda:', error);
     
     res.status(500).json({
       exito: false,
       error: errorMessage,
       biblioteca: 'Valdivia'
     });
-  } finally {
-    await scraper.cerrar();
   }
 }
 
@@ -421,6 +468,6 @@ export const config = {
     bodyParser: {
       sizeLimit: '2mb',
     },
-    maxDuration: 120,
+    maxDuration: 60,
   },
 };
