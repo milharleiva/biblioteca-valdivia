@@ -246,7 +246,7 @@ export const ValdiviaSearch: React.FC = () => {
             {/* Botones de acción */}
             <div className="flex flex-wrap gap-3 pt-2">
               <Button
-                onClick={realizarScraping}
+                onClick={tipoAccion === 'buscar_multiples' ? buscarMultiplesTerminos : realizarScraping}
                 loading={loading}
                 variant="primary"
                 size="lg"
@@ -255,17 +255,6 @@ export const ValdiviaSearch: React.FC = () => {
                 <Search className="h-5 w-5 mr-2" />
                 {loading ? 'Buscando en Valdivia...' : 'Buscar Libros'}
               </Button>
-
-              {tipoAccion === 'buscar_multiples' && (
-                <Button
-                  onClick={buscarMultiplesTerminos}
-                  loading={loading}
-                  variant="success"
-                  size="lg"
-                >
-                  Búsqueda Múltiple
-                </Button>
-              )}
 
               {(libros.length > 0 || terminoBusqueda) && (
                 <Button

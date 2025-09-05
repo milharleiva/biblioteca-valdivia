@@ -207,8 +207,6 @@ class ValdiviaScraperService {
       
       const html = await response.text();
       console.log(`📄 HTML recibido: ${html.length} caracteres`);
-      console.log(`🔍 Contiene "Harry Potter": ${html.includes('Harry Potter')}`);
-      console.log(`🔍 Contiene "Autor:": ${html.includes('Autor:')}`);
       
       return this.extraerLibrosDeHTML(html);
       
@@ -224,8 +222,7 @@ class ValdiviaScraperService {
     try {
       console.log('🔍 Analizando HTML para extraer libros...');
       
-      // NUEVO: Extraer títulos directamente del HTML
-      // Patrón mejorado basado en la estructura real de la página
+      // Extraer títulos directamente del HTML
       const textoLimpio = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
       
       // Buscar el patrón específico de la página de bibliotecas públicas
@@ -252,7 +249,6 @@ class ValdiviaScraperService {
           if (posicionTitulo !== -1) {
             contexto = html.substring(Math.max(0, posicionTitulo - 1000), posicionTitulo + 1000);
           } else {
-            // Si no encuentra la posición exacta, usar el contexto del match
             contexto = textoLimpio.substring(Math.max(0, match.index - 500), match.index + 500);
           }
           
@@ -296,8 +292,8 @@ class ValdiviaScraperService {
   private extraerEditorialDelContexto(contexto: string): string {
     const patronesEditorial = [
       /Editorial[:\s]+([^,\n\.]+)/i,
-      /([A-Z][a-z]+\s*(?:[A-Z][a-z]*)*)\s*,\s*\d{4}/i, // Formato: "Editorial, 2004"
-      /:\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]*)*)\s*,/i // Formato: ": Editorial ,"
+      /([A-Z][a-z]+\s*(?:[A-Z][a-z]*)*)\s*,\s*\d{4}/i,
+      /:\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]*)*)\s*,/i
     ];
     
     for (const patron of patronesEditorial) {
@@ -311,7 +307,6 @@ class ValdiviaScraperService {
   }
   
   private buscarDocNumberEnContexto(contexto: string): string {
-    // Buscar diferentes patrones de números de documento
     const patrones = [
       /Doc:\s*(\d{9})/i,
       /doc_number[=:](\d{6,9})/i,
@@ -366,43 +361,23 @@ class ValdiviaScraperService {
         }
       }
       
-      // Método 2: Si es Harry Potter, buscar títulos específicos
-      if (html.toLowerCase().includes('harry potter') && libros.length === 0) {
-        console.log('🪄 Detectado Harry Potter, usando extracción específica...');
-        
-        const titulosHarryPotter = [
-          'Harry Potter y la piedra filosofal',
-          'Harry Potter y la cámara secreta',
-          'Harry Potter y el prisionero de Azkaban',
-          'Harry Potter y el cáliz de fuego',
-          'Harry Potter y la Orden del Fénix',
-          'Harry Potter y el misterio del príncipe',
-          'Harry Potter y las reliquias de la muerte',
-          'Los mundos mágicos de Harry Potter',
-          'Guía Muggle del mundo mágico',
-          'diccionario del mago'
-        ];
-        
-        let docCounter = 46068; // Empezar desde un número base
-        
-        for (const titulo of titulosHarryPotter) {
-          if (html.toLowerCase().includes(titulo.toLowerCase())) {
-            const docNumber = docCounter.toString().padStart(9, '0');
-            libros.push({
-              titulo,
-              autor: 'J.K. Rowling',
-              isbn: '',
-              editorial: '',
-              año: '',
-              disponibilidad: 'Disponible en biblioteca',
-              urlDisponibilidad: buildCatalogURL(docNumber),
-              biblioteca: 'Biblioteca Pública de Valdivia',
-              docNumber,
-              subLibrary: 'D207'
-            });
-            docCounter += 1000; // Incrementar para el siguiente
-            console.log(`📚 Libro Harry Potter detectado: "${titulo}" -> ${docNumber}`);
-          }
+      // Método 2: Buscar patrones genéricos de libros en el HTML
+      const patronGenerico = /class="[^"]*book[^"]*"[^>]*>([^<]+)</gi;
+      while ((match = patronGenerico.exec(html)) !== null && libros.length < 20) {
+        const titulo = this.limpiarTexto(match[1]);
+        if (this.esTituloValido(titulo)) {
+          libros.push({
+            titulo,
+            autor: 'Autor no especificado',
+            isbn: '',
+            editorial: '',
+            año: '',
+            disponibilidad: 'Disponible en biblioteca',
+            urlDisponibilidad: '',
+            biblioteca: 'Biblioteca Pública de Valdivia',
+            docNumber: '',
+            subLibrary: 'D207'
+          });
         }
       }
       
@@ -419,8 +394,8 @@ class ValdiviaScraperService {
       .replace(/[\r\n\t]/g, ' ')
       .trim()
       .replace(/^[^\w\s]+|[^\w\s]+$/g, '')
-      .replace(/^\s*[-•*]\s*/, '') // Remover bullets
-      .replace(/\s*[:;]\s*$/, ''); // Remover : o ; al final
+      .replace(/^\s*[-•*]\s*/, '')
+      .replace(/\s*[:;]\s*$/, '');
   }
   
   private esTituloValido(titulo: string): boolean {

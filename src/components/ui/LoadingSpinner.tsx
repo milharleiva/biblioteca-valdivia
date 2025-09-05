@@ -1,4 +1,7 @@
+// ==========================================
 // src/components/ui/LoadingSpinner.tsx
+// ==========================================
+
 import { Loader } from 'lucide-react';
 
 interface LoadingSpinnerProps {
