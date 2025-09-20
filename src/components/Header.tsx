@@ -1,94 +1,166 @@
 'use client';
 
 import Link from 'next/link';
+import { AppBar, Toolbar, Box, Typography, Container, Chip, IconButton } from '@mui/material';
+import { Phone, Email, AccessTime, MenuBook } from '@mui/icons-material';
+import { motion } from 'framer-motion';
 
 export function Header() {
   return (
-    <header className="bg-white shadow-lg border-b-4 border-blue-600">
-      <div className="container mx-auto px-4">
+    <motion.header
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+    >
+      <AppBar position="static" sx={{ bgcolor: 'white', color: 'text.primary', boxShadow: 3, borderBottom: '4px solid #1976d2' }}>
         {/* Top bar */}
-        <div className="flex justify-between items-center py-2 text-sm text-gray-600 border-b border-gray-200">
-          <div className="flex items-center space-x-6">
-            <span className="flex items-center">
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21L6.3 11.27a11.054 11.054 0 005.43 5.43l1.838-3.924a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              (63) 221-1234
-            </span>
-            <span className="flex items-center">
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              info@bibliotecaslosrios.cl
-            </span>
-            <span className="flex items-center">
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Lun-Vie 9:00-18:00, Sáb 9:00-14:00
-            </span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-blue-600 font-medium">Portal Ciudadano</span>
-            <span>|</span>
-            <span className="text-blue-600 font-medium">Gobierno Regional</span>
-          </div>
-        </div>
+        <Box sx={{ bgcolor: '#f5f5f5', borderBottom: '1px solid #e0e0e0' }}>
+          <Container maxWidth="xl">
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Phone sx={{ fontSize: 16, color: 'text.secondary' }} />
+                    <Typography variant="body2" color="text.secondary">(63) 221-1234</Typography>
+                  </Box>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Email sx={{ fontSize: 16, color: 'text.secondary' }} />
+                    <Typography variant="body2" color="text.secondary">info@bibliotecaslosrios.cl</Typography>
+                  </Box>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <AccessTime sx={{ fontSize: 16, color: 'text.secondary' }} />
+                    <Typography variant="body2" color="text.secondary">Lun-Vie 9:00-18:00, Sáb 9:00-14:00</Typography>
+                  </Box>
+                </motion.div>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Chip label="Portal Ciudadano" color="primary" variant="outlined" size="small" />
+                <Typography variant="body2" color="text.secondary">|</Typography>
+                <Chip label="Gobierno Regional" color="primary" variant="outlined" size="small" />
+              </Box>
+            </Box>
+          </Container>
+        </Box>
 
         {/* Main header */}
-        <div className="flex items-center justify-between py-6">
-          <div className="flex items-center space-x-4">
-            <div className="bg-blue-600 p-3 rounded-lg">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">
-                Sistema de Bibliotecas Públicas
-              </h1>
-              <p className="text-blue-600 font-medium">Región de Los Ríos</p>
-            </div>
-          </div>
+        <Container maxWidth="xl">
+          <Toolbar sx={{ justifyContent: 'space-between', py: 3 }}>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <IconButton
+                  sx={{
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    '&:hover': { bgcolor: 'primary.dark' }
+                  }}
+                  size="large"
+                >
+                  <MenuBook sx={{ fontSize: 32 }} />
+                </IconButton>
+                <Box>
+                  <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+                    Sistema de Bibliotecas Públicas
+                  </Typography>
+                  <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 'medium' }}>
+                    Región de Los Ríos
+                  </Typography>
+                </Box>
+              </Box>
+            </motion.div>
 
-          <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <p className="text-sm text-gray-600">Gobierno de Chile</p>
-              <p className="text-sm font-medium text-gray-800">Servicio Nacional del Patrimonio Cultural</p>
-            </div>
-            <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-blue-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xs">CHILE</span>
-            </div>
-          </div>
-        </div>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography variant="body2" color="text.secondary">Gobierno de Chile</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                    Servicio Nacional del Patrimonio Cultural
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    width: 64,
+                    height: 64,
+                    background: 'linear-gradient(135deg, #f44336 0%, #2196f3 100%)',
+                    borderRadius: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Typography sx={{ color: 'white', fontWeight: 'bold', fontSize: '0.75rem' }}>
+                    CHILE
+                  </Typography>
+                </Box>
+              </Box>
+            </motion.div>
+          </Toolbar>
+        </Container>
 
         {/* Navigation */}
-        <nav className="border-t border-gray-200">
-          <div className="flex space-x-8 py-4">
-            <Link href="/" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
-              Inicio
-            </Link>
-            <Link href="/sobre-nosotros" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
-              Sobre Nosotros
-            </Link>
-            <Link href="/servicios" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
-              Servicios
-            </Link>
-            <Link href="/buscar-libros" className="text-gray-600 hover:text-blue-600 transition-colors pb-1 hover:bg-blue-50 px-3 py-1 rounded">
-              Buscador de Libros
-            </Link>
-            <Link href="/horarios" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
-              Horarios
-            </Link>
-            <Link href="/actividades" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
-              Actividades
-            </Link>
-            <Link href="/contacto" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
-              Contacto
-            </Link>
-          </div>
-        </nav>
-      </div>
-    </header>
+        <Box sx={{ borderTop: '1px solid #e0e0e0' }}>
+          <Container maxWidth="xl">
+            <Box sx={{ display: 'flex', gap: 4, py: 2 }}>
+              {[
+                { href: '/', label: 'Inicio' },
+                { href: '/sobre-nosotros', label: 'Sobre Nosotros' },
+                { href: '/servicios', label: 'Servicios' },
+                { href: '/buscar-libros', label: 'Buscador de Libros' },
+                { href: '/horarios', label: 'Horarios' },
+                { href: '/actividades', label: 'Actividades' },
+                { href: '/contacto', label: 'Contacto' }
+              ].map((item, index) => (
+                <motion.div
+                  key={item.href}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.3 }}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link href={item.href} passHref style={{ textDecoration: 'none' }}>
+                    <Typography
+                      component="span"
+                      sx={{
+                        color: 'text.secondary',
+                        cursor: 'pointer',
+                        px: 2,
+                        py: 1,
+                        borderRadius: 1,
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          color: 'primary.main',
+                          bgcolor: 'primary.50'
+                        }
+                      }}
+                    >
+                      {item.label}
+                    </Typography>
+                  </Link>
+                </motion.div>
+              ))}
+            </Box>
+          </Container>
+        </Box>
+      </AppBar>
+    </motion.header>
   );
 }

@@ -320,7 +320,7 @@ export default function Contacto() {
                   </h3>
                   <ul className="space-y-2 text-gray-700">
                     <li>• Líneas de micro: 1, 7, 12, 20</li>
-                    <li>• Parada más cercana: "Picarte con Independencia"</li>
+                    <li>• Parada más cercana: &ldquo;Picarte con Independencia&rdquo;</li>
                     <li>• Distancia desde terminal: 1.2 km (15 min caminando)</li>
                   </ul>
                 </div>

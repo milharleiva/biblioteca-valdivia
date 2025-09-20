@@ -65,7 +65,7 @@ export default function Actividades() {
                     </div>
                   </div>
                   <p className="text-sm text-center text-gray-500">
-                    Libro actual: "Cien años de soledad" - Gabriel García Márquez
+                    Libro actual: &ldquo;Cien años de soledad&rdquo; - Gabriel García Márquez
                   </p>
                 </div>
               </div>
@@ -238,7 +238,7 @@ export default function Actividades() {
                       <div className="text-sm text-gray-600">
                         <p className="mb-1">📅 Viernes 12, 19 y 26 de enero</p>
                         <p className="mb-1">🕐 16:00 - 17:30 hrs</p>
-                        <p className="mb-1">📖 Libro: "Eleanor & Park" - Rainbow Rowell</p>
+                        <p className="mb-1">📖 Libro: &ldquo;Eleanor &amp; Park&rdquo; - Rainbow Rowell</p>
                         <p>👥 Grupo abierto</p>
                       </div>
                     </div>
@@ -267,7 +267,7 @@ export default function Actividades() {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                  "Valdivia: Ayer y Hoy"
+                  &ldquo;Valdivia: Ayer y Hoy&rdquo;
                 </h3>
                 <p className="text-gray-600 mb-4">
                   Muestra fotográfica que contrasta imágenes históricas de Valdivia
@@ -290,7 +290,7 @@ export default function Actividades() {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                  "Primeras Ediciones Chilenas"
+                  &ldquo;Primeras Ediciones Chilenas&rdquo;
                 </h3>
                 <p className="text-gray-600 mb-4">
                   Exposición de primeras ediciones de autores chilenos clásicos,
