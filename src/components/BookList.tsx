@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Book } from '@/app/page';
 
 interface BookListProps {
@@ -51,9 +52,11 @@ export function BookList({ books, loading }: BookListProps) {
               {/* Imagen del libro */}
               <div className="flex-shrink-0">
                 {book.thumbnail ? (
-                  <img 
-                    src={book.thumbnail} 
+                  <Image
+                    src={book.thumbnail}
                     alt={book.title}
+                    width={64}
+                    height={80}
                     className="w-16 h-20 object-cover rounded-lg shadow-sm"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';

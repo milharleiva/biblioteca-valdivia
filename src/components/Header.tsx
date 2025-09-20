@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 export function Header() {
   return (
     <header className="bg-white shadow-lg border-b-4 border-blue-600">
@@ -63,9 +65,9 @@ export function Header() {
         {/* Navigation */}
         <nav className="border-t border-gray-200">
           <div className="flex space-x-8 py-4">
-            <a href="/" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
+            <Link href="/" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
               Inicio
-            </a>
+            </Link>
             <a href="/buscar-libros" className="text-gray-600 hover:text-blue-600 transition-colors pb-1 hover:bg-blue-50 px-3 py-1 rounded">
               Buscador de Libros
             </a>
