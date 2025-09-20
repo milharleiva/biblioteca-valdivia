@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
 
       // Si hay término de búsqueda, hacer búsqueda más flexible
       if (searchTerm && searchTerm.trim() !== '') {
-        const searchWords = searchTerm.toLowerCase().split(' ').filter(word => word.length > 0);
+        const searchWords = searchTerm.toLowerCase().split(' ').filter((word: string) => word.length > 0);
         const titleLower = rawBook.title.toLowerCase();
         const authorLower = rawBook.author.toLowerCase();
 
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
         console.log(`  🔍 Autor en minúsculas: "${authorLower}"`);
 
         // Verificar si el título o autor contiene al menos una palabra del término de búsqueda
-        const hasMatch = searchWords.some(word => {
+        const hasMatch = searchWords.some((word: string) => {
           const titleMatch = titleLower.includes(word);
           const authorMatch = authorLower.includes(word);
           console.log(`    - Palabra "${word}": título=${titleMatch}, autor=${authorMatch}`);
