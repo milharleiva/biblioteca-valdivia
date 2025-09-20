@@ -1,12 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
-import puppeteer from 'puppeteer';
+import axios, { AxiosResponse } from 'axios';
+import * as cheerio from 'cheerio';
+
+interface RawBookData {
+  index: number;
+  title: string;
+  author: string;
+  hasAvailabilityLink: boolean;
+  availabilityHref: string;
+  hasTitle: boolean;
+  fullHtml: string;
+}
+
+interface ProcessedBook {
+  title: string;
+  author: string;
+  availability: string;
+  library: string;
+  detailUrl: string;
+}
+
+interface PageData {
+  totalContainers: number;
+  books: RawBookData[];
+  pageInfo: {
+    hasResultsDiv: boolean;
+    totalRows: number;
+    resultsRows: number;
+    hasPagination: boolean;
+    currentPage: string;
+  };
+}
 
 export async function POST(request: NextRequest) {
-  let browser = null;
-  
   try {
     const { searchTerm } = await request.json();
-    
+
     if (!searchTerm) {
       return NextResponse.json(
         { error: 'Término de búsqueda requerido' },
@@ -19,103 +48,91 @@ export async function POST(request: NextRequest) {
     console.log('Término:', searchTerm);
     console.log('========================================');
 
-    browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage'
-      ],
-      timeout: 30000
-    });
-
-    const page = await browser.newPage();
-
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-    await page.setViewport({ width: 1366, height: 768 });
-
-    // Ir directamente a la URL específica con el término de búsqueda
+    // Configure HTTP request with axios
     const searchUrl = `https://www.bibliotecaspublicas.gob.cl/buscador-libros-transversal?region_id=14&commune_id%5B%5D=310&geolocation_center%5Bcoordinates%5D%5Blat%5D=&geolocation_center%5Bcoordinates%5D%5Blng%5D=&query=${encodeURIComponent(searchTerm)}`;
-    console.log('Navegando directamente a:', searchUrl);
+    console.log('Solicitando URL:', searchUrl);
 
-    await page.goto(searchUrl, {
-      waitUntil: 'networkidle2',
-      timeout: 30000
-    });
+    let response: AxiosResponse<string> | undefined;
+    let retries = 3;
 
-    console.log('Página cargada, esperando resultados...');
-    await new Promise(resolve => setTimeout(resolve, 5000));
-
-    // Verificar si la página cargó completamente
-    const pageLoaded = await page.evaluate(() => {
-      const resultsDiv = document.querySelector('.results');
-      const bookRows = document.querySelectorAll('.results .row');
-      return {
-        hasResults: !!resultsDiv,
-        rowCount: bookRows.length,
-        pageTitle: document.title,
-        url: window.location.href
-      };
-    });
-
-    console.log('Estado de la página:', pageLoaded);
-
-    // Si no hay resultados, esperar más tiempo
-    if (pageLoaded.rowCount === 0) {
-      console.log('No se encontraron resultados inicialmente, esperando más...');
-      await new Promise(resolve => setTimeout(resolve, 5000));
+    while (retries > 0) {
+      try {
+        response = await axios.get(searchUrl, {
+          timeout: 10000,
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+          }
+        });
+        break;
+      } catch (error: unknown) {
+        retries--;
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.log(`Error en solicitud HTTP, intentos restantes: ${retries}`, errorMessage);
+        if (retries === 0) {
+          throw new Error(`Failed to fetch after multiple attempts: ${errorMessage}`);
+        }
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
     }
 
-    const valdiviaCode = 'D207'; // Código fijo para Valdivia
-    const finalUrl = page.url();
-    console.log('URL actual:', finalUrl);
+    if (!response) {
+      throw new Error('No response received from server');
+    }
 
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    console.log('Respuesta recibida, parseando HTML...');
 
-    // Extraer libros y doc_number de la página de resultados
-    console.log('Extrayendo libros y doc_number...');
+    // Parse HTML with cheerio
+    const $ = cheerio.load(response.data);
 
-    // Primero obtener información básica de la página
-    const rawBookData = await page.evaluate(() => {
-      const bookRows = document.querySelectorAll('.results .row');
-      const rawBooks = [];
+    // Extract book data
+    const bookRows = $('.results .row');
+    console.log(`Encontradas ${bookRows.length} filas de resultados`);
 
-      for (let i = 0; i < bookRows.length; i++) {
-        const row = bookRows[i];
-        const titleElement = row.querySelector('.title-book');
-        const authorElement = row.querySelector('.autor span:not(.label)');
-        const availabilityLink = row.querySelector('a.availability[href*="doc_number"]');
+    const rawBooks: RawBookData[] = [];
 
-        rawBooks.push({
-          index: i,
-          title: titleElement?.textContent?.trim() || '',
-          author: authorElement?.textContent?.trim() || 'Autor no especificado',
-          hasAvailabilityLink: !!availabilityLink,
-          availabilityHref: availabilityLink ? (availabilityLink as HTMLAnchorElement).href : '',
-          hasTitle: !!titleElement,
-          fullHtml: row.innerHTML.substring(0, 200) + '...' // Para debugging
-        });
-      }
+    bookRows.each((i, row) => {
+      const $row = $(row);
+      const titleElement = $row.find('.title-book');
+      const authorElement = $row.find('.autor span:not(.label)');
+      const availabilityLink = $row.find('a.availability[href*="doc_number"]');
 
-      return {
-        totalContainers: bookRows.length,
-        books: rawBooks,
-        pageInfo: {
-          hasResultsDiv: !!document.querySelector('.results'),
-          totalRows: document.querySelectorAll('.row').length,
-          resultsRows: bookRows.length,
-          hasPagination: !!document.querySelector('.pager'),
-          currentPage: document.querySelector('.pager .is-active')?.textContent?.trim() || 'N/A'
-        }
-      };
+      rawBooks.push({
+        index: i,
+        title: titleElement.text().trim() || '',
+        author: authorElement.text().trim() || 'Autor no especificado',
+        hasAvailabilityLink: availabilityLink.length > 0,
+        availabilityHref: availabilityLink.attr('href') || '',
+        hasTitle: titleElement.length > 0,
+        fullHtml: $row.html()?.substring(0, 200) + '...' || '' // Para debugging
+      });
     });
+
+    const rawBookData: PageData = {
+      totalContainers: bookRows.length,
+      books: rawBooks,
+      pageInfo: {
+        hasResultsDiv: $('.results').length > 0,
+        totalRows: $('.row').length,
+        resultsRows: bookRows.length,
+        hasPagination: $('.pager').length > 0,
+        currentPage: $('.pager .is-active').text().trim() || 'N/A'
+      }
+    };
+
+    const valdiviaCode = 'D207'; // Código fijo para Valdivia
 
     console.log('=== INFORMACIÓN DETALLADA DE LA PÁGINA ===');
     console.log('Información de la página:', rawBookData.pageInfo);
     console.log(`Total de contenedores encontrados: ${rawBookData.totalContainers}`);
 
     console.log('\n=== ANÁLISIS DETALLADO DE CADA CONTENEDOR ===');
-    rawBookData.books.forEach((book, index) => {
+    rawBookData.books.forEach((book: RawBookData, index: number) => {
       console.log(`[${index + 1}/${rawBookData.totalContainers}] "${book.title}" por ${book.author}`);
       console.log(`  - Tiene título: ${book.hasTitle}`);
       console.log(`  - Tiene link de disponibilidad: ${book.hasAvailabilityLink}`);
@@ -124,7 +141,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Ahora procesar con la lógica de filtrado
-    const processedBooks = [];
+    const processedBooks: ProcessedBook[] = [];
 
     console.log('\n=== PROCESAMIENTO CON FILTROS ===');
     console.log(`Buscando libros con término: "${searchTerm}"`);
@@ -198,15 +215,13 @@ export async function POST(request: NextRequest) {
     console.log(`Libros devueltos: ${Math.min(processedBooks.length, 20)}`);
 
     console.log(`\n=== LISTA FINAL DE LIBROS (TODOS) ===`);
-    processedBooks.slice(0, 20).forEach((book, index) => {
+    processedBooks.slice(0, 20).forEach((book: ProcessedBook, index: number) => {
       console.log(`${index + 1}. "${book.title}" - ${book.author}`);
       console.log(`   URL: ${book.detailUrl ? 'SÍ' : 'NO'}`);
-      console.log(`   Doc Number: ${book.detailUrl.match(/doc_number=(\d+)/)?.[1] || 'N/A'}`);
+      console.log(`   Doc Number: ${book.detailUrl ? book.detailUrl.match(/doc_number=(\d+)/)?.[1] || 'N/A' : 'N/A'}`);
     });
 
     const finalBooks = processedBooks.slice(0, 20);
-
-    await browser.close();
 
     console.log(`Libros encontrados en Valdivia: ${finalBooks.length}`);
     console.log(`Código de biblioteca utilizado: ${valdiviaCode}`);
@@ -219,7 +234,7 @@ export async function POST(request: NextRequest) {
         source: 'Biblioteca Municipal Valdivia',
         region: 'Los Ríos',
         comuna: 'Valdivia',
-        finalUrl,
+        finalUrl: searchUrl,
         debugInfo: {
           totalContainers: rawBookData.totalContainers,
           processedBooks: processedBooks.length,
@@ -232,7 +247,7 @@ export async function POST(request: NextRequest) {
           error: 'No se encontraron libros en Valdivia',
           details: `No se encontraron resultados para "${searchTerm}" en la Biblioteca Municipal de Valdivia`,
           suggestion: 'Intenta con otros términos de búsqueda',
-          finalUrl,
+          finalUrl: searchUrl,
           debugInfo: {
             totalContainers: rawBookData.totalContainers,
             processedBooks: processedBooks.length,
@@ -245,13 +260,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('ERROR:', error);
-    
-    if (browser) {
-      await browser.close();
-    }
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Error durante la búsqueda',
         details: error instanceof Error ? error.message : 'Error desconocido'
       },
