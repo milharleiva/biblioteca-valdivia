@@ -2,7 +2,7 @@
 
 import { Box, Container, Typography, IconButton, Divider, Link } from '@mui/material';
 import { MenuBook, Twitter, Facebook, Instagram, LocationOn, Phone, Email } from '@mui/icons-material';
-import { motion } from 'framer-motion';
+import { MotionDiv } from './MotionWrapper';
 
 export function Footer() {
   const socialIcons = [
@@ -33,7 +33,7 @@ export function Footer() {
       <Container maxWidth="xl" sx={{ py: 6 }}>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr 1fr' }, gap: 4 }}>
           {/* Información institucional */}
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -65,7 +65,7 @@ export function Footer() {
             </Typography>
             <Box sx={{ display: 'flex', gap: 1 }}>
               {socialIcons.map((social, index) => (
-                <motion.div
+                <MotionDiv
                   key={index}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
@@ -79,13 +79,13 @@ export function Footer() {
                   >
                     {social.icon}
                   </IconButton>
-                </motion.div>
+                </MotionDiv>
               ))}
             </Box>
-          </motion.div>
+          </MotionDiv>
 
           {/* Enlaces rápidos */}
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
@@ -111,10 +111,10 @@ export function Footer() {
                 </Link>
               ))}
             </Box>
-          </motion.div>
+          </MotionDiv>
 
           {/* Contacto */}
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -142,13 +142,13 @@ export function Footer() {
                 </Box>
               ))}
             </Box>
-          </motion.div>
+          </MotionDiv>
         </Box>
 
         {/* Separador y derechos */}
         <Divider sx={{ my: 4, bgcolor: 'grey.700' }} />
 
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
@@ -184,7 +184,7 @@ export function Footer() {
               ))}
             </Box>
           </Box>
-        </motion.div>
+        </MotionDiv>
       </Container>
     </Box>
   );

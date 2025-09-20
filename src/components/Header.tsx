@@ -3,11 +3,11 @@
 import Link from 'next/link';
 import { AppBar, Toolbar, Box, Typography, Container, Chip, IconButton } from '@mui/material';
 import { Phone, Email, AccessTime, MenuBook } from '@mui/icons-material';
-import { motion } from 'framer-motion';
+import { MotionHeader, MotionDiv } from './MotionWrapper';
 
 export function Header() {
   return (
-    <motion.header
+    <MotionHeader
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
@@ -18,7 +18,7 @@ export function Header() {
           <Container maxWidth="xl">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                <motion.div
+                <MotionDiv
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
@@ -26,8 +26,8 @@ export function Header() {
                     <Phone sx={{ fontSize: 16, color: 'text.secondary' }} />
                     <Typography variant="body2" color="text.secondary">(63) 221-1234</Typography>
                   </Box>
-                </motion.div>
-                <motion.div
+                </MotionDiv>
+                <MotionDiv
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
@@ -35,8 +35,8 @@ export function Header() {
                     <Email sx={{ fontSize: 16, color: 'text.secondary' }} />
                     <Typography variant="body2" color="text.secondary">info@bibliotecaslosrios.cl</Typography>
                   </Box>
-                </motion.div>
-                <motion.div
+                </MotionDiv>
+                <MotionDiv
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
@@ -44,7 +44,7 @@ export function Header() {
                     <AccessTime sx={{ fontSize: 16, color: 'text.secondary' }} />
                     <Typography variant="body2" color="text.secondary">Lun-Vie 9:00-18:00, Sáb 9:00-14:00</Typography>
                   </Box>
-                </motion.div>
+                </MotionDiv>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Chip label="Portal Ciudadano" color="primary" variant="outlined" size="small" />
@@ -58,7 +58,7 @@ export function Header() {
         {/* Main header */}
         <Container maxWidth="xl">
           <Toolbar sx={{ justifyContent: 'space-between', py: 3 }}>
-            <motion.div
+            <MotionDiv
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
@@ -82,9 +82,9 @@ export function Header() {
                   </Typography>
                 </Box>
               </Box>
-            </motion.div>
+            </MotionDiv>
 
-            <motion.div
+            <MotionDiv
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
@@ -111,7 +111,7 @@ export function Header() {
                   </Typography>
                 </Box>
               </Box>
-            </motion.div>
+            </MotionDiv>
           </Toolbar>
         </Container>
 
@@ -128,7 +128,7 @@ export function Header() {
                 { href: '/actividades', label: 'Actividades' },
                 { href: '/contacto', label: 'Contacto' }
               ].map((item, index) => (
-                <motion.div
+                <MotionDiv
                   key={item.href}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -155,12 +155,12 @@ export function Header() {
                       {item.label}
                     </Typography>
                   </Link>
-                </motion.div>
+                </MotionDiv>
               ))}
             </Box>
           </Container>
         </Box>
       </AppBar>
-    </motion.header>
+    </MotionHeader>
   );
 }

@@ -25,9 +25,7 @@ import {
   Phone,
   Email
 } from '@mui/icons-material';
-import { motion } from 'framer-motion';
-
-export const dynamic = 'force-dynamic';
+import { MotionDiv } from '@/components/MotionWrapper';
 
 export default function Home() {
   const containerVariants = {
@@ -66,14 +64,14 @@ export default function Home() {
         }}
       >
         <Container maxWidth="xl">
-          <motion.div
+          <MotionDiv
             variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: 6, alignItems: 'center' }}>
               <Box sx={{ flex: 1 }}>
-                <motion.div variants={itemVariants}>
+                <MotionDiv variants={itemVariants}>
                   <Typography
                     variant="h1"
                     sx={{
@@ -85,8 +83,8 @@ export default function Home() {
                   >
                     Biblioteca Municipal de Valdivia
                   </Typography>
-                </motion.div>
-                <motion.div variants={itemVariants}>
+                </MotionDiv>
+                <MotionDiv variants={itemVariants}>
                   <Typography
                     variant="h5"
                     sx={{
@@ -97,8 +95,8 @@ export default function Home() {
                   >
                     Un espacio de cultura, conocimiento y comunidad en el corazón de Los Ríos
                   </Typography>
-                </motion.div>
-                <motion.div variants={itemVariants}>
+                </MotionDiv>
+                <MotionDiv variants={itemVariants}>
                   <Typography
                     variant="h6"
                     sx={{
@@ -109,10 +107,10 @@ export default function Home() {
                   >
                     Desde 1925 sirviendo a la comunidad valdiviana, promoviendo la lectura, la educación y el acceso libre al conocimiento para todos.
                   </Typography>
-                </motion.div>
-                <motion.div variants={itemVariants}>
+                </MotionDiv>
+                <MotionDiv variants={itemVariants}>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                    <motion.div
+                    <MotionDiv
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -131,8 +129,8 @@ export default function Home() {
                       >
                         Conoce Nuestra Historia
                       </Button>
-                    </motion.div>
-                    <motion.div
+                    </MotionDiv>
+                    <MotionDiv
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -153,12 +151,12 @@ export default function Home() {
                       >
                         Ver Servicios
                       </Button>
-                    </motion.div>
+                    </MotionDiv>
                   </Box>
-                </motion.div>
+                </MotionDiv>
               </Box>
               <Box sx={{ flex: 1 }}>
-                <motion.div
+                <MotionDiv
                   variants={itemVariants}
                   whileHover={{ scale: 1.02 }}
                   transition={{ type: "spring", stiffness: 300 }}
@@ -179,7 +177,7 @@ export default function Home() {
                         { number: '98', label: 'Años de historia' },
                         { number: '365', label: 'Días al año' }
                       ].map((stat, index) => (
-                        <motion.div
+                        <MotionDiv
                           key={index}
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
@@ -198,21 +196,21 @@ export default function Home() {
                           >
                             {stat.label}
                           </Typography>
-                        </motion.div>
+                        </MotionDiv>
                       ))}
                     </Box>
                   </Paper>
-                </motion.div>
+                </MotionDiv>
               </Box>
             </Box>
-          </motion.div>
+          </MotionDiv>
         </Container>
       </Box>
 
       {/* Buscador Destacado */}
       <Box sx={{ py: 8, bgcolor: 'primary.main', color: 'white' }}>
         <Container maxWidth="lg">
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -226,7 +224,7 @@ export default function Home() {
                 Más de 15,000 títulos disponibles para toda la comunidad
               </Typography>
             </Box>
-            <motion.div
+            <MotionDiv
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
@@ -245,7 +243,7 @@ export default function Home() {
                     }}
                     sx={{ flex: 1 }}
                   />
-                  <motion.div
+                  <MotionDiv
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -258,21 +256,21 @@ export default function Home() {
                     >
                       Buscar
                     </Button>
-                  </motion.div>
+                  </MotionDiv>
                 </Box>
                 <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
                   Accede al buscador avanzado con filtros por biblioteca, autor, género y disponibilidad
                 </Typography>
               </Paper>
-            </motion.div>
-          </motion.div>
+            </MotionDiv>
+          </MotionDiv>
         </Container>
       </Box>
 
       {/* Services Section */}
       <Box id="servicios" sx={{ py: 8, bgcolor: 'white' }}>
         <Container maxWidth="xl">
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -338,7 +336,7 @@ export default function Home() {
                   color: 'info'
                 }
               ].map((service, index) => (
-                <motion.div
+                <MotionDiv
                   key={index}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -391,17 +389,17 @@ export default function Home() {
                       </Button>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </MotionDiv>
               ))}
             </Box>
-          </motion.div>
+          </MotionDiv>
         </Container>
       </Box>
 
       {/* About Section */}
       <Box sx={{ py: 8, bgcolor: '#fafafa' }}>
         <Container maxWidth="xl">
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -424,7 +422,7 @@ export default function Home() {
                     { number: '15K+', label: 'Libros en colección', color: 'success' },
                     { number: '2.5K+', label: 'Usuarios registrados', color: 'secondary' }
                   ].map((stat, index) => (
-                    <motion.div
+                    <MotionDiv
                       key={index}
                       initial={{ scale: 0.8, opacity: 0 }}
                       whileInView={{ scale: 1, opacity: 1 }}
@@ -438,12 +436,12 @@ export default function Home() {
                       <Typography variant="body2" color="text.secondary">
                         {stat.label}
                       </Typography>
-                    </motion.div>
+                    </MotionDiv>
                   ))}
                 </Box>
               </Box>
               <Box sx={{ flex: 1 }}>
-                <motion.div
+                <MotionDiv
                   whileHover={{ scale: 1.02 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
@@ -482,17 +480,17 @@ export default function Home() {
                       ))}
                     </Box>
                   </Paper>
-                </motion.div>
+                </MotionDiv>
               </Box>
             </Box>
-          </motion.div>
+          </MotionDiv>
         </Container>
       </Box>
 
       {/* CTA Section */}
       <Box sx={{ py: 8, bgcolor: 'primary.main', color: 'white' }}>
         <Container maxWidth="lg">
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
@@ -506,7 +504,7 @@ export default function Home() {
                 Descubre miles de libros, reserva salas de estudio y participa en nuestras actividades culturales.
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 2 }}>
-                <motion.div
+                <MotionDiv
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -525,8 +523,8 @@ export default function Home() {
                   >
                     Buscar Libros
                   </Button>
-                </motion.div>
-                <motion.div
+                </MotionDiv>
+                <MotionDiv
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -547,10 +545,10 @@ export default function Home() {
                   >
                     Ver Servicios
                   </Button>
-                </motion.div>
+                </MotionDiv>
               </Box>
             </Box>
-          </motion.div>
+          </MotionDiv>
         </Container>
       </Box>
     </Box>
