@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Book } from '@/app/page';
+import { Book } from '@/app/buscar-libros/page';
 
 interface BookListProps {
   books: Book[];
