@@ -68,24 +68,24 @@ export function Header() {
             <Link href="/" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
               Inicio
             </Link>
-            <a href="/buscar-libros" className="text-gray-600 hover:text-blue-600 transition-colors pb-1 hover:bg-blue-50 px-3 py-1 rounded">
-              Buscador de Libros
-            </a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
-              Catálogo General
-            </a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
+            <Link href="/sobre-nosotros" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
+              Sobre Nosotros
+            </Link>
+            <Link href="/servicios" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
               Servicios
-            </a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
-              Reservas
-            </a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
-              Mi Cuenta
-            </a>
-            <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
+            </Link>
+            <Link href="/buscar-libros" className="text-gray-600 hover:text-blue-600 transition-colors pb-1 hover:bg-blue-50 px-3 py-1 rounded">
+              Buscador de Libros
+            </Link>
+            <Link href="/horarios" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
+              Horarios
+            </Link>
+            <Link href="/actividades" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
+              Actividades
+            </Link>
+            <Link href="/contacto" className="text-gray-600 hover:text-blue-600 transition-colors pb-1">
               Contacto
-            </a>
+            </Link>
           </div>
         </nav>
       </div>

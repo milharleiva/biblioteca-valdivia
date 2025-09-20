@@ -23,11 +23,11 @@ export default function Home() {
                   Desde 1925 sirviendo a la comunidad valdiviana, promoviendo la lectura, la educación y el acceso libre al conocimiento para todos.
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <a href="/buscar-libros" className="bg-white text-green-700 px-8 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors inline-flex items-center space-x-2">
+                  <a href="/sobre-nosotros" className="bg-white text-green-700 px-8 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors inline-flex items-center space-x-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>Buscar Libros</span>
+                    <span>Conoce Nuestra Historia</span>
                   </a>
                   <a href="#servicios" className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-700 transition-colors">
                     Ver Servicios
@@ -55,6 +55,41 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Buscador Destacado */}
+        <section className="py-16 bg-blue-600 text-white">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-3xl font-bold mb-6">
+                🔍 Busca en Nuestro Catálogo
+              </h2>
+              <p className="text-xl text-blue-100 mb-8">
+                Más de 15,000 títulos disponibles para toda la comunidad
+              </p>
+              <div className="bg-white p-6 rounded-xl">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <input
+                    type="text"
+                    placeholder="Buscar por título, autor o tema..."
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <a
+                    href="/buscar-libros"
+                    className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center space-x-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <span>Buscar</span>
+                  </a>
+                </div>
+                <p className="text-gray-500 text-sm mt-3">
+                  Accede al buscador avanzado con filtros por biblioteca, autor, género y disponibilidad
+                </p>
               </div>
             </div>
           </div>
@@ -98,8 +133,8 @@ export default function Home() {
                 <p className="text-gray-600 mb-4">
                   Espacios silenciosos y cómodos para estudio individual y grupal, con WiFi gratuito y recursos digitales.
                 </p>
-                <a href="#" className="text-green-600 font-medium hover:text-green-800 transition-colors">
-                  Reservar sala →
+                <a href="/servicios" className="text-green-600 font-medium hover:text-green-800 transition-colors">
+                  Ver más servicios →
                 </a>
               </div>
 
@@ -113,7 +148,7 @@ export default function Home() {
                 <p className="text-gray-600 mb-4">
                   Actividades para todas las edades: club de lectura, talleres de escritura, cuentacuentos infantiles.
                 </p>
-                <a href="#" className="text-purple-600 font-medium hover:text-purple-800 transition-colors">
+                <a href="/actividades" className="text-purple-600 font-medium hover:text-purple-800 transition-colors">
                   Ver actividades →
                 </a>
               </div>
@@ -128,7 +163,7 @@ export default function Home() {
                 <p className="text-gray-600 mb-4">
                   Asesoría especializada para investigaciones, trabajos académicos y consultas bibliográficas.
                 </p>
-                <a href="#" className="text-yellow-600 font-medium hover:text-yellow-800 transition-colors">
+                <a href="/contacto" className="text-yellow-600 font-medium hover:text-yellow-800 transition-colors">
                   Solicitar ayuda →
                 </a>
               </div>
@@ -143,8 +178,8 @@ export default function Home() {
                 <p className="text-gray-600 mb-4">
                   Conservación y acceso a documentos históricos, fotografías y memoria local de Valdivia.
                 </p>
-                <a href="#" className="text-red-600 font-medium hover:text-red-800 transition-colors">
-                  Explorar archivo →
+                <a href="/sobre-nosotros" className="text-red-600 font-medium hover:text-red-800 transition-colors">
+                  Conoce más →
                 </a>
               </div>
 
@@ -158,8 +193,8 @@ export default function Home() {
                 <p className="text-gray-600 mb-4">
                   Acceso a bases de datos, revistas digitales, e-books y plataformas de aprendizaje en línea.
                 </p>
-                <a href="#" className="text-indigo-600 font-medium hover:text-indigo-800 transition-colors">
-                  Acceder en línea →
+                <a href="/servicios" className="text-indigo-600 font-medium hover:text-indigo-800 transition-colors">
+                  Ver servicios →
                 </a>
               </div>
             </div>
@@ -257,8 +292,8 @@ export default function Home() {
                 </svg>
                 <span>Buscar Libros</span>
               </a>
-              <a href="#" className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
-                Hacerse Socio
+              <a href="/servicios" className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
+                Ver Servicios
               </a>
             </div>
           </div>
