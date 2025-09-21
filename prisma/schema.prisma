@@ -1,5 +1,4 @@
-// 📚 Sistema de Bibliotecas Públicas - Región de Los Ríos
-// Prisma Schema para Supabase
+
 
 generator client {
   provider = "prisma-client-js"
@@ -12,9 +11,6 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ============================================================================
-// 🧑‍💼 USER PROFILES
-// ============================================================================
 
 model UserProfile {
   id               String    @id @default(cuid())
@@ -39,10 +35,6 @@ model UserProfile {
 
   @@map("user_profiles")
 }
-
-// ============================================================================
-// 🎯 WORKSHOPS
-// ============================================================================
 
 model Workshop {
   id                  String             @id @default(cuid())
@@ -76,10 +68,6 @@ model Workshop {
   @@map("workshops")
 }
 
-// ============================================================================
-// 📝 WORKSHOP ENROLLMENTS
-// ============================================================================
-
 model WorkshopEnrollment {
   id                   String             @id @default(cuid())
   userId               String             @map("user_id")
@@ -103,9 +91,6 @@ model WorkshopEnrollment {
   @@map("workshop_enrollments")
 }
 
-// ============================================================================
-// 📢 ANNOUNCEMENTS
-// ============================================================================
 
 model Announcement {
   id             String           @id @default(cuid())
@@ -134,9 +119,6 @@ model Announcement {
 }
 
 
-// ============================================================================
-// 🏷️ ENUMS
-// ============================================================================
 
 enum Role {
   USER  @map("user")
