@@ -1,20 +1,17 @@
 'use client';
 
 import { Box, Container, Typography, IconButton, Divider, Link } from '@mui/material';
-import { MenuBook, Twitter, Facebook, Instagram, LocationOn, Phone, Email } from '@mui/icons-material';
+import { MenuBook, Facebook, Instagram, LocationOn, Phone, Email } from '@mui/icons-material';
 import { MotionDiv } from './MotionWrapper';
 
 export function Footer() {
   const socialIcons = [
-    { icon: <Twitter />, href: '#' },
-    { icon: <Facebook />, href: '#' },
-    { icon: <Instagram />, href: '#' }
+    { icon: <Facebook />, href: 'https://www.facebook.com/bibliotecavaldiviacamilohenriquez/?locale=es_LA' },
+    { icon: <Instagram />, href: 'https://www.instagram.com/bibliotecavaldivia/?hl=es' }
   ];
 
   const quickLinks = [
-    'Catálogo de Libros',
-    'Renovar Préstamos',
-    'Reservar Libros',
+    'buscar Libros',
     'Actividades Culturales',
     'Servicios Digitales',
     'Talleres y Eventos'
