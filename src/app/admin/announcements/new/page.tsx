@@ -42,7 +42,12 @@ export default function NewAnnouncementPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const supabase = createClient();
+  // Check if we can use Supabase (client-side only)
+  const canUseSupabase = typeof window !== 'undefined' &&
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  const supabase = canUseSupabase ? createClient() : null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +56,12 @@ export default function NewAnnouncementPage() {
 
     if (!formData.title.trim() || !formData.content.trim()) {
       setError('El título y contenido son obligatorios');
+      setLoading(false);
+      return;
+    }
+
+    if (!supabase) {
+      setError('Error de configuración. No se puede conectar a la base de datos.');
       setLoading(false);
       return;
     }
