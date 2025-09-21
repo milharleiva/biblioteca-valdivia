@@ -13,7 +13,12 @@ import {
   Button,
   Alert,
   FormControlLabel,
-  Switch
+  Switch,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  SelectChangeEvent
 } from '@mui/material';
 import {
   Save,
@@ -21,9 +26,12 @@ import {
   Event,
   Person,
   LocationOn,
-  Schedule,
   Description,
-  Groups
+  Groups,
+  PhotoCamera,
+  School,
+  Category,
+  AttachMoney
 } from '@mui/icons-material';
 import { MotionDiv } from '@/components/MotionWrapper';
 import Link from 'next/link';
@@ -39,14 +47,19 @@ export default function NewWorkshopPage() {
     title: '',
     description: '',
     instructor: '',
-    max_participants: 20,
-    start_date: '',
-    end_date: '',
-    schedule: '',
+    instructorBio: '',
+    category: 'GENERAL',
+    maxParticipants: 20,
+    startDate: '',
+    endDate: '',
     location: '',
-    image_url: '',
+    imageFile: null as File | null,
     requirements: '',
-    is_active: true
+    materials: '',
+    targetAudience: '',
+    difficultyLevel: 'BEGINNER',
+    price: 0,
+    isActive: true
   });
 
   const supabase = createClient();
@@ -60,14 +73,30 @@ export default function NewWorkshopPage() {
     );
   }
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = field === 'max_participants' ? parseInt(e.target.value) || 0 :
-                  field === 'is_active' ? e.target.checked :
-                  e.target.value;
+  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const target = e.target as HTMLInputElement;
+    const value = field === 'maxParticipants' || field === 'price' ? parseFloat(target.value) || 0 :
+                  field === 'isActive' ? target.checked :
+                  target.value;
 
     setFormData(prev => ({
       ...prev,
       [field]: value
+    }));
+  };
+
+  const handleSelectChange = (field: string) => (event: SelectChangeEvent<string>) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: event.target.value
+    }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setFormData(prev => ({
+      ...prev,
+      imageFile: file
     }));
   };
 
@@ -78,25 +107,60 @@ export default function NewWorkshopPage() {
     setSuccess('');
 
     // Validations
-    if (!formData.title || !formData.description || !formData.instructor) {
+    if (!formData.title || !formData.description || !formData.instructor || !formData.location) {
       setError('Por favor completa todos los campos obligatorios.');
       setLoading(false);
       return;
     }
 
-    if (new Date(formData.start_date) >= new Date(formData.end_date)) {
+    if (new Date(formData.startDate) >= new Date(formData.endDate)) {
       setError('La fecha de inicio debe ser anterior a la fecha de finalización.');
       setLoading(false);
       return;
     }
 
     try {
+      // Upload image if provided
+      let imageUrl = '';
+      if (formData.imageFile) {
+        const fileExt = formData.imageFile.name.split('.').pop();
+        const fileName = `workshop-${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('workshops')
+          .upload(fileName, formData.imageFile);
+
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+        } else {
+          const { data } = supabase.storage.from('workshops').getPublicUrl(fileName);
+          imageUrl = data.publicUrl;
+        }
+      }
+
+      const workshopData = {
+        title: formData.title,
+        description: formData.description,
+        instructor: formData.instructor,
+        instructor_bio: formData.instructorBio,
+        category: formData.category,
+        max_participants: formData.maxParticipants,
+        start_date: formData.startDate,
+        end_date: formData.endDate,
+        location: formData.location,
+        image_url: imageUrl,
+        requirements: formData.requirements,
+        materials: formData.materials,
+        target_audience: formData.targetAudience,
+        difficulty_level: formData.difficultyLevel,
+        price: formData.price,
+        is_active: formData.isActive,
+        created_by: user?.id
+      };
+
       const { error } = await supabase
         .from('workshops')
-        .insert({
-          ...formData,
-          created_by: user?.id
-        });
+        .insert(workshopData);
 
       if (error) {
         setError('Error al crear el taller. Por favor intenta nuevamente.');
@@ -197,8 +261,8 @@ export default function NewWorkshopPage() {
                     fullWidth
                     label="Máximo de Participantes"
                     type="number"
-                    value={formData.max_participants}
-                    onChange={handleChange('max_participants')}
+                    value={formData.maxParticipants}
+                    onChange={handleChange('maxParticipants')}
                     required
                     InputProps={{
                       startAdornment: <Groups sx={{ mr: 1, color: 'action.active' }} />
@@ -206,13 +270,54 @@ export default function NewWorkshopPage() {
                   />
                 </Box>
 
+                <TextField
+                  fullWidth
+                  label="Biografía del Instructor (opcional)"
+                  value={formData.instructorBio}
+                  onChange={handleChange('instructorBio')}
+                  multiline
+                  rows={2}
+                  placeholder="Breve descripción del instructor..."
+                />
+
+                <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Categoría</InputLabel>
+                    <Select
+                      value={formData.category}
+                      onChange={handleSelectChange('category')}
+                      startAdornment={<Category sx={{ mr: 1, color: 'action.active' }} />}
+                    >
+                      <MenuItem value="GENERAL">General</MenuItem>
+                      <MenuItem value="TECHNOLOGY">Tecnología</MenuItem>
+                      <MenuItem value="ART">Arte</MenuItem>
+                      <MenuItem value="LITERATURE">Literatura</MenuItem>
+                      <MenuItem value="EDUCATION">Educación</MenuItem>
+                      <MenuItem value="CULTURE">Cultura</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  <FormControl fullWidth>
+                    <InputLabel>Nivel de Dificultad</InputLabel>
+                    <Select
+                      value={formData.difficultyLevel}
+                      onChange={handleSelectChange('difficultyLevel')}
+                      startAdornment={<School sx={{ mr: 1, color: 'action.active' }} />}
+                    >
+                      <MenuItem value="BEGINNER">Principiante</MenuItem>
+                      <MenuItem value="INTERMEDIATE">Intermedio</MenuItem>
+                      <MenuItem value="ADVANCED">Avanzado</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+
                 <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
                   <TextField
                     fullWidth
-                    label="Fecha de Inicio"
+                    label="Fecha y Hora de Inicio"
                     type="datetime-local"
-                    value={formData.start_date}
-                    onChange={handleChange('start_date')}
+                    value={formData.startDate}
+                    onChange={handleChange('startDate')}
                     required
                     InputLabelProps={{
                       shrink: true,
@@ -221,10 +326,10 @@ export default function NewWorkshopPage() {
 
                   <TextField
                     fullWidth
-                    label="Fecha de Finalización"
+                    label="Fecha y Hora de Finalización"
                     type="datetime-local"
-                    value={formData.end_date}
-                    onChange={handleChange('end_date')}
+                    value={formData.endDate}
+                    onChange={handleChange('endDate')}
                     required
                     InputLabelProps={{
                       shrink: true,
@@ -233,18 +338,6 @@ export default function NewWorkshopPage() {
                 </Box>
 
                 <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
-                  <TextField
-                    fullWidth
-                    label="Horario"
-                    value={formData.schedule}
-                    onChange={handleChange('schedule')}
-                    placeholder="Ej: Lunes y Miércoles 16:00-18:00"
-                    required
-                    InputProps={{
-                      startAdornment: <Schedule sx={{ mr: 1, color: 'action.active' }} />
-                    }}
-                  />
-
                   <TextField
                     fullWidth
                     label="Ubicación"
@@ -255,15 +348,47 @@ export default function NewWorkshopPage() {
                       startAdornment: <LocationOn sx={{ mr: 1, color: 'action.active' }} />
                     }}
                   />
+
+                  <TextField
+                    fullWidth
+                    label="Precio (opcional)"
+                    type="number"
+                    value={formData.price}
+                    onChange={handleChange('price')}
+                    inputProps={{ step: '0.01', min: '0' }}
+                    InputProps={{
+                      startAdornment: <AttachMoney sx={{ mr: 1, color: 'action.active' }} />
+                    }}
+                  />
                 </Box>
 
-                <TextField
-                  fullWidth
-                  label="URL de Imagen (opcional)"
-                  value={formData.image_url}
-                  onChange={handleChange('image_url')}
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                />
+                {/* Imagen Upload */}
+                <Box>
+                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                    Imagen del Taller (opcional)
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Button
+                      variant="outlined"
+                      component="label"
+                      startIcon={<PhotoCamera />}
+                      sx={{ minWidth: 140 }}
+                    >
+                      Subir Imagen
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={handleFileChange}
+                      />
+                    </Button>
+                    {formData.imageFile && (
+                      <Typography variant="body2" color="success.main">
+                        {formData.imageFile.name}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
 
                 <TextField
                   fullWidth
@@ -271,15 +396,33 @@ export default function NewWorkshopPage() {
                   value={formData.requirements}
                   onChange={handleChange('requirements')}
                   multiline
-                  rows={3}
-                  placeholder="Ej: Traer cuaderno y lápiz, conocimientos básicos..."
+                  rows={2}
+                  placeholder="Ej: Conocimientos básicos de..."
+                />
+
+                <TextField
+                  fullWidth
+                  label="Materiales (opcional)"
+                  value={formData.materials}
+                  onChange={handleChange('materials')}
+                  multiline
+                  rows={2}
+                  placeholder="Ej: Cuaderno, lápiz, laptop..."
+                />
+
+                <TextField
+                  fullWidth
+                  label="Público Objetivo (opcional)"
+                  value={formData.targetAudience}
+                  onChange={handleChange('targetAudience')}
+                  placeholder="Ej: Estudiantes, adultos mayores, profesionales..."
                 />
 
                 <FormControlLabel
                   control={
                     <Switch
-                      checked={formData.is_active}
-                      onChange={handleChange('is_active')}
+                      checked={formData.isActive}
+                      onChange={handleChange('isActive')}
                       color="primary"
                     />
                   }
