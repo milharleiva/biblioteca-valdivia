@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { prisma, isPrismaAvailable } from '@/lib/prisma'
 
 // GET /api/profile?userId=xxx - Get user profile
 export async function GET(request: NextRequest) {
   try {
+    if (!isPrismaAvailable()) {
+      return NextResponse.json(
+        { success: false, error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
 
@@ -14,7 +21,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const profile = await prisma.userProfile.findUnique({
+    const profile = await prisma!.userProfile.findUnique({
       where: { userId },
     })
 
@@ -34,6 +41,13 @@ export async function GET(request: NextRequest) {
 // POST /api/profile - Create user profile
 export async function POST(request: NextRequest) {
   try {
+    if (!isPrismaAvailable()) {
+      return NextResponse.json(
+        { success: false, error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
     const body = await request.json()
     const { userId, name, role = 'USER' } = body
 
@@ -44,7 +58,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const profile = await prisma.userProfile.create({
+    const profile = await prisma!.userProfile.create({
       data: {
         userId,
         name,
@@ -68,6 +82,13 @@ export async function POST(request: NextRequest) {
 // PUT /api/profile - Update user profile
 export async function PUT(request: NextRequest) {
   try {
+    if (!isPrismaAvailable()) {
+      return NextResponse.json(
+        { success: false, error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
     const body = await request.json()
     const { userId, updates } = body
 
@@ -88,7 +109,7 @@ export async function PUT(request: NextRequest) {
     if (updates.emergency_phone) prismaUpdates.emergencyPhone = updates.emergency_phone
     if (updates.role) prismaUpdates.role = updates.role.toUpperCase()
 
-    const profile = await prisma.userProfile.update({
+    const profile = await prisma!.userProfile.update({
       where: { userId },
       data: prismaUpdates,
     })

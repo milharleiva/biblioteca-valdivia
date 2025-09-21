@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { prisma, isPrismaAvailable } from '@/lib/prisma'
 
 // GET /api/users - Obtener todos los usuarios
 export async function GET() {
   try {
-    const users = await prisma.userProfile.findMany({
+    if (!isPrismaAvailable()) {
+      return NextResponse.json(
+        { success: false, error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const users = await prisma!.userProfile.findMany({
       select: {
         id: true,
         userId: true,
@@ -42,6 +49,13 @@ export async function GET() {
 // POST /api/users - Crear un nuevo usuario
 export async function POST(request: NextRequest) {
   try {
+    if (!isPrismaAvailable()) {
+      return NextResponse.json(
+        { success: false, error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
     const body = await request.json()
     const { userId, name, phone, address, role = 'USER' } = body
 
@@ -55,7 +69,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const user = await prisma.userProfile.create({
+    const user = await prisma!.userProfile.create({
       data: {
         userId,
         name,

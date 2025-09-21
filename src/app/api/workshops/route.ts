@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { prisma, isPrismaAvailable } from '@/lib/prisma'
 
 // GET /api/workshops - Obtener todos los talleres
 export async function GET() {
   try {
-    const workshops = await prisma.workshop.findMany({
+    if (!isPrismaAvailable()) {
+      return NextResponse.json(
+        { success: false, error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
+    const workshops = await prisma!.workshop.findMany({
       where: {
         isActive: true,
       },
@@ -49,6 +56,13 @@ export async function GET() {
 // POST /api/workshops - Crear un nuevo taller
 export async function POST(request: NextRequest) {
   try {
+    if (!isPrismaAvailable()) {
+      return NextResponse.json(
+        { success: false, error: 'Database not available' },
+        { status: 503 }
+      )
+    }
+
     const body = await request.json()
     const {
       title,
@@ -73,7 +87,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const workshop = await prisma.workshop.create({
+    const workshop = await prisma!.workshop.create({
       data: {
         title,
         description,
