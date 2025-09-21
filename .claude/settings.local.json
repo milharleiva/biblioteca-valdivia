@@ -10,7 +10,8 @@
       "Bash(npx prisma:*)",
       "Bash(npm run:*)",
       "Bash(node:*)",
-      "Bash(del create-admin.js)"
+      "Bash(del create-admin.js)",
+      "Bash(del vercel.json)"
     ],
     "deny": [],
     "ask": []
