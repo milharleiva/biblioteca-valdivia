@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 interface UserProfile {
   id: string;
   user_id: string;
+  email: string;
   name: string;
   role: 'user' | 'admin';
   phone?: string;
@@ -91,6 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfile({
           id: profile.id,
           user_id: profile.userId,
+          email: profile.email || user?.email || '',
           name: profile.name,
           role: profile.role.toLowerCase() as 'user' | 'admin',
           phone: profile.phone,
@@ -103,9 +105,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Profile doesn't exist - create it (lazy creation)
         console.log('👤 Profile not found, creating new profile for user:', userId);
 
-        // Get user data from Supabase Auth to get the name
+        // Get user data from Supabase Auth to get the name and email
         const { data: authUser } = await supabase.auth.getUser();
         const userName = authUser.user?.user_metadata?.name || 'Usuario';
+        const userEmail = authUser.user?.email || '';
 
         try {
           const createResponse = await fetch('/api/profile', {
@@ -115,6 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             },
             body: JSON.stringify({
               userId: userId,
+              email: userEmail,
               name: userName,
               role: 'USER',
             }),
@@ -127,6 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setProfile({
               id: newProfile.id,
               user_id: newProfile.userId,
+              email: newProfile.email || userEmail,
               name: newProfile.name,
               role: newProfile.role.toLowerCase() as 'user' | 'admin',
               phone: newProfile.phone,
@@ -146,6 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setProfile({
             id: 'fallback-' + userId,
             user_id: userId,
+            email: userEmail,
             name: userName,
             role: 'user'
           });
@@ -157,6 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setProfile({
         id: 'error-' + userId,
         user_id: userId,
+        email: user?.email || '',
         name: 'Usuario',
         role: 'user'
       });
@@ -203,6 +210,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             },
             body: JSON.stringify({
               userId: data.user.id,
+              email: email,
               name: name,
               role: 'USER',
             }),

@@ -57,13 +57,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { userId, name, phone, address, role = 'USER' } = body
+    const { userId, email, name, phone, address, role = 'USER' } = body
 
-    if (!userId || !name) {
+    if (!userId || !name || !email) {
       return NextResponse.json(
         {
           success: false,
-          error: 'userId y name son requeridos',
+          error: 'userId, email y name son requeridos',
         },
         { status: 400 }
       )
@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
     const user = await prisma!.userProfile.create({
       data: {
         userId,
+        email,
         name,
         phone,
         address,

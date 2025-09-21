@@ -49,11 +49,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { userId, name, role = 'USER' } = body
+    const { userId, email, name, role = 'USER' } = body
 
-    if (!userId || !name) {
+    if (!userId || !name || !email) {
       return NextResponse.json(
-        { success: false, error: 'userId and name are required' },
+        { success: false, error: 'userId, email, and name are required' },
         { status: 400 }
       )
     }
@@ -61,6 +61,7 @@ export async function POST(request: NextRequest) {
     const profile = await prisma!.userProfile.create({
       data: {
         userId,
+        email,
         name,
         role: role.toUpperCase(),
       },
@@ -102,6 +103,7 @@ export async function PUT(request: NextRequest) {
     // Convert updates to Prisma format
     const prismaUpdates: Record<string, unknown> = {}
     if (updates.name) prismaUpdates.name = updates.name
+    if (updates.email) prismaUpdates.email = updates.email
     if (updates.phone) prismaUpdates.phone = updates.phone
     if (updates.address) prismaUpdates.address = updates.address
     if (updates.birth_date) prismaUpdates.birthDate = new Date(updates.birth_date)
