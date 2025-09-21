@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import {
   Box,
   Container,
@@ -27,27 +27,63 @@ import {
 import { MotionDiv } from '@/components/MotionWrapper';
 import Link from 'next/link';
 
-export default function NewAnnouncementPage() {
+
+export default function EditAnnouncementPage() {
   const { profile } = useAuth();
   const router = useRouter();
+  const params = useParams();
+  const announcementId = params.id as string;
+
   const [formData, setFormData] = useState({
     title: '',
     content: '',
     type: 'general',
     priority: 1,
     is_active: true,
-    start_date: new Date().toISOString().slice(0, 16), // Format for datetime-local
+    start_date: '',
     end_date: ''
   });
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [error, setError] = useState('');
 
-  // Check if we can use Supabase (client-side only)
-  const canUseSupabase = typeof window !== 'undefined' &&
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabase = createClient();
 
-  const supabase = canUseSupabase ? createClient() : null;
+  useEffect(() => {
+    if (profile?.role === 'admin' && announcementId) {
+      fetchAnnouncement();
+    }
+  }, [profile, announcementId]);
+
+  const fetchAnnouncement = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('announcements')
+        .select('*')
+        .eq('id', announcementId)
+        .single();
+
+      if (error) {
+        setError('Error al cargar el anuncio');
+        console.error('Error fetching announcement:', error);
+      } else if (data) {
+        setFormData({
+          title: data.title,
+          content: data.content,
+          type: data.type,
+          priority: data.priority,
+          is_active: data.is_active,
+          start_date: new Date(data.start_date).toISOString().slice(0, 16),
+          end_date: data.end_date ? new Date(data.end_date).toISOString().slice(0, 16) : ''
+        });
+      }
+    } catch (error) {
+      setError('Error inesperado al cargar el anuncio');
+      console.error('Error:', error);
+    } finally {
+      setFetching(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,31 +96,26 @@ export default function NewAnnouncementPage() {
       return;
     }
 
-    if (!supabase) {
-      setError('Error de configuración. No se puede conectar a la base de datos.');
-      setLoading(false);
-      return;
-    }
-
     try {
-      const announcementData = {
+      const updateData = {
         ...formData,
-        created_by: profile?.user_id,
-        end_date: formData.end_date || null
+        end_date: formData.end_date || null,
+        updated_at: new Date().toISOString()
       };
 
       const { error } = await supabase
         .from('announcements')
-        .insert([announcementData]);
+        .update(updateData)
+        .eq('id', announcementId);
 
       if (error) {
-        setError('Error al crear el anuncio');
-        console.error('Error creating announcement:', error);
+        setError('Error al actualizar el anuncio');
+        console.error('Error updating announcement:', error);
       } else {
-        router.push('/admin/announcements');
+        router.push('/dashboard/admin/announcements');
       }
     } catch (error) {
-      setError('Error inesperado al crear el anuncio');
+      setError('Error inesperado al actualizar el anuncio');
       console.error('Error:', error);
     } finally {
       setLoading(false);
@@ -106,6 +137,14 @@ export default function NewAnnouncementPage() {
     );
   }
 
+  if (fetching) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <Typography>Cargando anuncio...</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5', py: 4 }}>
       <Container maxWidth="md">
@@ -118,17 +157,17 @@ export default function NewAnnouncementPage() {
           <Box sx={{ mb: 4 }}>
             <Button
               component={Link}
-              href="/admin/announcements"
+              href="/dashboard/admin/announcements"
               startIcon={<ArrowBack />}
               sx={{ mb: 2 }}
             >
               Volver a Anuncios
             </Button>
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
-              Crear Nuevo Anuncio
+              Editar Anuncio
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Comparte información importante con todos los usuarios
+              Modifica la información del anuncio
             </Typography>
           </Box>
 
@@ -247,7 +286,7 @@ export default function NewAnnouncementPage() {
                   <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
                     <Button
                       component={Link}
-                      href="/admin/announcements"
+                      href="/dashboard/admin/announcements"
                       variant="outlined"
                       startIcon={<Cancel />}
                       disabled={loading}
@@ -260,7 +299,7 @@ export default function NewAnnouncementPage() {
                       startIcon={<Save />}
                       disabled={loading}
                     >
-                      {loading ? 'Creando...' : 'Crear Anuncio'}
+                      {loading ? 'Guardando...' : 'Guardar Cambios'}
                     </Button>
                   </Box>
                 </Box>

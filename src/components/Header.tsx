@@ -249,7 +249,7 @@ export function Header() {
                     {profile?.role === 'admin' && (
                       <>
                         <Divider />
-                        <MenuItem component={Link} href="/admin" onClick={handleMenuClose}>
+                        <MenuItem component={Link} href="/dashboard/admin" onClick={handleMenuClose}>
                           <AdminPanelSettings sx={{ mr: 2 }} />
                           Panel Admin
                         </MenuItem>

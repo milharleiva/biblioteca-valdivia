@@ -13,7 +13,9 @@
       "Bash(del create-admin.js)",
       "Bash(del vercel.json)",
       "Bash(taskkill:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(xcopy:*)",
+      "Bash(robocopy:*)"
     ],
     "deny": [],
     "ask": []

@@ -153,7 +153,7 @@ export default function EditWorkshopPage() {
       } else {
         setSuccess('¡Taller actualizado exitosamente!');
         setTimeout(() => {
-          router.push('/admin/workshops');
+          router.push('/dashboard/admin/workshops');
         }, 2000);
       }
     } catch (error) {
@@ -208,7 +208,7 @@ export default function EditWorkshopPage() {
           <Box sx={{ mb: 4 }}>
             <Button
               component={Link}
-              href="/admin/workshops"
+              href="/dashboard/admin/workshops"
               startIcon={<ArrowBack />}
               sx={{ mb: 2 }}
             >
@@ -383,7 +383,7 @@ export default function EditWorkshopPage() {
                 </Button>
                 <Button
                   component={Link}
-                  href="/admin/workshops"
+                  href="/dashboard/admin/workshops"
                   variant="outlined"
                   sx={{ px: 4 }}
                 >

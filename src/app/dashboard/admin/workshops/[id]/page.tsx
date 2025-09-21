@@ -204,7 +204,7 @@ export default function WorkshopDetailPage() {
           <Box sx={{ mb: 4 }}>
             <Button
               component={Link}
-              href="/admin/workshops"
+              href="/dashboard/admin/workshops"
               startIcon={<ArrowBack />}
               sx={{ mb: 2 }}
             >
@@ -227,7 +227,7 @@ export default function WorkshopDetailPage() {
               </Box>
               <Button
                 component={Link}
-                href={`/admin/workshops/${workshop.id}/edit`}
+                href={`/dashboard/admin/workshops/${workshop.id}/edit`}
                 variant="contained"
                 startIcon={<Edit />}
               >

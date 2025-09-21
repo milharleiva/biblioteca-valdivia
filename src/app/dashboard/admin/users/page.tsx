@@ -226,7 +226,7 @@ export default function AdminUsersPage() {
           <Box sx={{ mb: 4 }}>
             <Button
               component={Link}
-              href="/admin"
+              href="/dashboard/admin"
               startIcon={<ArrowBack />}
               sx={{ mb: 2 }}
             >

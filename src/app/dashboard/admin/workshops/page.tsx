@@ -158,7 +158,7 @@ export default function AdminWorkshopsPage() {
           <Box sx={{ mb: 4 }}>
             <Button
               component={Link}
-              href="/admin"
+              href="/dashboard/admin"
               startIcon={<ArrowBack />}
               sx={{ mb: 2 }}
             >
@@ -175,7 +175,7 @@ export default function AdminWorkshopsPage() {
               </Box>
               <Button
                 component={Link}
-                href="/admin/workshops/new"
+                href="/dashboard/admin/workshops/new"
                 variant="contained"
                 startIcon={<Add />}
                 size="large"
@@ -214,7 +214,7 @@ export default function AdminWorkshopsPage() {
                         </Typography>
                         <Button
                           component={Link}
-                          href="/admin/workshops/new"
+                          href="/dashboard/admin/workshops/new"
                           variant="contained"
                           startIcon={<Add />}
                           sx={{ mt: 2 }}
@@ -266,7 +266,7 @@ export default function AdminWorkshopsPage() {
                           <Box sx={{ display: 'flex', gap: 1 }}>
                             <IconButton
                               component={Link}
-                              href={`/admin/workshops/${workshop.id}`}
+                              href={`/dashboard/admin/workshops/${workshop.id}`}
                               size="small"
                               color="info"
                             >
@@ -274,7 +274,7 @@ export default function AdminWorkshopsPage() {
                             </IconButton>
                             <IconButton
                               component={Link}
-                              href={`/admin/workshops/${workshop.id}/edit`}
+                              href={`/dashboard/admin/workshops/${workshop.id}/edit`}
                               size="small"
                               color="primary"
                             >

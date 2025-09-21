@@ -190,7 +190,7 @@ export default function AnnouncementsPage() {
           <Box sx={{ mb: 4 }}>
             <Button
               component={Link}
-              href="/admin"
+              href="/dashboard/admin"
               startIcon={<ArrowBack />}
               sx={{ mb: 2 }}
             >
@@ -202,7 +202,7 @@ export default function AnnouncementsPage() {
               </Typography>
               <Button
                 component={Link}
-                href="/admin/announcements/new"
+                href="/dashboard/admin/announcements/new"
                 variant="contained"
                 startIcon={<Add />}
                 size="large"
@@ -291,7 +291,7 @@ export default function AnnouncementsPage() {
                           </IconButton>
                           <IconButton
                             component={Link}
-                            href={`/admin/announcements/${announcement.id}/edit`}
+                            href={`/dashboard/admin/announcements/${announcement.id}/edit`}
                             size="small"
                             color="primary"
                           >
@@ -322,7 +322,7 @@ export default function AnnouncementsPage() {
                 </Typography>
                 <Button
                   component={Link}
-                  href="/admin/announcements/new"
+                  href="/dashboard/admin/announcements/new"
                   variant="contained"
                   startIcon={<Add />}
                 >

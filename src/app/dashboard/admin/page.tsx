@@ -26,7 +26,7 @@ export default function AdminPage() {
   const { profile } = useAuth();
 
   // Redirect if not admin
-  if (profile?.role !== 'admin') {
+  if (!profile || profile.role !== 'admin') {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
         <Typography>Acceso denegado. Esta página es solo para administradores.</Typography>
@@ -137,7 +137,7 @@ export default function AdminPage() {
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Button
                   component={Link}
-                  href="/admin/workshops/new"
+                  href="/dashboard/admin/workshops/new"
                   variant="contained"
                   startIcon={<Add />}
                   sx={{ px: 3 }}
@@ -146,7 +146,7 @@ export default function AdminPage() {
                 </Button>
                 <Button
                   component={Link}
-                  href="/admin/workshops"
+                  href="/dashboard/admin/workshops"
                   variant="outlined"
                   sx={{ px: 3 }}
                 >
@@ -169,7 +169,7 @@ export default function AdminPage() {
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Button
                   component={Link}
-                  href="/admin/users"
+                  href="/dashboard/admin/users"
                   variant="contained"
                   color="success"
                   sx={{ px: 3 }}
@@ -178,7 +178,7 @@ export default function AdminPage() {
                 </Button>
                 <Button
                   component={Link}
-                  href="/admin/enrollments"
+                  href="/dashboard/admin/enrollments"
                   variant="outlined"
                   color="success"
                   sx={{ px: 3 }}
@@ -202,7 +202,7 @@ export default function AdminPage() {
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Button
                   component={Link}
-                  href="/admin/announcements/new"
+                  href="/dashboard/admin/announcements/new"
                   variant="contained"
                   color="info"
                   startIcon={<Add />}
@@ -212,7 +212,7 @@ export default function AdminPage() {
                 </Button>
                 <Button
                   component={Link}
-                  href="/admin/announcements"
+                  href="/dashboard/admin/announcements"
                   variant="outlined"
                   color="info"
                   sx={{ px: 3 }}

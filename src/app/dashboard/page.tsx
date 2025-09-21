@@ -178,7 +178,7 @@ export default function DashboardPage() {
                     <CardActions sx={{ justifyContent: 'center', pb: 2 }}>
                       <Button
                         component={Link}
-                        href="/admin"
+                        href="/dashboard/admin"
                         variant="contained"
                         size="small"
                         color="warning"
