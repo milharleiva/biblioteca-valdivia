@@ -73,6 +73,7 @@ export async function POST(request: NextRequest) {
       max_participants = 20,
       start_date,
       end_date,
+      schedule,
       location,
       image_url,
       requirements,
