@@ -32,9 +32,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+
+  // Check if we're in a server environment or missing Supabase config
+  const canUseSupabase = typeof window !== 'undefined' &&
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  const supabase = canUseSupabase ? createClient() : null;
 
   useEffect(() => {
+    // Skip if Supabase is not available (during build or missing config)
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -59,9 +71,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [canUseSupabase]);
 
   const fetchProfile = async (userId: string) => {
+    // Skip if Supabase is not available
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('user_profiles')
@@ -117,6 +135,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
+    if (!supabase) {
+      return { data: null, error: { message: 'Supabase not available' } };
+    }
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -125,6 +146,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, name: string) => {
+    if (!supabase) {
+      return { data: null, error: { message: 'Supabase not available' } };
+    }
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -138,11 +162,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    if (!supabase) return;
     await supabase.auth.signOut();
   };
 
   const updateProfile = async (updates: Partial<UserProfile>) => {
-    if (!user) return;
+    if (!user || !supabase) return;
 
     const { error } = await supabase
       .from('user_profiles')

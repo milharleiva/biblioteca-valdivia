@@ -75,14 +75,26 @@ export default function Home() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [statistics, setStatistics] = useState<Statistics>({ userCount: 0, workshopCount: 0, totalWorkshopsThisYear: 0 });
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+
+  // Check if we can use Supabase (client-side only)
+  const canUseSupabase = typeof window !== 'undefined' &&
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  const supabase = canUseSupabase ? createClient() : null;
+
   useEffect(() => {
+    if (!canUseSupabase) {
+      setLoading(false);
+      return;
+    }
     fetchStatistics();
     fetchFeaturedWorkshops();
     fetchAnnouncements();
-  }, []);
+  }, [canUseSupabase]);
 
   const fetchStatistics = async () => {
+    if (!supabase) return;
     try {
       // Get user count
       const { count: userCount, error: userError } = await supabase
@@ -117,6 +129,7 @@ export default function Home() {
   };
 
   const fetchFeaturedWorkshops = async () => {
+    if (!supabase) return;
     try {
       const currentDate = new Date().toISOString();
 
@@ -158,6 +171,7 @@ export default function Home() {
   };
 
   const fetchAnnouncements = async () => {
+    if (!supabase) return;
     try {
       const currentDate = new Date().toISOString();
 
