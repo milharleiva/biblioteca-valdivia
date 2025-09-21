@@ -41,7 +41,10 @@ export async function GET(request: NextRequest) {
 // POST /api/profile - Create user profile
 export async function POST(request: NextRequest) {
   try {
+    console.log('🟡 POST /api/profile - Iniciando creación de perfil');
+
     if (!(await isPrismaAvailable())) {
+      console.log('🔴 Database not available');
       return NextResponse.json(
         { success: false, error: 'Database not available' },
         { status: 503 }
@@ -49,15 +52,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
+    console.log('🟡 Datos recibidos:', body);
     const { userId, email, name, role = 'USER' } = body
 
     if (!userId || !name || !email) {
+      console.log('🔴 Datos faltantes:', { userId: !!userId, email: !!email, name: !!name });
       return NextResponse.json(
         { success: false, error: 'userId, email, and name are required' },
         { status: 400 }
       )
     }
 
+    console.log('🟡 Creando perfil en base de datos...');
     const profile = await prisma!.userProfile.create({
       data: {
         userId,
@@ -67,12 +73,19 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    console.log('🟢 Perfil creado exitosamente:', profile.id);
+
     return NextResponse.json({
       success: true,
       data: profile,
     })
   } catch (error) {
-    console.error('Error creating profile:', error)
+    console.error('🔴 Error creating profile:', error)
+    console.error('🔴 Error details:', {
+      message: (error as Error)?.message,
+      stack: (error as Error)?.stack,
+      name: (error as Error)?.name
+    });
     return NextResponse.json(
       { success: false, error: 'Error al crear perfil' },
       { status: 500 }

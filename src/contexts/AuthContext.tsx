@@ -190,6 +190,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       // 1. Create user in Supabase Auth
+      console.log('🔵 Iniciando registro para:', email);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -200,9 +201,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       });
 
+      console.log('🔵 Respuesta de Supabase Auth:', {
+        hasUser: !!data.user,
+        userConfirmed: data.user?.email_confirmed_at,
+        hasError: !!error,
+        errorMessage: error?.message
+      });
+
       // 2. If auth user created successfully, create profile in our database
+      // Note: El usuario puede existir pero no estar confirmado
       if (data.user && !error) {
         try {
+          console.log('🔵 Creando perfil de usuario con datos:', {
+            userId: data.user.id,
+            email: email,
+            name: name,
+            role: 'USER'
+          });
+
           const createResponse = await fetch('/api/profile', {
             method: 'POST',
             headers: {
@@ -216,7 +232,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }),
           });
 
+          console.log('🔵 Status del API call:', createResponse.status);
+
           const createResult = await createResponse.json();
+          console.log('🔵 Respuesta del API:', createResult);
+
           if (createResult.success) {
             console.log('✅ User profile created successfully');
           } else {
