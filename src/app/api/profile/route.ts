@@ -4,7 +4,7 @@ import { prisma, isPrismaAvailable } from '@/lib/prisma'
 // GET /api/profile?userId=xxx - Get user profile
 export async function GET(request: NextRequest) {
   try {
-    if (!isPrismaAvailable()) {
+    if (!(await isPrismaAvailable())) {
       return NextResponse.json(
         { success: false, error: 'Database not available' },
         { status: 503 }
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
 // POST /api/profile - Create user profile
 export async function POST(request: NextRequest) {
   try {
-    if (!isPrismaAvailable()) {
+    if (!(await isPrismaAvailable())) {
       return NextResponse.json(
         { success: false, error: 'Database not available' },
         { status: 503 }
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 // PUT /api/profile - Update user profile
 export async function PUT(request: NextRequest) {
   try {
-    if (!isPrismaAvailable()) {
+    if (!(await isPrismaAvailable())) {
       return NextResponse.json(
         { success: false, error: 'Database not available' },
         { status: 503 }

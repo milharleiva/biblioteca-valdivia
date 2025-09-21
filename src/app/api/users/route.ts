@@ -4,7 +4,7 @@ import { prisma, isPrismaAvailable } from '@/lib/prisma'
 // GET /api/users - Obtener todos los usuarios
 export async function GET() {
   try {
-    if (!isPrismaAvailable()) {
+    if (!(await isPrismaAvailable())) {
       return NextResponse.json(
         { success: false, error: 'Database not available' },
         { status: 503 }
@@ -49,7 +49,7 @@ export async function GET() {
 // POST /api/users - Crear un nuevo usuario
 export async function POST(request: NextRequest) {
   try {
-    if (!isPrismaAvailable()) {
+    if (!(await isPrismaAvailable())) {
       return NextResponse.json(
         { success: false, error: 'Database not available' },
         { status: 503 }
