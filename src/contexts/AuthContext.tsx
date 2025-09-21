@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
+import { prisma } from '@/lib/prisma';
 
 interface UserProfile {
   id: string;
@@ -81,50 +82,72 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+      // Try to fetch profile using Prisma
+      const profile = await prisma.userProfile.findUnique({
+        where: {
+          userId: userId,
+        },
+      });
 
-      if (error) {
-        // Check if this is a schema cache error (table doesn't exist)
-        if (error.code === 'PGRST116' || error.code === 'PGRST205') {
-          console.warn('User profiles table not found - using default profile:', {
-            code: error.code,
-            message: error.message
+      if (profile) {
+        // Profile exists - convert to expected format
+        setProfile({
+          id: profile.id,
+          user_id: profile.userId,
+          name: profile.name,
+          role: profile.role.toLowerCase() as 'user' | 'admin',
+          phone: profile.phone,
+          address: profile.address,
+          birth_date: profile.birthDate?.toISOString(),
+          emergency_contact: profile.emergencyContact,
+          emergency_phone: profile.emergencyPhone,
+        });
+      } else {
+        // Profile doesn't exist - create it (lazy creation)
+        console.log('👤 Profile not found, creating new profile for user:', userId);
+
+        // Get user data from Supabase Auth to get the name
+        const { data: authUser } = await supabase.auth.getUser();
+        const userName = authUser.user?.user_metadata?.name || 'Usuario';
+
+        try {
+          const newProfile = await prisma.userProfile.create({
+            data: {
+              userId: userId,
+              name: userName,
+              role: 'USER',
+            },
           });
-          // Create a default profile when table doesn't exist
+
           setProfile({
-            id: 'temp-' + userId,
-            user_id: userId,
-            name: 'Usuario',
-            role: 'user'
+            id: newProfile.id,
+            user_id: newProfile.userId,
+            name: newProfile.name,
+            role: newProfile.role.toLowerCase() as 'user' | 'admin',
+            phone: newProfile.phone,
+            address: newProfile.address,
+            birth_date: newProfile.birthDate?.toISOString(),
+            emergency_contact: newProfile.emergencyContact,
+            emergency_phone: newProfile.emergencyPhone,
           });
-        } else {
-          console.error('Error fetching profile:', {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code,
-            full_error: error
-          });
-          // Still set a default profile to prevent app crash
+
+          console.log('✅ New profile created successfully');
+        } catch (createError) {
+          console.error('❌ Error creating profile:', createError);
+          // Set a fallback profile
           setProfile({
-            id: 'error-' + userId,
+            id: 'fallback-' + userId,
             user_id: userId,
-            name: 'Usuario',
+            name: userName,
             role: 'user'
           });
         }
-      } else {
-        setProfile(data);
       }
     } catch (error) {
-      console.error('Unexpected error fetching profile:', error);
+      console.error('❌ Error fetching profile:', error);
       // Set a default profile as fallback
       setProfile({
-        id: 'fallback-' + userId,
+        id: 'error-' + userId,
         user_id: userId,
         name: 'Usuario',
         role: 'user'
@@ -149,16 +172,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!supabase) {
       return { data: null, error: { message: 'Supabase not available' } };
     }
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
+
+    try {
+      // 1. Create user in Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+          },
         },
-      },
-    });
-    return { data, error };
+      });
+
+      // 2. If auth user created successfully, create profile in our database
+      if (data.user && !error) {
+        try {
+          await prisma.userProfile.create({
+            data: {
+              userId: data.user.id,
+              name: name,
+              role: 'USER',
+            },
+          });
+          console.log('✅ User profile created successfully');
+        } catch (profileError) {
+          console.error('❌ Error creating user profile:', profileError);
+          // Don't return error here - user auth was successful
+          // Profile can be created later if needed
+        }
+      }
+
+      return { data, error };
+    } catch (error) {
+      console.error('❌ Error in signUp:', error);
+      return { data: null, error };
+    }
   };
 
   const signOut = async () => {
@@ -176,19 +225,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateProfile = async (updates: Partial<UserProfile>) => {
-    if (!user || !supabase) return;
+    if (!user) return;
 
-    const { error } = await supabase
-      .from('user_profiles')
-      .update(updates)
-      .eq('user_id', user.id);
+    try {
+      // Convert updates to Prisma format
+      const prismaUpdates: any = {};
 
-    if (error) {
+      if (updates.name) prismaUpdates.name = updates.name;
+      if (updates.phone) prismaUpdates.phone = updates.phone;
+      if (updates.address) prismaUpdates.address = updates.address;
+      if (updates.birth_date) prismaUpdates.birthDate = new Date(updates.birth_date);
+      if (updates.emergency_contact) prismaUpdates.emergencyContact = updates.emergency_contact;
+      if (updates.emergency_phone) prismaUpdates.emergencyPhone = updates.emergency_phone;
+      if (updates.role) prismaUpdates.role = updates.role.toUpperCase();
+
+      // Update using Prisma
+      await prisma.userProfile.update({
+        where: {
+          userId: user.id,
+        },
+        data: prismaUpdates,
+      });
+
+      console.log('✅ Profile updated successfully');
+
+      // Refresh profile
+      await fetchProfile(user.id);
+    } catch (error) {
+      console.error('❌ Error updating profile:', error);
       throw error;
     }
-
-    // Refresh profile
-    await fetchProfile(user.id);
   };
 
   const value = {
