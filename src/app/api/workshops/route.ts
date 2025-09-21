@@ -80,7 +80,6 @@ export async function POST(request: NextRequest) {
       materials,
       target_audience,
       difficulty_level = 'BEGINNER',
-      price = 0,
       is_active = true,
       created_by,
     } = body
@@ -105,14 +104,13 @@ export async function POST(request: NextRequest) {
         maxParticipants: max_participants,
         startDate: new Date(start_date),
         endDate: new Date(end_date),
-        schedule: String(schedule), // Campo opcional para compatibilidad
+        schedule: schedule || '', // Campo opcional para compatibilidad
         location,
         imageUrl: image_url,
         requirements,
         materials,
         targetAudience: target_audience,
         difficultyLevel: difficulty_level,
-        price: price,
         isActive: is_active,
         createdBy: created_by,
       },
