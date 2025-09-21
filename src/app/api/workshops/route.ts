@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
         maxParticipants: max_participants,
         startDate: new Date(start_date),
         endDate: new Date(end_date),
-        schedule: null, // Campo opcional para compatibilidad
+        schedule: String(schedule), // Campo opcional para compatibilidad
         location,
         imageUrl: image_url,
         requirements,
