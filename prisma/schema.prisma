@@ -1,0 +1,182 @@
+// 📚 Sistema de Bibliotecas Públicas - Región de Los Ríos
+// Prisma Schema para Supabase
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================================================
+// 🧑‍💼 USER PROFILES
+// ============================================================================
+
+model UserProfile {
+  id               String    @id @default(cuid())
+  userId           String    @unique @map("user_id")
+  name             String
+  phone            String?
+  address          String?
+  birthDate        DateTime? @map("birth_date") @db.Date
+  emergencyContact String?   @map("emergency_contact")
+  emergencyPhone   String?   @map("emergency_phone")
+  role             Role      @default(USER)
+  avatarUrl        String?   @map("avatar_url")
+  preferences      Json      @default("{}")
+  isActive         Boolean   @default(true) @map("is_active")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  workshopsCreated     Workshop[]           @relation("WorkshopCreator")
+  workshopEnrollments  WorkshopEnrollment[]
+  announcementsCreated Announcement[]       @relation("AnnouncementCreator")
+
+  @@map("user_profiles")
+}
+
+// ============================================================================
+// 🎯 WORKSHOPS
+// ============================================================================
+
+model Workshop {
+  id                  String             @id @default(cuid())
+  title               String
+  description         String
+  instructor          String
+  instructorBio       String?            @map("instructor_bio")
+  category            WorkshopCategory   @default(GENERAL)
+  maxParticipants     Int                @default(20) @map("max_participants")
+  currentParticipants Int                @default(0) @map("current_participants")
+  startDate           DateTime           @map("start_date")
+  endDate             DateTime           @map("end_date")
+  schedule            String
+  location            String
+  imageUrl            String?            @map("image_url")
+  requirements        String?
+  materials           String?
+  targetAudience      String?            @map("target_audience")
+  difficultyLevel     DifficultyLevel    @default(BEGINNER) @map("difficulty_level")
+  price               Decimal            @default(0.00) @db.Decimal(10, 2)
+  isActive            Boolean            @default(true) @map("is_active")
+  isFeatured          Boolean            @default(false) @map("is_featured")
+  createdBy           String?            @map("created_by")
+  createdAt           DateTime           @default(now()) @map("created_at")
+  updatedAt           DateTime           @updatedAt @map("updated_at")
+
+  // Relations
+  creator     UserProfile?         @relation("WorkshopCreator", fields: [createdBy], references: [userId])
+  enrollments WorkshopEnrollment[]
+
+  @@map("workshops")
+}
+
+// ============================================================================
+// 📝 WORKSHOP ENROLLMENTS
+// ============================================================================
+
+model WorkshopEnrollment {
+  id                   String             @id @default(cuid())
+  userId               String             @map("user_id")
+  workshopId           String             @map("workshop_id")
+  status               EnrollmentStatus   @default(ENROLLED)
+  enrollmentDate       DateTime           @default(now()) @map("enrollment_date")
+  completionDate       DateTime?          @map("completion_date")
+  attendanceConfirmed  Boolean            @default(false) @map("attendance_confirmed")
+  rating               Int?               @db.SmallInt
+  feedback             String?
+  certificateIssued    Boolean            @default(false) @map("certificate_issued")
+  notes                String?
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+
+  // Relations
+  user     UserProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  workshop Workshop    @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workshopId])
+  @@map("workshop_enrollments")
+}
+
+// ============================================================================
+// 📢 ANNOUNCEMENTS
+// ============================================================================
+
+model Announcement {
+  id             String           @id @default(cuid())
+  title          String
+  content        String
+  excerpt        String?
+  type           AnnouncementType @default(GENERAL)
+  priority       Int              @default(1) @db.SmallInt
+  isActive       Boolean          @default(true) @map("is_active")
+  isPinned       Boolean          @default(false) @map("is_pinned")
+  startDate      DateTime         @default(now()) @map("start_date")
+  endDate        DateTime?        @map("end_date")
+  imageUrl       String?          @map("image_url")
+  linkUrl        String?          @map("link_url")
+  linkText       String?          @map("link_text")
+  targetAudience TargetAudience   @default(ALL) @map("target_audience")
+  createdBy      String?          @map("created_by")
+  viewsCount     Int              @default(0) @map("views_count")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  creator UserProfile? @relation("AnnouncementCreator", fields: [createdBy], references: [userId])
+
+  @@map("announcements")
+}
+
+
+// ============================================================================
+// 🏷️ ENUMS
+// ============================================================================
+
+enum Role {
+  USER  @map("user")
+  ADMIN @map("admin")
+}
+
+enum WorkshopCategory {
+  GENERAL     @map("general")
+  TECHNOLOGY  @map("tecnologia")
+  ART         @map("arte")
+  LITERATURE  @map("literatura")
+  EDUCATION   @map("educacion")
+  CULTURE     @map("cultura")
+}
+
+enum DifficultyLevel {
+  BEGINNER     @map("principiante")
+  INTERMEDIATE @map("intermedio")
+  ADVANCED     @map("avanzado")
+}
+
+enum EnrollmentStatus {
+  ENROLLED  @map("enrolled")
+  CANCELLED @map("cancelled")
+  COMPLETED @map("completed")
+  NO_SHOW   @map("no_show")
+}
+
+enum AnnouncementType {
+  GENERAL     @map("general")
+  EVENT       @map("event")
+  IMPORTANT   @map("important")
+  MAINTENANCE @map("maintenance")
+  NEWS        @map("news")
+  EMERGENCY   @map("emergency")
+}
+
+enum TargetAudience {
+  ALL   @map("all")
+  USERS @map("users")
+  STAFF @map("staff")
+}
+

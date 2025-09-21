@@ -6,7 +6,11 @@
       "Bash(npm run dev:*)",
       "Bash(npm install:*)",
       "Bash(npm uninstall:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npm run:*)",
+      "Bash(node:*)",
+      "Bash(del create-admin.js)"
     ],
     "deny": [],
     "ask": []
