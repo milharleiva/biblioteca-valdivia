@@ -3,7 +3,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
-import { prisma } from '@/lib/prisma';
 
 interface UserProfile {
   id: string;
@@ -82,15 +81,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      // Try to fetch profile using Prisma
-      const profile = await prisma.userProfile.findUnique({
-        where: {
-          userId: userId,
-        },
-      });
+      // Try to fetch profile using our API
+      const response = await fetch(`/api/profile?userId=${userId}`);
+      const result = await response.json();
 
-      if (profile) {
+      if (result.success && result.data) {
         // Profile exists - convert to expected format
+        const profile = result.data;
         setProfile({
           id: profile.id,
           user_id: profile.userId,
@@ -98,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: profile.role.toLowerCase() as 'user' | 'admin',
           phone: profile.phone,
           address: profile.address,
-          birth_date: profile.birthDate?.toISOString(),
+          birth_date: profile.birthDate?.slice(0, 10), // Convert to YYYY-MM-DD format
           emergency_contact: profile.emergencyContact,
           emergency_phone: profile.emergencyPhone,
         });
@@ -111,27 +108,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userName = authUser.user?.user_metadata?.name || 'Usuario';
 
         try {
-          const newProfile = await prisma.userProfile.create({
-            data: {
+          const createResponse = await fetch('/api/profile', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
               userId: userId,
               name: userName,
               role: 'USER',
-            },
+            }),
           });
 
-          setProfile({
-            id: newProfile.id,
-            user_id: newProfile.userId,
-            name: newProfile.name,
-            role: newProfile.role.toLowerCase() as 'user' | 'admin',
-            phone: newProfile.phone,
-            address: newProfile.address,
-            birth_date: newProfile.birthDate?.toISOString(),
-            emergency_contact: newProfile.emergencyContact,
-            emergency_phone: newProfile.emergencyPhone,
-          });
+          const createResult = await createResponse.json();
 
-          console.log('✅ New profile created successfully');
+          if (createResult.success) {
+            const newProfile = createResult.data;
+            setProfile({
+              id: newProfile.id,
+              user_id: newProfile.userId,
+              name: newProfile.name,
+              role: newProfile.role.toLowerCase() as 'user' | 'admin',
+              phone: newProfile.phone,
+              address: newProfile.address,
+              birth_date: newProfile.birthDate?.slice(0, 10),
+              emergency_contact: newProfile.emergencyContact,
+              emergency_phone: newProfile.emergencyPhone,
+            });
+
+            console.log('✅ New profile created successfully');
+          } else {
+            throw new Error(createResult.error);
+          }
         } catch (createError) {
           console.error('❌ Error creating profile:', createError);
           // Set a fallback profile
@@ -188,14 +196,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // 2. If auth user created successfully, create profile in our database
       if (data.user && !error) {
         try {
-          await prisma.userProfile.create({
-            data: {
+          const createResponse = await fetch('/api/profile', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
               userId: data.user.id,
               name: name,
               role: 'USER',
-            },
+            }),
           });
-          console.log('✅ User profile created successfully');
+
+          const createResult = await createResponse.json();
+          if (createResult.success) {
+            console.log('✅ User profile created successfully');
+          } else {
+            console.error('❌ Error creating user profile:', createResult.error);
+          }
         } catch (profileError) {
           console.error('❌ Error creating user profile:', profileError);
           // Don't return error here - user auth was successful
@@ -228,29 +246,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return;
 
     try {
-      // Convert updates to Prisma format
-      const prismaUpdates: any = {};
-
-      if (updates.name) prismaUpdates.name = updates.name;
-      if (updates.phone) prismaUpdates.phone = updates.phone;
-      if (updates.address) prismaUpdates.address = updates.address;
-      if (updates.birth_date) prismaUpdates.birthDate = new Date(updates.birth_date);
-      if (updates.emergency_contact) prismaUpdates.emergencyContact = updates.emergency_contact;
-      if (updates.emergency_phone) prismaUpdates.emergencyPhone = updates.emergency_phone;
-      if (updates.role) prismaUpdates.role = updates.role.toUpperCase();
-
-      // Update using Prisma
-      await prisma.userProfile.update({
-        where: {
-          userId: user.id,
+      // Update using our API
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        data: prismaUpdates,
+        body: JSON.stringify({
+          userId: user.id,
+          updates: updates,
+        }),
       });
 
-      console.log('✅ Profile updated successfully');
+      const result = await response.json();
 
-      // Refresh profile
-      await fetchProfile(user.id);
+      if (result.success) {
+        console.log('✅ Profile updated successfully');
+        // Refresh profile
+        await fetchProfile(user.id);
+      } else {
+        throw new Error(result.error);
+      }
     } catch (error) {
       console.error('❌ Error updating profile:', error);
       throw error;
