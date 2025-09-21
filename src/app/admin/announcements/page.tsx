@@ -59,15 +59,26 @@ export default function AnnouncementsPage() {
     announcement: null
   });
 
-  const supabase = createClient();
+  // Check if we can use Supabase (client-side only)
+  const canUseSupabase = typeof window !== 'undefined' &&
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  const supabase = canUseSupabase ? createClient() : null;
 
   useEffect(() => {
-    if (profile?.role === 'admin') {
+    if (profile?.role === 'admin' && canUseSupabase) {
       fetchAnnouncements();
+    } else if (!canUseSupabase) {
+      setLoading(false);
     }
-  }, [profile]);
+  }, [profile, canUseSupabase]);
 
   const fetchAnnouncements = async () => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
     try {
       const { data, error } = await supabase
         .from('announcements')
@@ -92,6 +103,7 @@ export default function AnnouncementsPage() {
   };
 
   const toggleAnnouncementStatus = async (announcement: Announcement) => {
+    if (!supabase) return;
     try {
       const { error } = await supabase
         .from('announcements')
@@ -111,7 +123,7 @@ export default function AnnouncementsPage() {
   };
 
   const handleDelete = async () => {
-    if (!deleteDialog.announcement) return;
+    if (!deleteDialog.announcement || !supabase) return;
 
     try {
       const { error } = await supabase
