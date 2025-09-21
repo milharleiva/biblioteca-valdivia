@@ -11,7 +11,9 @@
       "Bash(npm run:*)",
       "Bash(node:*)",
       "Bash(del create-admin.js)",
-      "Bash(del vercel.json)"
+      "Bash(del vercel.json)",
+      "Bash(taskkill:*)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []
