@@ -30,8 +30,7 @@ import {
   Groups,
   PhotoCamera,
   School,
-  Category,
-  AttachMoney
+  Category
 } from '@mui/icons-material';
 import { MotionDiv } from '@/components/MotionWrapper';
 import Link from 'next/link';
@@ -48,17 +47,18 @@ export default function NewWorkshopPage() {
     description: '',
     instructor: '',
     instructorBio: '',
-    category: 'GENERAL',
+    category: 'general',
     maxParticipants: 20,
     startDate: '',
+    startTime: '09:00',
     endDate: '',
+    endTime: '17:00',
     location: '',
     imageFile: null as File | null,
     requirements: '',
     materials: '',
     targetAudience: '',
-    difficultyLevel: 'BEGINNER',
-    price: 0,
+    difficultyLevel: 'principiante',
     isActive: true
   });
 
@@ -75,9 +75,15 @@ export default function NewWorkshopPage() {
 
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const target = e.target as HTMLInputElement;
-    const value = field === 'maxParticipants' || field === 'price' ? parseFloat(target.value) || 0 :
-                  field === 'isActive' ? target.checked :
-                  target.value;
+    let value: any = target.value;
+
+    if (field === 'maxParticipants') {
+      // Solo permitir números y convertir a número
+      const numericValue = target.value.replace(/[^0-9]/g, '');
+      value = numericValue === '' ? '' : parseInt(numericValue) || '';
+    } else if (field === 'isActive') {
+      value = target.checked;
+    }
 
     setFormData(prev => ({
       ...prev,
@@ -113,8 +119,20 @@ export default function NewWorkshopPage() {
       return;
     }
 
-    if (new Date(formData.startDate) >= new Date(formData.endDate)) {
-      setError('La fecha de inicio debe ser anterior a la fecha de finalización.');
+    // Validar número de participantes
+    const maxParticipants = parseInt(formData.maxParticipants.toString()) || 0;
+    if (maxParticipants < 1) {
+      setError('El número máximo de participantes debe ser al menos 1.');
+      setLoading(false);
+      return;
+    }
+
+    // Combine date and time for validation
+    const startDateTime = new Date(`${formData.startDate}T${formData.startTime}`);
+    const endDateTime = new Date(`${formData.endDate}T${formData.endTime}`);
+
+    if (startDateTime >= endDateTime) {
+      setError('La fecha y hora de inicio debe ser anterior a la fecha y hora de finalización.');
       setLoading(false);
       return;
     }
@@ -144,27 +162,34 @@ export default function NewWorkshopPage() {
         instructor: formData.instructor,
         instructor_bio: formData.instructorBio,
         category: formData.category,
-        max_participants: formData.maxParticipants,
-        start_date: formData.startDate,
-        end_date: formData.endDate,
+        max_participants: maxParticipants,
+        start_date: `${formData.startDate}T${formData.startTime}:00`,
+        end_date: `${formData.endDate}T${formData.endTime}:00`,
+        schedule: `${formData.startTime} - ${formData.endTime}`,
         location: formData.location,
         image_url: imageUrl,
         requirements: formData.requirements,
         materials: formData.materials,
         target_audience: formData.targetAudience,
         difficulty_level: formData.difficultyLevel,
-        price: formData.price,
         is_active: formData.isActive,
         created_by: user?.id
       };
 
-      const { error } = await supabase
-        .from('workshops')
-        .insert(workshopData);
+      // Usar la API de Next.js en lugar de Supabase directamente
+      const response = await fetch('/api/workshops', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(workshopData),
+      });
 
-      if (error) {
-        setError('Error al crear el taller. Por favor intenta nuevamente.');
-        console.error('Error creating workshop:', error);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        setError(result.error || 'Error al crear el taller. Por favor intenta nuevamente.');
+        console.error('Error creating workshop:', result.error);
       } else {
         setSuccess('¡Taller creado exitosamente!');
         setTimeout(() => {
@@ -260,10 +285,12 @@ export default function NewWorkshopPage() {
                   <TextField
                     fullWidth
                     label="Máximo de Participantes"
-                    type="number"
+                    type="text"
                     value={formData.maxParticipants}
                     onChange={handleChange('maxParticipants')}
                     required
+                    placeholder="Ej: 20"
+                    helperText="Solo se permiten números (mínimo 1)"
                     InputProps={{
                       startAdornment: <Groups sx={{ mr: 1, color: 'action.active' }} />
                     }}
@@ -288,12 +315,12 @@ export default function NewWorkshopPage() {
                       onChange={handleSelectChange('category')}
                       startAdornment={<Category sx={{ mr: 1, color: 'action.active' }} />}
                     >
-                      <MenuItem value="GENERAL">General</MenuItem>
-                      <MenuItem value="TECHNOLOGY">Tecnología</MenuItem>
-                      <MenuItem value="ART">Arte</MenuItem>
-                      <MenuItem value="LITERATURE">Literatura</MenuItem>
-                      <MenuItem value="EDUCATION">Educación</MenuItem>
-                      <MenuItem value="CULTURE">Cultura</MenuItem>
+                      <MenuItem value="general">General</MenuItem>
+                      <MenuItem value="tecnologia">Tecnología</MenuItem>
+                      <MenuItem value="arte">Arte</MenuItem>
+                      <MenuItem value="literatura">Literatura</MenuItem>
+                      <MenuItem value="educacion">Educación</MenuItem>
+                      <MenuItem value="cultura">Cultura</MenuItem>
                     </Select>
                   </FormControl>
 
@@ -304,36 +331,68 @@ export default function NewWorkshopPage() {
                       onChange={handleSelectChange('difficultyLevel')}
                       startAdornment={<School sx={{ mr: 1, color: 'action.active' }} />}
                     >
-                      <MenuItem value="BEGINNER">Principiante</MenuItem>
-                      <MenuItem value="INTERMEDIATE">Intermedio</MenuItem>
-                      <MenuItem value="ADVANCED">Avanzado</MenuItem>
+                      <MenuItem value="principiante">Principiante</MenuItem>
+                      <MenuItem value="intermedio">Intermedio</MenuItem>
+                      <MenuItem value="avanzado">Avanzado</MenuItem>
                     </Select>
                   </FormControl>
                 </Box>
 
-                <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
+                {/* Fechas */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, mb: 3 }}>
                   <TextField
                     fullWidth
-                    label="Fecha y Hora de Inicio"
-                    type="datetime-local"
+                    label="Fecha de Inicio"
+                    type="date"
                     value={formData.startDate}
                     onChange={handleChange('startDate')}
                     required
                     InputLabelProps={{
                       shrink: true,
                     }}
+                    helperText="Selecciona la fecha de inicio del taller"
                   />
 
                   <TextField
                     fullWidth
-                    label="Fecha y Hora de Finalización"
-                    type="datetime-local"
+                    label="Fecha de Finalización"
+                    type="date"
                     value={formData.endDate}
                     onChange={handleChange('endDate')}
                     required
                     InputLabelProps={{
                       shrink: true,
                     }}
+                    helperText="Selecciona la fecha de finalización del taller"
+                  />
+                </Box>
+
+                {/* Horarios */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+                  <TextField
+                    fullWidth
+                    label="Hora de Inicio"
+                    type="time"
+                    value={formData.startTime}
+                    onChange={handleChange('startTime')}
+                    required
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    helperText="Hora de inicio del taller"
+                  />
+
+                  <TextField
+                    fullWidth
+                    label="Hora de Finalización"
+                    type="time"
+                    value={formData.endTime}
+                    onChange={handleChange('endTime')}
+                    required
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    helperText="Hora de finalización del taller"
                   />
                 </Box>
 
@@ -349,17 +408,6 @@ export default function NewWorkshopPage() {
                     }}
                   />
 
-                  <TextField
-                    fullWidth
-                    label="Precio (opcional)"
-                    type="number"
-                    value={formData.price}
-                    onChange={handleChange('price')}
-                    inputProps={{ step: '0.01', min: '0' }}
-                    InputProps={{
-                      startAdornment: <AttachMoney sx={{ mr: 1, color: 'action.active' }} />
-                    }}
-                  />
                 </Box>
 
                 {/* Imagen Upload */}

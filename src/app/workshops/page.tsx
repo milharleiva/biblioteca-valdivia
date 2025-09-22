@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { createClient } from '@/lib/supabase/client';
 import {
   Box,
   Container,
@@ -36,15 +35,17 @@ interface Workshop {
   title: string;
   description: string;
   instructor: string;
-  max_participants: number;
-  current_participants: number;
-  start_date: string;
-  end_date: string;
-  schedule: string;
+  maxParticipants: number;
+  startDate: string;
+  endDate: string;
+  schedule?: string;
   location: string;
-  image_url?: string;
+  imageUrl?: string;
   requirements?: string;
-  is_active: boolean;
+  isActive: boolean;
+  _count?: {
+    enrollments: number;
+  };
 }
 
 interface Enrollment {
@@ -57,6 +58,7 @@ export default function WorkshopsPage() {
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [enrollmentsLoading, setEnrollmentsLoading] = useState(true);
   const [enrollDialog, setEnrollDialog] = useState<{ open: boolean; workshop: Workshop | null }>({
     open: false,
     workshop: null
@@ -64,7 +66,6 @@ export default function WorkshopsPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const supabase = createClient();
 
   useEffect(() => {
     fetchWorkshops();
@@ -75,23 +76,20 @@ export default function WorkshopsPage() {
 
   const fetchWorkshops = async () => {
     try {
-      const currentDate = new Date().toISOString();
+      const response = await fetch('/api/workshops');
+      const result = await response.json();
 
-      const { data, error } = await supabase
-        .from('workshops')
-        .select('*')
-        .eq('is_active', true)
-        .gte('end_date', currentDate)
-        .order('start_date', { ascending: true });
+      if (result.success) {
+        // Filtrar talleres que aún no han terminado
+        const currentDate = new Date();
+        const activeWorkshops = result.data.filter((workshop: Record<string, unknown>) =>
+          new Date(workshop.endDate as string) >= currentDate
+        );
 
-      if (error) {
-        console.error('Error fetching workshops:', error);
-        // Only show error if it's not a "table doesn't exist" error
-        if (error.code !== 'PGRST116') {
-          setError('Error al cargar los talleres');
-        }
+        setWorkshops(activeWorkshops);
       } else {
-        setWorkshops(data || []);
+        setError('Error al cargar los talleres');
+        console.error('Error fetching workshops:', result.error);
       }
     } catch (error) {
       setError('Error inesperado al cargar los talleres');
@@ -102,21 +100,25 @@ export default function WorkshopsPage() {
   };
 
   const fetchUserEnrollments = async () => {
-    if (!user) return;
+    if (!user) {
+      setEnrollmentsLoading(false);
+      return;
+    }
 
+    setEnrollmentsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('workshop_enrollments')
-        .select('workshop_id, status')
-        .eq('user_id', user.id);
+      const response = await fetch(`/api/users/${user.id}/enrollments`);
+      const result = await response.json();
 
-      if (error) {
-        console.error('Error fetching enrollments:', error);
+      if (result.success) {
+        setEnrollments(result.data || []);
       } else {
-        setEnrollments(data || []);
+        console.error('Error fetching enrollments:', result.error);
       }
     } catch (error) {
       console.error('Error:', error);
+    } finally {
+      setEnrollmentsLoading(false);
     }
   };
 
@@ -127,24 +129,40 @@ export default function WorkshopsPage() {
   };
 
   const canEnroll = (workshop: Workshop) => {
-    return workshop.current_participants < workshop.max_participants && !isEnrolled(workshop.id);
+    // Don't allow enrollment if enrollments are still loading to prevent race conditions
+    if (enrollmentsLoading) return false;
+    return (workshop._count?.enrollments || 0) < workshop.maxParticipants && !isEnrolled(workshop.id);
   };
 
   const handleEnroll = async () => {
     if (!enrollDialog.workshop || !user) return;
 
-    try {
-      const { error } = await supabase
-        .from('workshop_enrollments')
-        .insert({
-          user_id: user.id,
-          workshop_id: enrollDialog.workshop.id,
-          status: 'enrolled'
-        });
+    // Double-check enrollment status before making API call
+    if (isEnrolled(enrollDialog.workshop.id)) {
+      setError('Ya estás inscrito en este taller');
+      setEnrollDialog({ open: false, workshop: null });
+      return;
+    }
 
-      if (error) {
-        setError('Error al inscribirse al taller');
-        console.error('Error enrolling:', error);
+    try {
+      const response = await fetch(`/api/workshops/${enrollDialog.workshop.id}/enrollments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        setError(result.error || 'Error al inscribirse al taller');
+        // Only log to console if it's not a user validation error
+        if (result.error !== 'Ya estás inscrito en este taller' && result.error !== 'Este taller ya está lleno') {
+          console.error('Error enrolling:', result.error);
+        }
       } else {
         setSuccess('¡Te has inscrito exitosamente al taller!');
         fetchWorkshops(); // Refresh to update participant count
@@ -202,11 +220,11 @@ export default function WorkshopsPage() {
           <Box sx={{ mb: 4 }}>
             <Button
               component={Link}
-              href="/dashboard"
+              href="/"
               startIcon={<ArrowBack />}
               sx={{ mb: 2 }}
             >
-              Volver al Dashboard
+              Volver al Inicio
             </Button>
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
               Talleres Disponibles
@@ -269,11 +287,11 @@ export default function WorkshopsPage() {
                         '&:hover': { elevation: 4 }
                       }}
                     >
-                      {workshop.image_url && (
+                      {workshop.imageUrl && (
                         <Box
                           sx={{
                             height: 200,
-                            backgroundImage: `url(${workshop.image_url})`,
+                            backgroundImage: `url(${workshop.imageUrl})`,
                             backgroundSize: 'cover',
                             backgroundPosition: 'center'
                           }}
@@ -310,8 +328,8 @@ export default function WorkshopsPage() {
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <CalendarMonth fontSize="small" color="action" />
                             <Typography variant="body2">
-                              {new Date(workshop.start_date).toLocaleDateString('es-ES')} - {' '}
-                              {new Date(workshop.end_date).toLocaleDateString('es-ES')}
+                              {new Date(workshop.startDate).toLocaleDateString('es-ES')} - {' '}
+                              {new Date(workshop.endDate).toLocaleDateString('es-ES')}
                             </Typography>
                           </Box>
 
@@ -332,7 +350,7 @@ export default function WorkshopsPage() {
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <Groups fontSize="small" color="action" />
                             <Typography variant="body2">
-                              {workshop.current_participants}/{workshop.max_participants} participantes
+                              {workshop._count?.enrollments || 0}/{workshop.maxParticipants} participantes
                             </Typography>
                           </Box>
                         </Box>
@@ -410,7 +428,7 @@ export default function WorkshopsPage() {
                   <strong>Ubicación:</strong> {enrollDialog.workshop.location}
                 </Typography>
                 <Typography variant="body2">
-                  <strong>Fechas:</strong> {new Date(enrollDialog.workshop.start_date).toLocaleDateString('es-ES')} - {new Date(enrollDialog.workshop.end_date).toLocaleDateString('es-ES')}
+                  <strong>Fechas:</strong> {new Date(enrollDialog.workshop.startDate).toLocaleDateString('es-ES')} - {new Date(enrollDialog.workshop.endDate).toLocaleDateString('es-ES')}
                 </Typography>
               </Box>
             )}

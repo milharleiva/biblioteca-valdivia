@@ -14,7 +14,12 @@ import {
   Alert,
   FormControlLabel,
   Switch,
-  CircularProgress
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent
 } from '@mui/material';
 import {
   Save,
@@ -24,7 +29,10 @@ import {
   LocationOn,
   Schedule,
   Description,
-  Groups
+  Groups,
+  PhotoCamera,
+  Category,
+  School
 } from '@mui/icons-material';
 import { MotionDiv } from '@/components/MotionWrapper';
 import Link from 'next/link';
@@ -60,48 +68,79 @@ export default function EditWorkshopPage() {
     title: '',
     description: '',
     instructor: '',
-    max_participants: 20,
-    start_date: '',
-    end_date: '',
-    schedule: '',
+    instructorBio: '',
+    category: 'general',
+    maxParticipants: 20,
+    startDate: '',
+    startTime: '09:00',
+    endDate: '',
+    endTime: '17:00',
     location: '',
-    image_url: '',
+    imageUrl: '',
+    imageFile: null as File | null,
     requirements: '',
-    is_active: true
+    materials: '',
+    targetAudience: '',
+    difficultyLevel: 'principiante',
+    isActive: true
   });
 
   const supabase = createClient();
 
   const fetchWorkshop = async () => {
     try {
-      const { data, error } = await supabase
-        .from('workshops')
-        .select('*')
-        .eq('id', workshopId)
-        .single();
+      const response = await fetch(`/api/workshops?id=${workshopId}`);
+      const result = await response.json();
 
-      if (error) {
-        setError('Error al cargar el taller');
-        console.error('Error fetching workshop:', error);
-      } else if (data) {
+      if (result.success && result.data) {
+        const data = result.data;
+        console.log('Workshop data from API:', data); // Debug log
         setWorkshop(data);
-        // Format dates for datetime-local input
-        const startDate = new Date(data.start_date).toISOString().slice(0, 16);
-        const endDate = new Date(data.end_date).toISOString().slice(0, 16);
+
+        // Extract date and time from datetime strings
+        let startDate = '';
+        let startTime = '09:00';
+        let endDate = '';
+        let endTime = '17:00';
+
+        if (data.startDate) {
+          const startDateTime = new Date(data.startDate);
+          if (!isNaN(startDateTime.getTime())) {
+            startDate = startDateTime.toISOString().split('T')[0];
+            startTime = startDateTime.toTimeString().slice(0, 5);
+          }
+        }
+
+        if (data.endDate) {
+          const endDateTime = new Date(data.endDate);
+          if (!isNaN(endDateTime.getTime())) {
+            endDate = endDateTime.toISOString().split('T')[0];
+            endTime = endDateTime.toTimeString().slice(0, 5);
+          }
+        }
 
         setFormData({
           title: data.title || '',
           description: data.description || '',
           instructor: data.instructor || '',
-          max_participants: data.max_participants || 20,
-          start_date: startDate,
-          end_date: endDate,
-          schedule: data.schedule || '',
+          instructorBio: data.instructorBio || '',
+          category: data.category || 'general',
+          maxParticipants: data.maxParticipants || 20,
+          startDate: startDate,
+          startTime: startTime,
+          endDate: endDate,
+          endTime: endTime,
           location: data.location || '',
-          image_url: data.image_url || '',
           requirements: data.requirements || '',
-          is_active: data.is_active ?? true
+          materials: data.materials || '',
+          targetAudience: data.targetAudience || '',
+          difficultyLevel: data.difficultyLevel || 'principiante',
+          imageUrl: data.imageUrl || '',
+          isActive: data.isActive ?? true
         });
+      } else {
+        setError('Error al cargar el taller');
+        console.error('Error fetching workshop:', result.error);
       }
     } catch (error) {
       setError('Error inesperado al cargar el taller');
@@ -111,16 +150,41 @@ export default function EditWorkshopPage() {
     }
   };
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = field === 'max_participants' ? parseInt(e.target.value) || 0 :
-                  field === 'is_active' ? e.target.checked :
-                  e.target.value;
+  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const target = e.target as HTMLInputElement;
+    let value: any = target.value;
+
+    if (field === 'maxParticipants') {
+      // Solo permitir números y convertir a número
+      const numericValue = target.value.replace(/[^0-9]/g, '');
+      value = numericValue === '' ? '' : parseInt(numericValue) || '';
+    } else if (field === 'isActive') {
+      value = target.checked;
+    }
 
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
+
+  const handleSelectChange = (field: string) => (event: SelectChangeEvent<string>) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: event.target.value
+    }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData(prev => ({
+        ...prev,
+        imageFile: file
+      }));
+    }
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,32 +193,89 @@ export default function EditWorkshopPage() {
     setSuccess('');
 
     // Validations
-    if (!formData.title || !formData.description || !formData.instructor) {
+    if (!formData.title || !formData.description || !formData.instructor || !formData.location) {
       setError('Por favor completa todos los campos obligatorios.');
       setLoading(false);
       return;
     }
 
-    if (new Date(formData.start_date) >= new Date(formData.end_date)) {
-      setError('La fecha de inicio debe ser anterior a la fecha de finalización.');
+    // Validar número de participantes
+    const maxParticipants = parseInt(formData.maxParticipants.toString()) || 0;
+    if (maxParticipants < 1) {
+      setError('El número máximo de participantes debe ser al menos 1.');
+      setLoading(false);
+      return;
+    }
+
+    // Combine date and time for validation
+    const startDateTime = new Date(`${formData.startDate}T${formData.startTime}`);
+    const endDateTime = new Date(`${formData.endDate}T${formData.endTime}`);
+
+    if (startDateTime >= endDateTime) {
+      setError('La fecha y hora de inicio debe ser anterior a la fecha y hora de finalización.');
       setLoading(false);
       return;
     }
 
     try {
-      const { error } = await supabase
-        .from('workshops')
-        .update(formData)
-        .eq('id', workshopId);
+      // Upload image if provided
+      let imageUrl = formData.imageUrl; // Keep existing image URL as default
+      if (formData.imageFile) {
+        const fileExt = formData.imageFile.name.split('.').pop();
+        const fileName = `workshop-${Date.now()}.${fileExt}`;
 
-      if (error) {
-        setError('Error al actualizar el taller. Por favor intenta nuevamente.');
-        console.error('Error updating workshop:', error);
-      } else {
+        const { error: uploadError } = await supabase.storage
+          .from('workshops')
+          .upload(fileName, formData.imageFile);
+
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+        } else {
+          const { data } = supabase.storage.from('workshops').getPublicUrl(fileName);
+          imageUrl = data.publicUrl;
+        }
+      }
+
+      const workshopData = {
+        title: formData.title,
+        description: formData.description,
+        instructor: formData.instructor,
+        instructor_bio: formData.instructorBio,
+        category: formData.category,
+        max_participants: maxParticipants,
+        start_date: `${formData.startDate}T${formData.startTime}:00`,
+        end_date: `${formData.endDate}T${formData.endTime}:00`,
+        schedule: `${formData.startTime} - ${formData.endTime}`,
+        location: formData.location,
+        image_url: imageUrl,
+        requirements: formData.requirements,
+        materials: formData.materials,
+        target_audience: formData.targetAudience,
+        difficulty_level: formData.difficultyLevel,
+        is_active: formData.isActive
+      };
+
+      const response = await fetch('/api/workshops', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: workshopId,
+          ...workshopData
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
         setSuccess('¡Taller actualizado exitosamente!');
         setTimeout(() => {
           router.push('/dashboard/admin/workshops');
         }, 2000);
+      } else {
+        setError('Error al actualizar el taller. Por favor intenta nuevamente.');
+        console.error('Error updating workshop:', result.error);
       }
     } catch (error) {
       setError('Error inesperado al actualizar el taller.');
@@ -262,8 +383,7 @@ export default function EditWorkshopPage() {
                   }}
                 />
 
-                {/* Two-column layout for instructor and max participants */}
-                <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' } }}>
+                <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
                   <TextField
                     fullWidth
                     label="Instructor"
@@ -278,57 +398,118 @@ export default function EditWorkshopPage() {
                   <TextField
                     fullWidth
                     label="Máximo de Participantes"
-                    type="number"
-                    value={formData.max_participants}
-                    onChange={handleChange('max_participants')}
+                    type="text"
+                    value={formData.maxParticipants}
+                    onChange={handleChange('maxParticipants')}
                     required
+                    placeholder="Ej: 20"
+                    helperText="Solo se permiten números (mínimo 1)"
                     InputProps={{
                       startAdornment: <Groups sx={{ mr: 1, color: 'action.active' }} />
                     }}
                   />
                 </Box>
 
-                {/* Two-column layout for dates */}
-                <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' } }}>
+                <TextField
+                  fullWidth
+                  label="Biografía del Instructor (opcional)"
+                  value={formData.instructorBio}
+                  onChange={handleChange('instructorBio')}
+                  multiline
+                  rows={2}
+                  placeholder="Breve descripción del instructor..."
+                />
+
+                <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Categoría</InputLabel>
+                    <Select
+                      value={formData.category}
+                      onChange={handleSelectChange('category')}
+                      startAdornment={<Category sx={{ mr: 1, color: 'action.active' }} />}
+                    >
+                      <MenuItem value="general">General</MenuItem>
+                      <MenuItem value="tecnologia">Tecnología</MenuItem>
+                      <MenuItem value="arte">Arte</MenuItem>
+                      <MenuItem value="literatura">Literatura</MenuItem>
+                      <MenuItem value="educacion">Educación</MenuItem>
+                      <MenuItem value="cultura">Cultura</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  <FormControl fullWidth>
+                    <InputLabel>Nivel de Dificultad</InputLabel>
+                    <Select
+                      value={formData.difficultyLevel}
+                      onChange={handleSelectChange('difficultyLevel')}
+                      startAdornment={<School sx={{ mr: 1, color: 'action.active' }} />}
+                    >
+                      <MenuItem value="principiante">Principiante</MenuItem>
+                      <MenuItem value="intermedio">Intermedio</MenuItem>
+                      <MenuItem value="avanzado">Avanzado</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+
+                {/* Fechas */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, mb: 3 }}>
                   <TextField
                     fullWidth
                     label="Fecha de Inicio"
-                    type="datetime-local"
-                    value={formData.start_date}
-                    onChange={handleChange('start_date')}
+                    type="date"
+                    value={formData.startDate}
+                    onChange={handleChange('startDate')}
                     required
                     InputLabelProps={{
                       shrink: true,
                     }}
+                    helperText="Selecciona la fecha de inicio del taller"
                   />
 
                   <TextField
                     fullWidth
                     label="Fecha de Finalización"
-                    type="datetime-local"
-                    value={formData.end_date}
-                    onChange={handleChange('end_date')}
+                    type="date"
+                    value={formData.endDate}
+                    onChange={handleChange('endDate')}
                     required
                     InputLabelProps={{
                       shrink: true,
                     }}
+                    helperText="Selecciona la fecha de finalización del taller"
                   />
                 </Box>
 
-                {/* Two-column layout for schedule and location */}
-                <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' } }}>
+                {/* Horarios */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
                   <TextField
                     fullWidth
-                    label="Horario"
-                    value={formData.schedule}
-                    onChange={handleChange('schedule')}
-                    placeholder="Ej: Lunes y Miércoles 16:00-18:00"
+                    label="Hora de Inicio"
+                    type="time"
+                    value={formData.startTime}
+                    onChange={handleChange('startTime')}
                     required
-                    InputProps={{
-                      startAdornment: <Schedule sx={{ mr: 1, color: 'action.active' }} />
+                    InputLabelProps={{
+                      shrink: true,
                     }}
+                    helperText="Hora de inicio del taller"
                   />
 
+                  <TextField
+                    fullWidth
+                    label="Hora de Finalización"
+                    type="time"
+                    value={formData.endTime}
+                    onChange={handleChange('endTime')}
+                    required
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    helperText="Hora de finalización del taller"
+                  />
+                </Box>
+
+                <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
                   <TextField
                     fullWidth
                     label="Ubicación"
@@ -341,13 +522,38 @@ export default function EditWorkshopPage() {
                   />
                 </Box>
 
-                <TextField
-                  fullWidth
-                  label="URL de Imagen (opcional)"
-                  value={formData.image_url}
-                  onChange={handleChange('image_url')}
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                />
+                {/* Imagen Upload */}
+                <Box>
+                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                    Imagen del Taller (opcional)
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Button
+                      variant="outlined"
+                      component="label"
+                      startIcon={<PhotoCamera />}
+                      sx={{ minWidth: 140 }}
+                    >
+                      Subir Imagen
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={handleFileChange}
+                      />
+                    </Button>
+                    {formData.imageFile && (
+                      <Typography variant="body2" color="success.main">
+                        {formData.imageFile.name}
+                      </Typography>
+                    )}
+                    {!formData.imageFile && formData.imageUrl && (
+                      <Typography variant="body2" color="info.main">
+                        Imagen actual cargada
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
 
                 <TextField
                   fullWidth
@@ -359,11 +565,29 @@ export default function EditWorkshopPage() {
                   placeholder="Ej: Traer cuaderno y lápiz, conocimientos básicos..."
                 />
 
+                <TextField
+                  fullWidth
+                  label="Materiales (opcional)"
+                  value={formData.materials}
+                  onChange={handleChange('materials')}
+                  multiline
+                  rows={2}
+                  placeholder="Materiales que se proporcionarán..."
+                />
+
+                <TextField
+                  fullWidth
+                  label="Audiencia Objetivo (opcional)"
+                  value={formData.targetAudience}
+                  onChange={handleChange('targetAudience')}
+                  placeholder="Ej: Adultos mayores, jóvenes, principiantes..."
+                />
+
                 <FormControlLabel
                   control={
                     <Switch
-                      checked={formData.is_active}
-                      onChange={handleChange('is_active')}
+                      checked={formData.isActive}
+                      onChange={handleChange('isActive')}
                       color="primary"
                     />
                   }

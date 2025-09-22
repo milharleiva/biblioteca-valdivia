@@ -75,24 +75,28 @@ export default function AnnouncementsPage() {
   }, [profile, canUseSupabase]);
 
   const fetchAnnouncements = async () => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
     try {
-      const { data, error } = await supabase
-        .from('announcements')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const response = await fetch('/api/announcements');
+      const result = await response.json();
 
-      if (error) {
-        console.error('Error fetching announcements:', error);
-        // Only show error if it's not a "table doesn't exist" error
-        if (error.code !== 'PGRST116') {
-          setError('Error al cargar los anuncios');
-        }
+      if (result.success) {
+        // Mapear campos de Prisma a la interfaz esperada
+        const mappedAnnouncements = result.data.map((announcement: Record<string, unknown>) => ({
+          id: announcement.id,
+          title: announcement.title,
+          content: announcement.content,
+          type: announcement.type.toLowerCase(),
+          is_active: announcement.isActive,
+          priority: announcement.priority,
+          start_date: announcement.startDate,
+          end_date: announcement.endDate,
+          created_at: announcement.createdAt,
+          updated_at: announcement.updatedAt
+        }));
+        setAnnouncements(mappedAnnouncements);
       } else {
-        setAnnouncements(data || []);
+        setError('Error al cargar los anuncios');
+        console.error('Error fetching announcements:', result.error);
       }
     } catch (error) {
       setError('Error inesperado al cargar los anuncios');
@@ -103,16 +107,23 @@ export default function AnnouncementsPage() {
   };
 
   const toggleAnnouncementStatus = async (announcement: Announcement) => {
-    if (!supabase) return;
     try {
-      const { error } = await supabase
-        .from('announcements')
-        .update({ is_active: !announcement.is_active })
-        .eq('id', announcement.id);
+      const response = await fetch('/api/announcements', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: announcement.id,
+          isActive: !announcement.is_active
+        })
+      });
 
-      if (error) {
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
         setError('Error al actualizar el anuncio');
-        console.error('Error updating announcement:', error);
+        console.error('Error updating announcement:', result.error);
       } else {
         fetchAnnouncements();
       }
@@ -272,11 +283,11 @@ export default function AnnouncementsPage() {
                         />
                       </TableCell>
                       <TableCell>
-                        {format(new Date(announcement.start_date), 'dd/MM/yyyy HH:mm', { locale: es })}
+                        {format(new Date(announcement.start_date), 'dd/MM/yyyy', { locale: es })}
                       </TableCell>
                       <TableCell>
                         {announcement.end_date
-                          ? format(new Date(announcement.end_date), 'dd/MM/yyyy HH:mm', { locale: es })
+                          ? format(new Date(announcement.end_date), 'dd/MM/yyyy', { locale: es })
                           : 'Sin fecha fin'
                         }
                       </TableCell>

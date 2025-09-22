@@ -63,7 +63,7 @@ export function Header() {
               <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <Phone sx={{ fontSize: 16, color: 'text.secondary' }} />
-                  <Typography variant="body2" color="text.secondary">(63) 221-1234</Typography>
+                  <Typography variant="body2" color="text.secondary">(63) 221 7351</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <Email sx={{ fontSize: 16, color: 'text.secondary' }} />
@@ -246,15 +246,13 @@ export function Header() {
                       <Event sx={{ mr: 2 }} />
                       Mis Talleres
                     </MenuItem>
-                    {profile?.role === 'admin' && (
-                      <>
-                        <Divider />
-                        <MenuItem component={Link} href="/dashboard/admin" onClick={handleMenuClose}>
-                          <AdminPanelSettings sx={{ mr: 2 }} />
-                          Panel Admin
-                        </MenuItem>
-                      </>
-                    )}
+                    {profile?.role === 'admin' && [
+                      <Divider key="admin-divider" />,
+                      <MenuItem key="admin-panel" component={Link} href="/dashboard/admin" onClick={handleMenuClose}>
+                        <AdminPanelSettings sx={{ mr: 2 }} />
+                        Panel Admin
+                      </MenuItem>
+                    ]}
                     <Divider />
                     <MenuItem onClick={handleSignOut}>
                       <ExitToApp sx={{ mr: 2 }} />

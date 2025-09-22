@@ -40,9 +40,9 @@ export default function Contacto() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Dirección</h3>
                   <p className="text-gray-600">
-                    Avenida Picarte 1785<br />
-                    Valdivia, Región de Los Ríos<br />
-                    Chile
+                    Av. Ramón Picarte 2102<br />
+                    5100402 Valdivia<br />
+                    Los Ríos, Chile
                   </p>
                 </div>
 
@@ -55,7 +55,7 @@ export default function Contacto() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Teléfono</h3>
                   <p className="text-gray-600">
-                    (63) 221-1234<br />
+                    (63) 221 7351<br />
                     <span className="text-sm">
                       Lun-Vie: 9:00-18:00<br />
                       Sáb: 9:00-14:00
@@ -72,7 +72,7 @@ export default function Contacto() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Email</h3>
                   <p className="text-gray-600">
-                    info@bibliotecaslosrios.cl<br />
+                    biblioteca@valdivia.cl<br />
                     <span className="text-sm">
                       Respuesta en 24-48 hrs
                     </span>
@@ -98,147 +98,51 @@ export default function Contacto() {
           </div>
         </section>
 
-        {/* Formulario de Contacto */}
+        {/* Información Adicional */}
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-gray-800 text-center mb-12">
-                Envíanos un Mensaje
-              </h2>
-
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                {/* Formulario */}
+                {/* Departamentos */}
                 <div className="bg-white p-8 rounded-xl shadow-lg">
-                  <form className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Nombre *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Tu nombre completo"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email *
-                        </label>
-                        <input
-                          type="email"
-                          required
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="tu@email.com"
-                        />
-                      </div>
-                    </div>
-
+                  <h3 className="text-2xl font-semibold text-gray-800 mb-6">
+                    Departamentos Específicos
+                  </h3>
+                  <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Teléfono
-                      </label>
-                      <input
-                        type="tel"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="+56 9 xxxx xxxx"
-                      />
+                      <h4 className="font-medium text-gray-800">Dirección</h4>
+                      <p className="text-gray-600 text-sm">direccion@valdivia.cl</p>
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Asunto *
-                      </label>
-                      <select
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      >
-                        <option value="">Selecciona un asunto</option>
-                        <option value="consulta-general">Consulta General</option>
-                        <option value="prestamo-libros">Préstamo de Libros</option>
-                        <option value="actividades">Actividades y Talleres</option>
-                        <option value="salas-estudio">Reserva de Salas</option>
-                        <option value="archivo-historico">Archivo Histórico</option>
-                        <option value="sugerencias">Sugerencias</option>
-                        <option value="otro">Otro</option>
-                      </select>
+                      <h4 className="font-medium text-gray-800">Actividades Culturales</h4>
+                      <p className="text-gray-600 text-sm">talleres@valdivia.cl</p>
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Mensaje *
-                      </label>
-                      <textarea
-                        required
-                        rows={5}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
-                        placeholder="Escribe tu mensaje aquí..."
-                      ></textarea>
+                      <h4 className="font-medium text-gray-800">Archivo Histórico</h4>
+                      <p className="text-gray-600 text-sm">archivo@valdivia.cl</p>
                     </div>
-
-                    <div className="flex items-start">
-                      <input
-                        type="checkbox"
-                        id="privacy"
-                        required
-                        className="mt-1 mr-3"
-                      />
-                      <label htmlFor="privacy" className="text-sm text-gray-600">
-                        Acepto que mis datos sean utilizados para responder mi consulta de acuerdo
-                        a la <a href="#" className="text-blue-600 hover:underline">política de privacidad</a>
-                      </label>
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                    >
-                      Enviar Mensaje
-                    </button>
-                  </form>
-                </div>
-
-                {/* Información Adicional */}
-                <div className="space-y-8">
-                  <div className="bg-white p-6 rounded-xl shadow-lg">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                      Departamentos Específicos
-                    </h3>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-medium text-gray-800">Dirección</h4>
-                        <p className="text-gray-600 text-sm">direccion@bibliotecaslosrios.cl</p>
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-gray-800">Actividades Culturales</h4>
-                        <p className="text-gray-600 text-sm">actividades@bibliotecaslosrios.cl</p>
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-gray-800">Archivo Histórico</h4>
-                        <p className="text-gray-600 text-sm">archivo@bibliotecaslosrios.cl</p>
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-gray-800">Soporte Técnico</h4>
-                        <p className="text-gray-600 text-sm">soporte@bibliotecaslosrios.cl</p>
-                      </div>
+                    <div>
+                      <h4 className="font-medium text-gray-800">Soporte Técnico</h4>
+                      <p className="text-gray-600 text-sm">soporte@valdivia.cl</p>
                     </div>
                   </div>
+                </div>
 
+                {/* Ayuda Inmediata */}
+                <div className="space-y-6">
                   <div className="bg-blue-50 p-6 rounded-xl">
                     <h3 className="text-xl font-semibold text-gray-800 mb-4">
                       ¿Necesitas ayuda inmediata?
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Para consultas urgentes sobre préstamos, renovaciones o
-                      disponibilidad de servicios, te recomendamos:
+                      Para consultas urgentes sobre talleres, eventos o servicios:
                     </p>
                     <ul className="space-y-2 text-sm text-gray-700">
                       <li className="flex items-center">
                         <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
-                        Llamar directamente al (63) 221-1234
+                        Llamar directamente al (63) 221 7351
                       </li>
                       <li className="flex items-center">
                         <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -294,22 +198,18 @@ export default function Contacto() {
             </h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              {/* Mapa Placeholder */}
-              <div className="bg-gray-100 rounded-xl p-8">
-                <div className="aspect-video bg-gray-300 rounded-lg flex items-center justify-center mb-6">
-                  <div className="text-center text-gray-600">
-                    <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <p className="text-lg font-medium">Mapa Interactivo</p>
-                    <p className="text-sm">Av. Picarte 1785, Valdivia</p>
-                  </div>
-                </div>
-                <p className="text-center text-gray-600">
-                  Ubicación en el centro histórico de Valdivia, con fácil acceso
-                  en transporte público y estacionamiento disponible.
-                </p>
+              {/* Mapa Interactivo */}
+              <div className="bg-gray-100 rounded-xl overflow-hidden">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2558.6789!2d-73.2333!3d-39.8102!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9615eee7be0c75a7%3A0x5b4e89d635c3b3b3!2sAv.%20Ram%C3%B3n%20Picarte%202102%2C%20Valdivia%2C%20Los%20R%C3%ADos%2C%20Chile!5e0!3m2!1ses!2scl!4v1694798765432!5m2!1ses!2scl"
+                  width="100%"
+                  height="400"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Ubicación Biblioteca Municipal Valdivia"
+                ></iframe>
               </div>
 
               {/* Instrucciones */}
@@ -320,7 +220,7 @@ export default function Contacto() {
                   </h3>
                   <ul className="space-y-2 text-gray-700">
                     <li>• Líneas de micro: 1, 7, 12, 20</li>
-                    <li>• Parada más cercana: &ldquo;Picarte con Independencia&rdquo;</li>
+                    <li>• Parada más cercana: &quot;Picarte con Independencia&quot;</li>
                     <li>• Distancia desde terminal: 1.2 km (15 min caminando)</li>
                   </ul>
                 </div>

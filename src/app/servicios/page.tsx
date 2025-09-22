@@ -27,28 +27,6 @@ export default function Servicios() {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-              {/* Préstamo de Libros */}
-              <div className="bg-blue-50 p-8 rounded-xl text-center hover:bg-blue-100 transition-colors">
-                <div className="bg-blue-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Préstamo de Libros</h3>
-                <p className="text-gray-600 mb-6">
-                  Acceso gratuito a más de 15,000 títulos. Sistema de reservas en línea
-                  y renovaciones automáticas disponibles.
-                </p>
-                <div className="space-y-2 text-sm text-gray-700">
-                  <p><strong>Duración:</strong> 15 días renovables</p>
-                  <p><strong>Límite:</strong> 3 libros por usuario</p>
-                  <p><strong>Renovaciones:</strong> 2 veces máximo</p>
-                </div>
-                <Link href="/buscar-libros" className="inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                  Buscar Libros
-                </Link>
-              </div>
-
               {/* Salas de Estudio */}
               <div className="bg-green-50 p-8 rounded-xl text-center hover:bg-green-100 transition-colors">
                 <div className="bg-green-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
@@ -85,8 +63,8 @@ export default function Servicios() {
                   <p><strong>Cuentacuentos:</strong> Sábados 11:00</p>
                   <p><strong>Talleres:</strong> Según programación mensual</p>
                 </div>
-                <Link href="/actividades" className="inline-block mt-4 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">
-                  Ver Actividades
+                <Link href="/workshops" className="inline-block mt-4 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                  Ver Talleres
                 </Link>
               </div>
 
@@ -128,22 +106,41 @@ export default function Servicios() {
                 </div>
               </div>
 
-              {/* Recursos Digitales */}
+              {/* Acceso a Internet */}
               <div className="bg-indigo-50 p-8 rounded-xl text-center hover:bg-indigo-100 transition-colors">
                 <div className="bg-indigo-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Recursos Digitales</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Acceso a Internet</h3>
                 <p className="text-gray-600 mb-6">
-                  Acceso a bases de datos, revistas digitales, e-books
-                  y plataformas de aprendizaje en línea.
+                  Computadores y WiFi gratuito para estudiantes y visitantes.
+                  Acceso a recursos educativos y herramientas digitales.
                 </p>
                 <div className="space-y-2 text-sm text-gray-700">
-                  <p><strong>E-books:</strong> Biblioteca digital</p>
-                  <p><strong>Bases de datos:</strong> Académicas y científicas</p>
-                  <p><strong>Internet:</strong> Acceso gratuito en computadores</p>
+                  <p><strong>WiFi:</strong> Acceso gratuito en toda la biblioteca</p>
+                  <p><strong>Computadores:</strong> 20 estaciones disponibles</p>
+                  <p><strong>Tiempo:</strong> Hasta 2 horas por sesión</p>
+                </div>
+              </div>
+
+              {/* Eventos y Conferencias */}
+              <div className="bg-orange-50 p-8 rounded-xl text-center hover:bg-orange-100 transition-colors">
+                <div className="bg-orange-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Eventos y Conferencias</h3>
+                <p className="text-gray-600 mb-6">
+                  Programación cultural regular con autores, académicos y artistas
+                  locales e internacionales.
+                </p>
+                <div className="space-y-2 text-sm text-gray-700">
+                  <p><strong>Conferencias:</strong> Mensuales</p>
+                  <p><strong>Presentaciones:</strong> Libros y autores</p>
+                  <p><strong>Exposiciones:</strong> Arte y cultura local</p>
                 </div>
               </div>
             </div>
@@ -221,53 +218,93 @@ export default function Servicios() {
           </div>
         </section>
 
-        {/* Cómo obtener tu carnet */}
+        {/* Información de Acceso */}
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <h2 className="text-3xl font-bold text-gray-800 text-center mb-12">
-                ¿Cómo obtener tu carnet de biblioteca?
+                Información de Acceso
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="text-center">
-                  <div className="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-white font-bold text-xl">1</span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">Documentación</h3>
-                  <p className="text-gray-600">
-                    Presenta tu cédula de identidad vigente y comprobante de domicilio.
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-blue-50 p-6 rounded-xl">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                    Acceso Libre a Servicios Básicos
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Puedes acceder libremente a nuestras instalaciones y servicios básicos:
                   </p>
+                  <ul className="space-y-2 text-gray-700">
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Consulta de libros y materiales
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Uso de salas de lectura
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      WiFi gratuito
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Participación en eventos públicos
+                    </li>
+                  </ul>
                 </div>
 
-                <div className="text-center">
-                  <div className="bg-green-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-white font-bold text-xl">2</span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">Registro</h3>
-                  <p className="text-gray-600">
-                    Completa el formulario de inscripción en nuestro mesón de atención.
+                <div className="bg-green-50 p-6 rounded-xl">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                    Para Servicios Completos
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Para acceder a todos nuestros servicios, regístrate como usuario:
                   </p>
-                </div>
+                  <ul className="space-y-2 text-gray-700">
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Inscripción en talleres
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Reserva de salas de estudio
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Acceso completo a computadores
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Servicios personalizados
+                    </li>
+                  </ul>
 
-                <div className="text-center">
-                  <div className="bg-purple-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-white font-bold text-xl">3</span>
+                  <div className="mt-4 p-4 bg-white rounded-lg">
+                    <p className="text-sm text-gray-600 mb-2">
+                      <strong>Registro gratuito:</strong> Solo necesitas tu cédula de identidad.
+                    </p>
+                    <Link href="/contacto" className="inline-block bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                      Más Información
+                    </Link>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">¡Listo!</h3>
-                  <p className="text-gray-600">
-                    Recibe tu carnet al instante y comienza a disfrutar todos nuestros servicios.
-                  </p>
                 </div>
-              </div>
-
-              <div className="bg-blue-50 p-6 rounded-xl mt-8 text-center">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  ¡El carnet es completamente gratuito!
-                </h3>
-                <p className="text-gray-600">
-                  No hay costo de inscripción ni mantención. Solo necesitas renovar tus datos cada 2 años.
-                </p>
               </div>
             </div>
           </div>

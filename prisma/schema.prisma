@@ -51,7 +51,6 @@ model Workshop {
   materials           String?
   targetAudience      String?              @map("target_audience")
   difficultyLevel     DifficultyLevel      @default(BEGINNER) @map("difficulty_level")
-  price               Decimal              @default(0.00) @db.Decimal(10, 2)
   isActive            Boolean              @default(true) @map("is_active")
   isFeatured          Boolean              @default(false) @map("is_featured")
   createdBy           String?              @map("created_by")

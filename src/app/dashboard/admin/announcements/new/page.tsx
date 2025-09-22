@@ -36,7 +36,7 @@ export default function NewAnnouncementPage() {
     type: 'general',
     priority: 1,
     is_active: true,
-    start_date: new Date().toISOString().slice(0, 16), // Format for datetime-local
+    start_date: new Date().toISOString().slice(0, 10), // Format for date
     end_date: ''
   });
   const [loading, setLoading] = useState(false);
@@ -47,7 +47,7 @@ export default function NewAnnouncementPage() {
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  const supabase = canUseSupabase ? createClient() : null;
+  // const supabase = canUseSupabase ? createClient() : null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,32 +60,37 @@ export default function NewAnnouncementPage() {
       return;
     }
 
-    if (!supabase) {
-      setError('Error de configuración. No se puede conectar a la base de datos.');
-      setLoading(false);
-      return;
-    }
-
     try {
       const announcementData = {
-        ...formData,
-        created_by: profile?.user_id,
-        end_date: formData.end_date || null
+        title: formData.title,
+        content: formData.content,
+        type: formData.type,
+        priority: formData.priority,
+        is_active: formData.is_active,
+        start_date: formData.start_date,
+        end_date: formData.end_date || null,
+        created_by: profile?.userId
       };
 
-      const { error } = await supabase
-        .from('announcements')
-        .insert([announcementData]);
+      const response = await fetch('/api/announcements', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(announcementData),
+      });
 
-      if (error) {
-        setError('Error al crear el anuncio');
-        console.error('Error creating announcement:', error);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        setError(result.error || 'Error al crear el anuncio');
+        console.error('Error creating announcement:', result);
       } else {
         router.push('/dashboard/admin/announcements');
       }
     } catch (error) {
       setError('Error inesperado al crear el anuncio');
-      console.error('Error:', error);
+      console.error('Unexpected error creating announcement:', error);
     } finally {
       setLoading(false);
     }
@@ -206,7 +211,7 @@ export default function NewAnnouncementPage() {
                     <TextField
                       fullWidth
                       label="Fecha de Inicio"
-                      type="datetime-local"
+                      type="date"
                       value={formData.start_date}
                       onChange={(e) => handleChange('start_date', e.target.value)}
                       required
@@ -219,7 +224,7 @@ export default function NewAnnouncementPage() {
                     <TextField
                       fullWidth
                       label="Fecha de Fin (Opcional)"
-                      type="datetime-local"
+                      type="date"
                       value={formData.end_date}
                       onChange={(e) => handleChange('end_date', e.target.value)}
                       InputLabelProps={{

@@ -73,8 +73,8 @@ export default function EditAnnouncementPage() {
           type: data.type,
           priority: data.priority,
           is_active: data.is_active,
-          start_date: new Date(data.start_date).toISOString().slice(0, 16),
-          end_date: data.end_date ? new Date(data.end_date).toISOString().slice(0, 16) : ''
+          start_date: new Date(data.start_date).toISOString().slice(0, 10),
+          end_date: data.end_date ? new Date(data.end_date).toISOString().slice(0, 10) : ''
         });
       }
     } catch (error) {
@@ -245,7 +245,7 @@ export default function EditAnnouncementPage() {
                     <TextField
                       fullWidth
                       label="Fecha de Inicio"
-                      type="datetime-local"
+                      type="date"
                       value={formData.start_date}
                       onChange={(e) => handleChange('start_date', e.target.value)}
                       required
@@ -258,7 +258,7 @@ export default function EditAnnouncementPage() {
                     <TextField
                       fullWidth
                       label="Fecha de Fin (Opcional)"
-                      type="datetime-local"
+                      type="date"
                       value={formData.end_date}
                       onChange={(e) => handleChange('end_date', e.target.value)}
                       InputLabelProps={{

@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { createClient } from '@/lib/supabase/client';
 import {
   Box,
   Container,
@@ -85,21 +84,34 @@ export default function WorkshopDetailPage() {
     participant: null
   });
 
-  const supabase = createClient();
 
   const fetchWorkshopDetails = async () => {
     try {
-      const { data, error } = await supabase
-        .from('workshops')
-        .select('*')
-        .eq('id', workshopId)
-        .single();
+      const response = await fetch(`/api/workshops?id=${workshopId}`);
+      const result = await response.json();
 
-      if (error) {
-        setError('Error al cargar el taller');
-        console.error('Error fetching workshop:', error);
+      if (result.success && result.data) {
+        // Map Prisma fields to the expected interface
+        const workshopData = {
+          id: result.data.id,
+          title: result.data.title,
+          description: result.data.description,
+          instructor: result.data.instructor,
+          max_participants: result.data.maxParticipants,
+          current_participants: result.data.currentParticipants || 0,
+          start_date: result.data.startDate,
+          end_date: result.data.endDate,
+          schedule: result.data.schedule || '',
+          location: result.data.location,
+          image_url: result.data.imageUrl,
+          requirements: result.data.requirements,
+          is_active: result.data.isActive,
+          created_at: result.data.createdAt
+        };
+        setWorkshop(workshopData);
       } else {
-        setWorkshop(data);
+        setError('Error al cargar el taller');
+        console.error('Error fetching workshop:', result.error);
       }
     } catch (error) {
       setError('Error inesperado al cargar el taller');
@@ -109,24 +121,26 @@ export default function WorkshopDetailPage() {
 
   const fetchParticipants = async () => {
     try {
-      const { data, error } = await supabase
-        .from('workshop_enrollments')
-        .select(`
-          *,
-          user_profiles (
-            name,
-            phone
-          )
-        `)
-        .eq('workshop_id', workshopId)
-        .eq('status', 'enrolled')
-        .order('enrolled_at', { ascending: true });
+      const response = await fetch(`/api/workshops/${workshopId}/enrollments`);
+      const result = await response.json();
 
-      if (error) {
-        setError('Error al cargar los participantes');
-        console.error('Error fetching participants:', error);
+      if (result.success) {
+        // Map the API response to match our interface
+        const mappedParticipants = result.data.map((enrollment: any) => ({
+          id: enrollment.id,
+          user_id: enrollment.userId,
+          workshop_id: enrollment.workshopId,
+          status: enrollment.status,
+          enrolled_at: enrollment.enrollmentDate,
+          user_profiles: {
+            name: enrollment.user.name,
+            phone: enrollment.user.phone
+          }
+        }));
+        setParticipants(mappedParticipants);
       } else {
-        setParticipants(data || []);
+        setError('Error al cargar los participantes');
+        console.error('Error fetching participants:', result.error);
       }
     } catch (error) {
       setError('Error inesperado al cargar los participantes');
@@ -140,18 +154,19 @@ export default function WorkshopDetailPage() {
     if (!removeDialog.participant) return;
 
     try {
-      const { error } = await supabase
-        .from('workshop_enrollments')
-        .delete()
-        .eq('id', removeDialog.participant.id);
+      const response = await fetch(`/api/workshops/${workshopId}/enrollments?enrollmentId=${removeDialog.participant.id}`, {
+        method: 'DELETE'
+      });
 
-      if (error) {
-        setError('Error al remover participante');
-        console.error('Error removing participant:', error);
-      } else {
+      const result = await response.json();
+
+      if (result.success) {
         fetchParticipants(); // Refresh the list
         fetchWorkshopDetails(); // Refresh workshop to update participant count
         setRemoveDialog({ open: false, participant: null });
+      } else {
+        setError('Error al remover participante');
+        console.error('Error removing participant:', result.error);
       }
     } catch (error) {
       setError('Error inesperado al remover participante');

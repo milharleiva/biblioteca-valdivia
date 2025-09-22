@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { createClient } from '@/lib/supabase/client';
+// import { createClient } from '@/lib/supabase/client'; // No longer used
 import {
   Box,
   Container,
@@ -59,20 +59,42 @@ export default function AdminWorkshopsPage() {
   });
   const [error, setError] = useState('');
 
-  const supabase = createClient();
+  // const supabase = createClient(); // No longer used
 
   const fetchWorkshops = async () => {
     try {
-      const { data, error } = await supabase
-        .from('workshops')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const response = await fetch('/api/workshops');
+      const result = await response.json();
 
-      if (error) {
-        setError('Error al cargar los talleres');
-        console.error('Error fetching workshops:', error);
+      if (result.success) {
+        // Mapear campos de Prisma a la interfaz esperada
+        const mappedWorkshops = result.data.map((workshop: Record<string, unknown>) => ({
+          id: workshop.id,
+          title: workshop.title,
+          description: workshop.description,
+          instructor: workshop.instructor,
+          max_participants: workshop.maxParticipants,
+          current_participants: workshop.currentParticipants,
+          start_date: workshop.startDate,
+          end_date: workshop.endDate,
+          schedule: workshop.schedule || '',
+          location: workshop.location,
+          image_url: workshop.imageUrl,
+          requirements: workshop.requirements,
+          materials: workshop.materials,
+          target_audience: workshop.targetAudience,
+          difficulty_level: workshop.difficultyLevel,
+          price: workshop.price,
+          is_active: workshop.isActive,
+          is_featured: workshop.isFeatured,
+          created_at: workshop.createdAt,
+          updated_at: workshop.updatedAt
+        }));
+
+        setWorkshops(mappedWorkshops);
       } else {
-        setWorkshops(data || []);
+        setError('Error al cargar los talleres');
+        console.error('Error fetching workshops:', result.error);
       }
     } catch (error) {
       setError('Error inesperado al cargar los talleres');
@@ -86,17 +108,18 @@ export default function AdminWorkshopsPage() {
     if (!deleteDialog.workshop) return;
 
     try {
-      const { error } = await supabase
-        .from('workshops')
-        .delete()
-        .eq('id', deleteDialog.workshop.id);
+      const response = await fetch(`/api/workshops?id=${deleteDialog.workshop.id}`, {
+        method: 'DELETE'
+      });
 
-      if (error) {
-        setError('Error al eliminar el taller');
-        console.error('Error deleting workshop:', error);
-      } else {
+      const result = await response.json();
+
+      if (result.success) {
         fetchWorkshops(); // Refresh the list
         setDeleteDialog({ open: false, workshop: null });
+      } else {
+        setError('Error al eliminar el taller');
+        console.error('Error deleting workshop:', result.error);
       }
     } catch (error) {
       setError('Error inesperado al eliminar el taller');
@@ -106,16 +129,24 @@ export default function AdminWorkshopsPage() {
 
   const toggleWorkshopStatus = async (workshop: Workshop) => {
     try {
-      const { error } = await supabase
-        .from('workshops')
-        .update({ is_active: !workshop.is_active })
-        .eq('id', workshop.id);
+      const response = await fetch('/api/workshops', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: workshop.id,
+          isActive: !workshop.is_active
+        })
+      });
 
-      if (error) {
-        setError('Error al actualizar el estado del taller');
-        console.error('Error updating workshop:', error);
-      } else {
+      const result = await response.json();
+
+      if (result.success) {
         fetchWorkshops(); // Refresh the list
+      } else {
+        setError('Error al actualizar el estado del taller');
+        console.error('Error updating workshop:', result.error);
       }
     } catch (error) {
       setError('Error inesperado al actualizar el taller');
