@@ -68,9 +68,19 @@ export default function AdminPage() {
       const statsResponse = await fetch('/api/statistics');
       const statsResult = await statsResponse.json();
 
+      console.log('Admin statistics response:', statsResult);
+
       // For now, we'll use the existing statistics and calculate additional ones
       if (statsResult.success) {
         const basicStats = statsResult.data;
+
+        console.log('Setting statistics:', {
+          activeWorkshops: basicStats.workshopCount || 0,
+          totalUsers: basicStats.userCount || 0,
+          totalEnrollments: basicStats.totalEnrollments || 0,
+          activeEnrollments: basicStats.activeEnrollments || 0,
+          workshopsThisMonth: basicStats.totalWorkshopsThisYear || 0
+        });
 
         // Set statistics with available data
         setStatistics({
@@ -81,6 +91,8 @@ export default function AdminPage() {
           workshopsThisMonth: basicStats.totalWorkshopsThisYear || 0
         });
         setLastUpdated(new Date());
+      } else {
+        console.error('Statistics API failed:', statsResult);
       }
     } catch (error) {
       console.error('Error fetching admin statistics:', error);
