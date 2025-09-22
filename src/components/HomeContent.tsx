@@ -182,7 +182,7 @@ export default function HomeContent() {
           sx={{
             background: 'linear-gradient(135deg, #1976d2 0%, #2e7d32 100%)',
             color: 'white',
-            py: { xs: 8, md: 12 }
+            py: { xs: 6, sm: 8, md: 12 }
           }}
         >
           <Container maxWidth="xl">
@@ -191,16 +191,23 @@ export default function HomeContent() {
               initial="hidden"
               animate="visible"
             >
-              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: 6, alignItems: 'center' }}>
+              <Box sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', lg: 'row' },
+                gap: { xs: 4, md: 6 },
+                alignItems: { xs: 'center', lg: 'flex-start' },
+                textAlign: { xs: 'center', lg: 'left' }
+              }}>
                 {/* Left Content */}
-                <Box sx={{ flex: 1 }}>
+                <Box sx={{ flex: 1, width: '100%' }}>
                   <MotionDiv variants={itemVariants}>
                     <Typography
                       variant="h2"
                       sx={{
                         fontWeight: 'bold',
-                        mb: 2,
-                        fontSize: { xs: '2.5rem', md: '3.5rem' }
+                        mb: { xs: 2, md: 3 },
+                        fontSize: { xs: '2rem', sm: '2.5rem', md: '3.5rem' },
+                        lineHeight: { xs: 1.2, md: 1.1 }
                       }}
                     >
                       Biblioteca Municipal de Valdivia
@@ -211,9 +218,11 @@ export default function HomeContent() {
                     <Typography
                       variant="h5"
                       sx={{
-                        mb: 4,
+                        mb: { xs: 3, md: 4 },
                         opacity: 0.9,
-                        fontSize: { xs: '1.2rem', md: '1.5rem' }
+                        fontSize: { xs: '1rem', sm: '1.2rem', md: '1.5rem' },
+                        lineHeight: 1.4,
+                        maxWidth: { xs: '100%', lg: '90%' }
                       }}
                     >
                       Tu centro de conocimiento, cultura y aprendizaje en el corazón de Valdivia
@@ -221,7 +230,14 @@ export default function HomeContent() {
                   </MotionDiv>
 
                   <MotionDiv variants={itemVariants}>
-                    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    <Box sx={{
+                      display: 'flex',
+                      gap: { xs: 2, sm: 3 },
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      alignItems: 'center',
+                      justifyContent: { xs: 'center', lg: 'flex-start' },
+                      width: '100%'
+                    }}>
                       <Button
                         variant="contained"
                         size="large"
@@ -230,8 +246,11 @@ export default function HomeContent() {
                           bgcolor: 'white',
                           color: 'primary.main',
                           '&:hover': { bgcolor: 'grey.100' },
-                          px: 4,
-                          py: 1.5
+                          px: { xs: 3, sm: 4 },
+                          py: { xs: 1.5, sm: 1.5 },
+                          fontSize: { xs: '0.9rem', sm: '1rem' },
+                          width: { xs: '100%', sm: 'auto' },
+                          maxWidth: { xs: '280px', sm: 'none' }
                         }}
                         startIcon={<Search />}
                       >
@@ -245,8 +264,11 @@ export default function HomeContent() {
                           borderColor: 'white',
                           color: 'white',
                           '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' },
-                          px: 4,
-                          py: 1.5
+                          px: { xs: 3, sm: 4 },
+                          py: { xs: 1.5, sm: 1.5 },
+                          fontSize: { xs: '0.9rem', sm: '1rem' },
+                          width: { xs: '100%', sm: 'auto' },
+                          maxWidth: { xs: '280px', sm: 'none' }
                         }}
                         startIcon={<Event />}
                       >
@@ -257,22 +279,36 @@ export default function HomeContent() {
                 </Box>
 
                 {/* Right Content - Stats */}
-                <Box sx={{ flex: { lg: 0.4 } }}>
+                <Box sx={{
+                  flex: { lg: 0.4 },
+                  width: { xs: '100%', lg: 'auto' },
+                  maxWidth: { xs: '100%', sm: '500px', lg: 'none' }
+                }}>
                   <MotionDiv variants={itemVariants}>
                     <Paper
                       elevation={8}
                       sx={{
-                        p: 4,
+                        p: { xs: 3, sm: 4 },
                         borderRadius: 3,
                         bgcolor: 'rgba(255,255,255,0.95)',
-                        backdropFilter: 'blur(10px)'
+                        backdropFilter: 'blur(10px)',
+                        width: '100%'
                       }}
                     >
-                      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3, color: 'text.primary' }}>
+                      <Typography variant="h6" sx={{
+                        fontWeight: 'bold',
+                        mb: 3,
+                        color: 'text.primary',
+                        fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                      }}>
                         Estadísticas en Vivo
                       </Typography>
 
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                      <Box sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: { xs: 2.5, sm: 3 }
+                      }}>
                         {[
                           { icon: <People />, label: 'Usuarios Registrados', value: statistics.userCount, color: '#1976d2' },
                           { icon: <Event />, label: 'Talleres Activos', value: statistics.workshopCount, color: '#2e7d32' },
@@ -280,20 +316,35 @@ export default function HomeContent() {
                         ].map((stat, index) => (
                           <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             <Box sx={{
-                              p: 1.5,
+                              p: { xs: 1, sm: 1.5 },
                               borderRadius: 2,
                               bgcolor: stat.color + '20',
                               color: stat.color,
                               display: 'flex',
-                              alignItems: 'center'
+                              alignItems: 'center',
+                              flexShrink: 0
                             }}>
                               {stat.icon}
                             </Box>
-                            <Box>
-                              <Typography variant="h4" sx={{ fontWeight: 'bold', color: stat.color }}>
+                            <Box sx={{ minWidth: 0, flex: 1 }}>
+                              <Typography
+                                variant="h4"
+                                sx={{
+                                  fontWeight: 'bold',
+                                  color: stat.color,
+                                  fontSize: { xs: '1.8rem', sm: '2.125rem' }
+                                }}
+                              >
                                 {loading ? <Skeleton width={40} /> : stat.value}
                               </Typography>
-                              <Typography variant="body2" color="text.secondary">
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{
+                                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                                  lineHeight: 1.3
+                                }}
+                              >
                                 {stat.label}
                               </Typography>
                             </Box>
@@ -403,7 +454,15 @@ export default function HomeContent() {
                 ))}
               </Box>
             ) : workshops.length > 0 ? (
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(auto-fit, minmax(350px, 1fr))' }, gap: 3 }}>
+              <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  sm: 'repeat(auto-fit, minmax(300px, 1fr))',
+                  md: 'repeat(auto-fit, minmax(350px, 1fr))'
+                },
+                gap: { xs: 2, sm: 3 }
+              }}>
                 {workshops.map((workshop, index) => (
                   <MotionDiv
                     key={workshop.id}
@@ -523,7 +582,15 @@ export default function HomeContent() {
                 Nuestros Servicios
               </Typography>
 
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 4 }}>
+              <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  sm: 'repeat(2, 1fr)',
+                  md: 'repeat(4, 1fr)'
+                },
+                gap: { xs: 3, md: 4 }
+              }}>
                 {[
                   {
                     icon: <MenuBook />,
@@ -622,7 +689,11 @@ export default function HomeContent() {
               Información y Contacto
             </Typography>
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' }, gap: 6 }}>
+            <Box sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1fr', lg: '2fr 1fr' },
+              gap: { xs: 4, md: 6 }
+            }}>
               {/* Contact Info */}
               <MotionDiv
                 initial={{ opacity: 0, x: -30 }}

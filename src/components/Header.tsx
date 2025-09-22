@@ -15,7 +15,13 @@ import {
   Menu,
   MenuItem,
   Divider,
-  Chip
+  Chip,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemButton
 } from '@mui/material';
 import {
   MenuBook,
@@ -28,13 +34,20 @@ import {
   AdminPanelSettings,
   Phone,
   Email,
-  AccessTime
+  AccessTime,
+  Menu as MenuIcon,
+  Close,
+  Home,
+  Search,
+  Build,
+  Info
 } from '@mui/icons-material';
 import { MotionHeader, MotionDiv } from './MotionWrapper';
 
 export function Header() {
   const { user, profile, signOut } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -49,6 +62,22 @@ export function Header() {
     handleMenuClose();
   };
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const handleMobileMenuClose = () => {
+    setMobileMenuOpen(false);
+  };
+
+  const navigationItems = [
+    { href: '/', label: 'Inicio', icon: <Home /> },
+    { href: '/workshops', label: 'Talleres', icon: <Event /> },
+    { href: '/buscar-libros', label: 'Buscar Libros', icon: <Search /> },
+    { href: '/servicios', label: 'Servicios', icon: <Build /> },
+    { href: '/sobre-nosotros', label: 'Nosotros', icon: <Info /> }
+  ];
+
   return (
     <MotionHeader
       initial={{ y: -100, opacity: 0 }}
@@ -59,8 +88,15 @@ export function Header() {
         {/* Top info bar */}
         <Box sx={{ bgcolor: '#f8f9fa', borderBottom: '1px solid #e0e0e0' }}>
           <Container maxWidth="xl">
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 1 }}>
-              <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 3 }}>
+            <Box sx={{
+              display: 'flex',
+              justifyContent: { xs: 'center', md: 'space-between' },
+              alignItems: 'center',
+              py: { xs: 0.5, md: 1 },
+              flexDirection: { xs: 'column', md: 'row' },
+              gap: { xs: 1, md: 0 }
+            }}>
+              <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <Phone sx={{ fontSize: 16, color: 'text.secondary' }} />
                   <Typography variant="body2" color="text.secondary">(63) 221 7351</Typography>
@@ -74,7 +110,14 @@ export function Header() {
                   <Typography variant="body2" color="text.secondary">Lun-Vie 9:00-18:00</Typography>
                 </Box>
               </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                  fontSize: { xs: '0.7rem', md: '0.75rem' },
+                  textAlign: 'center'
+                }}
+              >
                 Gobierno de Chile - Municipalidad de Valdivia
               </Typography>
             </Box>
@@ -113,15 +156,9 @@ export function Header() {
               </Link>
             </MotionDiv>
 
-            {/* Navigation Links */}
+            {/* Navigation Links - Desktop */}
             <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
-              {[
-                { href: '/', label: 'Inicio' },
-                { href: '/workshops', label: 'Talleres' },
-                { href: '/buscar-libros', label: 'Buscar Libros' },
-                { href: '/servicios', label: 'Servicios' },
-                { href: '/sobre-nosotros', label: 'Nosotros' }
-              ].map((item) => (
+              {navigationItems.map((item) => (
                 <MotionDiv
                   key={item.href}
                   whileHover={{ scale: 1.05 }}
@@ -144,6 +181,19 @@ export function Header() {
                   </Button>
                 </MotionDiv>
               ))}
+            </Box>
+
+            {/* Mobile Menu Button */}
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center' }}>
+              <IconButton
+                onClick={toggleMobileMenu}
+                sx={{
+                  color: 'text.primary',
+                  '&:hover': { bgcolor: 'primary.50' }
+                }}
+              >
+                <MenuIcon />
+              </IconButton>
             </Box>
 
             {/* Auth buttons / User menu */}
@@ -265,6 +315,182 @@ export function Header() {
           </Toolbar>
         </Container>
       </AppBar>
+
+      {/* Mobile Navigation Drawer */}
+      <Drawer
+        anchor="left"
+        open={mobileMenuOpen}
+        onClose={handleMobileMenuClose}
+        PaperProps={{
+          sx: { width: 280 }
+        }}
+      >
+        <Box sx={{ p: 2, bgcolor: 'primary.main', color: 'white' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <MenuBook />
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                Biblioteca Municipal
+              </Typography>
+            </Box>
+            <IconButton
+              onClick={handleMobileMenuClose}
+              sx={{ color: 'white' }}
+            >
+              <Close />
+            </IconButton>
+          </Box>
+        </Box>
+
+        <List sx={{ pt: 0 }}>
+          {navigationItems.map((item) => (
+            <ListItem key={item.href} disablePadding>
+              <ListItemButton
+                component={Link}
+                href={item.href}
+                onClick={handleMobileMenuClose}
+                sx={{
+                  py: 2,
+                  '&:hover': {
+                    bgcolor: 'primary.50'
+                  }
+                }}
+              >
+                <ListItemIcon sx={{ color: 'primary.main' }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    fontWeight: 'medium'
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
+
+          <Divider sx={{ my: 1 }} />
+
+          {/* Auth Section in Mobile Menu */}
+          {!user ? (
+            <>
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/auth/login"
+                  onClick={handleMobileMenuClose}
+                  sx={{ py: 2 }}
+                >
+                  <ListItemIcon sx={{ color: 'primary.main' }}>
+                    <Login />
+                  </ListItemIcon>
+                  <ListItemText primary="Iniciar Sesión" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/auth/register"
+                  onClick={handleMobileMenuClose}
+                  sx={{ py: 2 }}
+                >
+                  <ListItemIcon sx={{ color: 'primary.main' }}>
+                    <PersonAdd />
+                  </ListItemIcon>
+                  <ListItemText primary="Registrarse" />
+                </ListItemButton>
+              </ListItem>
+            </>
+          ) : (
+            <>
+              <ListItem sx={{ py: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+                  <Avatar
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      bgcolor: 'primary.main'
+                    }}
+                  >
+                    {profile?.name?.charAt(0).toUpperCase() || <AccountCircle />}
+                  </Avatar>
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      {profile?.name || 'Usuario'}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {user?.email}
+                    </Typography>
+                  </Box>
+                  {profile?.role === 'admin' && (
+                    <Chip
+                      label="Admin"
+                      color="warning"
+                      size="small"
+                      sx={{ ml: 'auto' }}
+                    />
+                  )}
+                </Box>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/dashboard"
+                  onClick={handleMobileMenuClose}
+                  sx={{ py: 2 }}
+                >
+                  <ListItemIcon sx={{ color: 'primary.main' }}>
+                    <Dashboard />
+                  </ListItemIcon>
+                  <ListItemText primary="Mi Cuenta" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/profile"
+                  onClick={handleMobileMenuClose}
+                  sx={{ py: 2 }}
+                >
+                  <ListItemIcon sx={{ color: 'primary.main' }}>
+                    <AccountCircle />
+                  </ListItemIcon>
+                  <ListItemText primary="Mi Perfil" />
+                </ListItemButton>
+              </ListItem>
+              {profile?.role === 'admin' && (
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href="/dashboard/admin"
+                    onClick={handleMobileMenuClose}
+                    sx={{ py: 2 }}
+                  >
+                    <ListItemIcon sx={{ color: 'warning.main' }}>
+                      <AdminPanelSettings />
+                    </ListItemIcon>
+                    <ListItemText primary="Panel Admin" />
+                  </ListItemButton>
+                </ListItem>
+              )}
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() => {
+                    handleSignOut();
+                    handleMobileMenuClose();
+                  }}
+                  sx={{ py: 2, color: 'error.main' }}
+                >
+                  <ListItemIcon sx={{ color: 'error.main' }}>
+                    <ExitToApp />
+                  </ListItemIcon>
+                  <ListItemText primary="Cerrar Sesión" />
+                </ListItemButton>
+              </ListItem>
+            </>
+          )}
+        </List>
+      </Drawer>
     </MotionHeader>
   );
 }

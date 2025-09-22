@@ -60,15 +60,15 @@ export default function BuscarLibros() {
 
       <main>
         {/* Hero Section */}
-        <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
+        <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12 md:py-16">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6">
               Buscador de Libros
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-8">
+            <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-6 md:mb-8">
               Encuentra y consulta libros disponibles en la Biblioteca Municipal de Valdivia
             </p>
-            <div className="flex flex-wrap justify-center gap-6 text-sm">
+            <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm">
               <div className="flex items-center space-x-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -123,7 +123,7 @@ export default function BuscarLibros() {
 
               {/* Quick Access */}
               {books.length === 0 && !loading && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mt-8 md:mt-12">
                   <div className="bg-blue-50 p-6 rounded-xl text-center hover:bg-blue-100 transition-colors cursor-pointer">
                     <div className="bg-blue-600 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
                       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
