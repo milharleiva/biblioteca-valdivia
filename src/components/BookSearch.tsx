@@ -29,7 +29,7 @@ export function BookSearch({ onSearch, loading }: BookSearchProps) {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Ingresa el título del libro o nombre del autor..."
-              className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
+              className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
               disabled={loading}
             />
             <div className="absolute inset-y-0 left-0 flex items-center pl-3">
