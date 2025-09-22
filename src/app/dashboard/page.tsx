@@ -20,7 +20,9 @@ import {
   Event,
   LibraryBooks,
   Settings,
-  ExitToApp
+  ExitToApp,
+  Home,
+  ArrowBack
 } from '@mui/icons-material';
 import { MotionDiv } from '@/components/MotionWrapper';
 import Link from 'next/link';
@@ -43,6 +45,27 @@ export default function DashboardPage() {
       {/* Header */}
       <Box sx={{ bgcolor: 'primary.main', color: 'white', py: 4 }}>
         <Container maxWidth="xl">
+          {/* Botón Volver al Inicio */}
+          <Box sx={{ mb: 3 }}>
+            <Button
+              component={Link}
+              href="/"
+              variant="outlined"
+              color="inherit"
+              startIcon={<ArrowBack />}
+              sx={{
+                borderColor: 'white',
+                color: 'white',
+                '&:hover': {
+                  borderColor: 'white',
+                  bgcolor: 'rgba(255, 255, 255, 0.1)'
+                }
+              }}
+            >
+              Volver al Inicio
+            </Button>
+          </Box>
+
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
               <Avatar sx={{ width: 64, height: 64, bgcolor: 'primary.dark' }}>
