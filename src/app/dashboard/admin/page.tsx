@@ -128,7 +128,7 @@ export default function AdminPage() {
               Volver al Dashboard
             </Button>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
                 Panel de Administración
               </Typography>
               <Chip label="Administrador" color="warning" variant="filled" />
@@ -212,7 +212,7 @@ export default function AdminPage() {
             <Paper elevation={2} sx={{ p: 3, height: '100%' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                 <Event sx={{ mr: 2, color: 'primary.main' }} />
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
                   Gestión de Talleres
                 </Typography>
               </Box>
@@ -244,7 +244,7 @@ export default function AdminPage() {
             <Paper elevation={2} sx={{ p: 3, height: '100%' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                 <People sx={{ mr: 2, color: 'success.main' }} />
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
                   Gestión de Usuarios
                 </Typography>
               </Box>
@@ -268,7 +268,7 @@ export default function AdminPage() {
             <Paper elevation={2} sx={{ p: 3, height: '100%' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                 <Announcement sx={{ mr: 2, color: 'info.main' }} />
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
                   Gestión de Anuncios
                 </Typography>
               </Box>
