@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
+import LoadingScreen from '@/components/LoadingScreen';
 import {
   Box,
   Container,
@@ -36,21 +37,22 @@ import {
   People,
   Search,
   AdminPanelSettings,
-  Person
+  Person,
+  Refresh
 } from '@mui/icons-material';
 import { MotionDiv } from '@/components/MotionWrapper';
 import Link from 'next/link';
 
 interface UserProfile {
   id: string;
-  user_id: string;
+  userId: string;
   name: string;
   phone?: string;
   address?: string;
-  birth_date?: string;
-  role: 'user' | 'admin';
-  created_at: string;
-  updated_at: string;
+  birthDate?: string;
+  role: 'USER' | 'ADMIN';
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function AdminUsersPage() {
@@ -59,7 +61,7 @@ export default function AdminUsersPage() {
   const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'admin'>('all');
+  const [roleFilter, setRoleFilter] = useState<'all' | 'USER' | 'ADMIN'>('all');
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; user: UserProfile | null }>({
     open: false,
     user: null
@@ -73,31 +75,50 @@ export default function AdminUsersPage() {
     phone: '',
     address: '',
     birth_date: '',
-    role: 'user' as 'user' | 'admin'
+    role: 'USER' as 'USER' | 'ADMIN'
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   const supabase = createClient();
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (showLoading = true) => {
     try {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+      if (showLoading) {
+        setLoading(true);
+      }
 
-      if (error) {
-        setError('Error al cargar los usuarios');
-        console.error('Error fetching users:', error);
+      // Try API endpoint first (now using Prisma instead of Supabase)
+      console.log('Fetching users via API endpoint...');
+      const response = await fetch('/api/admin/users');
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('API response:', result);
+
+        if (result.success) {
+          setUsers(result.data || []);
+          console.log(`Found ${result.data?.length || 0} users via API`);
+          setError(''); // Clear any previous errors
+          return;
+        } else {
+          console.error('API returned error:', result.error);
+          setError('Error en API: ' + result.error);
+          return;
+        }
       } else {
-        setUsers(data || []);
+        console.error('API request failed with status:', response.status);
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        setError(`Error ${response.status}: ${errorData.error || 'Error desconocido'}`);
+        return;
       }
     } catch (error) {
+      console.error('Fetch users error:', error);
       setError('Error inesperado al cargar los usuarios');
-      console.error('Error:', error);
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   };
 
@@ -127,7 +148,7 @@ export default function AdminUsersPage() {
       const { error: profileError } = await supabase
         .from('user_profiles')
         .delete()
-        .eq('user_id', deleteDialog.user.user_id);
+        .eq('user_id', deleteDialog.user.userId);
 
       if (profileError) {
         setError('Error al eliminar el perfil del usuario');
@@ -136,7 +157,7 @@ export default function AdminUsersPage() {
       }
 
       // Then delete the auth user (this requires service role key)
-      const { error: authError } = await supabase.auth.admin.deleteUser(deleteDialog.user.user_id);
+      const { error: authError } = await supabase.auth.admin.deleteUser(deleteDialog.user.userId);
 
       if (authError) {
         setError('Error al eliminar la cuenta del usuario');
@@ -157,18 +178,27 @@ export default function AdminUsersPage() {
     if (!editDialog.user) return;
 
     try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update(editFormData)
-        .eq('user_id', editDialog.user.user_id);
+      const response = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: editDialog.user.userId,
+          ...editFormData
+        })
+      });
 
-      if (error) {
-        setError('Error al actualizar el usuario');
-        console.error('Error updating user:', error);
-      } else {
+      const result = await response.json();
+
+      if (response.ok && result.success) {
         setSuccess('Usuario actualizado exitosamente');
         fetchUsers(); // Refresh the list
         setEditDialog({ open: false, user: null });
+        setError(''); // Clear any previous errors
+      } else {
+        setError('Error al actualizar el usuario: ' + (result.error || 'Error desconocido'));
+        console.error('API error:', result);
       }
     } catch (error) {
       setError('Error inesperado al actualizar el usuario');
@@ -181,7 +211,7 @@ export default function AdminUsersPage() {
       name: user.name || '',
       phone: user.phone || '',
       address: user.address || '',
-      birth_date: user.birth_date || '',
+      birth_date: user.birthDate || '',
       role: user.role
     });
     setEditDialog({ open: true, user });
@@ -199,19 +229,11 @@ export default function AdminUsersPage() {
 
   // Redirect if not admin
   if (profile?.role !== 'admin') {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <Typography>Acceso denegado. Esta página es solo para administradores.</Typography>
-      </Box>
-    );
+    return <LoadingScreen message="Verificando permisos de administrador" />;
   }
 
   if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <Typography>Cargando usuarios...</Typography>
-      </Box>
-    );
+    return <LoadingScreen message="Cargando usuarios del sistema" />;
   }
 
   return (
@@ -235,7 +257,7 @@ export default function AdminUsersPage() {
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
               Gestión de Usuarios
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body1" color="text.primary">
               Administra todos los usuarios del sistema
             </Typography>
           </Box>
@@ -274,18 +296,29 @@ export default function AdminUsersPage() {
                 <Select
                   value={roleFilter}
                   label="Filtrar por rol"
-                  onChange={(e) => setRoleFilter(e.target.value as 'all' | 'user' | 'admin')}
+                  onChange={(e) => setRoleFilter(e.target.value as 'all' | 'USER' | 'ADMIN')}
                 >
                   <MenuItem value="all">Todos los roles</MenuItem>
-                  <MenuItem value="user">Usuarios</MenuItem>
-                  <MenuItem value="admin">Administradores</MenuItem>
+                  <MenuItem value="USER">Usuarios</MenuItem>
+                  <MenuItem value="ADMIN">Administradores</MenuItem>
                 </Select>
               </FormControl>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <People color="action" />
-                <Typography variant="body2" color="text.secondary">
-                  {filteredUsers.length} usuario{filteredUsers.length !== 1 ? 's' : ''}
-                </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <People color="action" />
+                  <Typography variant="body2" color="text.primary">
+                    {filteredUsers.length} usuario{filteredUsers.length !== 1 ? 's' : ''}
+                  </Typography>
+                </Box>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<Refresh />}
+                  onClick={() => fetchUsers(false)}
+                  disabled={loading}
+                >
+                  Actualizar
+                </Button>
               </Box>
             </Box>
           </Paper>
@@ -307,9 +340,19 @@ export default function AdminUsersPage() {
                   {filteredUsers.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} sx={{ textAlign: 'center', py: 4 }}>
-                        <Typography variant="body1" color="text.secondary">
-                          {searchTerm || roleFilter !== 'all' ? 'No se encontraron usuarios con los filtros aplicados' : 'No hay usuarios registrados'}
-                        </Typography>
+                        <Box>
+                          <People sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+                          <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                            {searchTerm || roleFilter !== 'all'
+                              ? 'No se encontraron usuarios con los filtros aplicados'
+                              : 'No hay usuarios registrados en el sistema'}
+                          </Typography>
+                          {!searchTerm && roleFilter === 'all' && (
+                            <Typography variant="body2" color="text.secondary">
+                              Los usuarios aparecerán aquí cuando se registren en la plataforma
+                            </Typography>
+                          )}
+                        </Box>
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -327,7 +370,7 @@ export default function AdminUsersPage() {
                                 {user.name}
                               </Typography>
                               <Typography variant="body2" color="text.secondary">
-                                ID: {user.user_id.slice(0, 8)}...
+                                ID: {user.userId.slice(0, 8)}...
                               </Typography>
                             </Box>
                           </Box>
@@ -343,15 +386,15 @@ export default function AdminUsersPage() {
                         </TableCell>
                         <TableCell>
                           <Chip
-                            label={user.role === 'admin' ? 'Administrador' : 'Usuario'}
-                            color={user.role === 'admin' ? 'warning' : 'default'}
+                            label={user.role === 'ADMIN' ? 'Administrador' : 'Usuario'}
+                            color={user.role === 'ADMIN' ? 'warning' : 'default'}
                             size="small"
-                            icon={user.role === 'admin' ? <AdminPanelSettings /> : <Person />}
+                            icon={user.role === 'ADMIN' ? <AdminPanelSettings /> : <Person />}
                           />
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2">
-                            {new Date(user.created_at).toLocaleDateString('es-ES')}
+                            {new Date(user.createdAt).toLocaleDateString('es-ES')}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -367,7 +410,7 @@ export default function AdminUsersPage() {
                               size="small"
                               color="error"
                               onClick={() => setDeleteDialog({ open: true, user })}
-                              disabled={user.user_id === profile?.user_id} // Prevent self-deletion
+                              disabled={user.userId === profile?.user_id} // Prevent self-deletion
                             >
                               <Delete />
                             </IconButton>
@@ -448,10 +491,10 @@ export default function AdminUsersPage() {
                 <Select
                   value={editFormData.role}
                   label="Rol"
-                  onChange={(e) => setEditFormData({ ...editFormData, role: e.target.value as 'user' | 'admin' })}
+                  onChange={(e) => setEditFormData({ ...editFormData, role: e.target.value as 'USER' | 'ADMIN' })}
                 >
-                  <MenuItem value="user">Usuario</MenuItem>
-                  <MenuItem value="admin">Administrador</MenuItem>
+                  <MenuItem value="USER">Usuario</MenuItem>
+                  <MenuItem value="ADMIN">Administrador</MenuItem>
                 </Select>
               </FormControl>
             </Box>

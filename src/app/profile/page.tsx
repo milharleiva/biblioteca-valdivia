@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import LoadingScreen from '@/components/LoadingScreen';
 import {
   Box,
   Container,
@@ -65,11 +66,7 @@ export default function ProfilePage() {
   };
 
   if (!user || !profile) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <Typography>Cargando...</Typography>
-      </Box>
-    );
+    return <LoadingScreen message="Cargando tu perfil" />;
   }
 
   return (

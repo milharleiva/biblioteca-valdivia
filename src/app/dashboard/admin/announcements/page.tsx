@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
+import LoadingScreen from '@/components/LoadingScreen';
 import {
   Box,
   Container,
@@ -182,11 +183,7 @@ export default function AnnouncementsPage() {
   }
 
   if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <Typography>Cargando anuncios...</Typography>
-      </Box>
-    );
+    return <LoadingScreen message="Cargando anuncios del sistema" />;
   }
 
   return (
@@ -221,7 +218,7 @@ export default function AnnouncementsPage() {
                 Crear Anuncio
               </Button>
             </Box>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body1" color="text.primary">
               Administra los anuncios e información importante para los usuarios
             </Typography>
           </Box>

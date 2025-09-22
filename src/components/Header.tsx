@@ -84,10 +84,17 @@ export function Header() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <AppBar position="static" sx={{ bgcolor: 'white', color: 'text.primary', boxShadow: 2 }}>
+      <AppBar position="static" sx={{
+        bgcolor: 'white',
+        color: 'text.primary',
+        boxShadow: 2,
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden'
+      }}>
         {/* Top info bar */}
         <Box sx={{ bgcolor: '#f8f9fa', borderBottom: '1px solid #e0e0e0' }}>
-          <Container maxWidth="xl">
+          <Container maxWidth="xl" sx={{ width: '100%', maxWidth: '100vw', px: { xs: 2, sm: 3 } }}>
             <Box sx={{
               display: 'flex',
               justifyContent: { xs: 'center', md: 'space-between' },
@@ -125,8 +132,8 @@ export function Header() {
         </Box>
 
         {/* Main header */}
-        <Container maxWidth="xl">
-          <Toolbar sx={{ justifyContent: 'space-between', py: 2 }}>
+        <Container maxWidth="xl" sx={{ width: '100%', maxWidth: '100vw', px: { xs: 2, sm: 3 } }}>
+          <Toolbar sx={{ justifyContent: 'space-between', py: 2, px: { xs: 0, sm: 2 } }}>
             {/* Logo and title */}
             <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -140,8 +147,20 @@ export function Header() {
                 >
                   <MenuBook sx={{ fontSize: 32 }} />
                 </IconButton>
-                <Box>
-                  <Typography variant="h5" component="h1" sx={{ fontWeight: 'bold', color: 'text.primary', lineHeight: 1.2 }}>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography
+                    variant="h5"
+                    component="h1"
+                    sx={{
+                      fontWeight: 'bold',
+                      color: 'text.primary',
+                      lineHeight: 1.2,
+                      fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
+                      whiteSpace: { xs: 'nowrap', sm: 'normal' },
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                  >
                     Biblioteca Municipal de Valdivia
                   </Typography>
                 </Box>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
+import LoadingScreen from '@/components/LoadingScreen';
 import {
   Box,
   Container,
@@ -31,11 +32,7 @@ export default function DashboardPage() {
   const { user, profile, signOut } = useAuth();
 
   if (!user || !profile) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <Typography>Cargando...</Typography>
-      </Box>
-    );
+    return <LoadingScreen message="Cargando tu dashboard" />;
   }
 
   const isAdmin = profile.role === 'admin';

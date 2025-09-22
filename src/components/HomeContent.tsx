@@ -174,10 +174,16 @@ export default function HomeContent() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5' }}>
+    <Box sx={{
+      minHeight: '100vh',
+      bgcolor: '#f5f5f5',
+      width: '100%',
+      maxWidth: '100vw',
+      overflowX: 'hidden'
+    }}>
       <Header />
 
-      <Box component="main">
+      <Box component="main" sx={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
         {/* Hero Section */}
         <Box
           sx={{
@@ -186,7 +192,7 @@ export default function HomeContent() {
             py: { xs: 6, sm: 8, md: 12 }
           }}
         >
-          <Container maxWidth="xl">
+          <Container maxWidth="xl" sx={{ width: '100%', maxWidth: '100vw', px: { xs: 2, sm: 3 } }}>
             <MotionDiv
               variants={containerVariants}
               initial="hidden"
@@ -362,7 +368,7 @@ export default function HomeContent() {
 
         {/* Announcements Section */}
         {announcements.length > 0 && (
-          <Container maxWidth="xl" sx={{ py: 6 }}>
+          <Container maxWidth="xl" sx={{ py: 6, width: '100%', maxWidth: '100vw', px: { xs: 2, sm: 3 } }}>
             <MotionDiv
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -493,7 +499,7 @@ export default function HomeContent() {
         )}
 
         {/* Featured Workshops Section */}
-        <Container maxWidth="xl" sx={{ py: 6 }}>
+        <Container maxWidth="xl" sx={{ py: 6, width: '100%', maxWidth: '100vw', px: { xs: 2, sm: 3 } }}>
           <MotionDiv
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -647,7 +653,7 @@ export default function HomeContent() {
 
         {/* Services Section */}
         <Box sx={{ bgcolor: 'grey.50', py: 8 }}>
-          <Container maxWidth="xl">
+          <Container maxWidth="xl" sx={{ width: '100%', maxWidth: '100vw', px: { xs: 2, sm: 3 } }}>
             <MotionDiv
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -754,7 +760,7 @@ export default function HomeContent() {
         </Box>
 
         {/* Contact Section */}
-        <Container maxWidth="xl" sx={{ py: 8 }}>
+        <Container maxWidth="xl" sx={{ py: 8, width: '100%', maxWidth: '100vw', px: { xs: 2, sm: 3 } }}>
           <MotionDiv
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}

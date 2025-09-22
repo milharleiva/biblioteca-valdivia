@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 // import { createClient } from '@/lib/supabase/client'; // No longer used
+import LoadingScreen from '@/components/LoadingScreen';
 import {
   Box,
   Container,
@@ -170,11 +171,7 @@ export default function AdminWorkshopsPage() {
   }
 
   if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <Typography>Cargando talleres...</Typography>
-      </Box>
-    );
+    return <LoadingScreen message="Cargando talleres del sistema" />;
   }
 
   return (
@@ -200,7 +197,7 @@ export default function AdminWorkshopsPage() {
                 <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
                   Gestión de Talleres
                 </Typography>
-                <Typography variant="body1" color="text.secondary">
+                <Typography variant="body1" color="text.primary">
                   Administra todos los talleres del sistema
                 </Typography>
               </Box>

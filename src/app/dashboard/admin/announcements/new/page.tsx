@@ -132,7 +132,7 @@ export default function NewAnnouncementPage() {
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
               Crear Nuevo Anuncio
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body1" color="text.primary">
               Comparte información importante con todos los usuarios
             </Typography>
           </Box>

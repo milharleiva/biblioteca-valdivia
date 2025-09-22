@@ -225,7 +225,7 @@ export default function NewWorkshopPage() {
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
               Crear Nuevo Taller
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body1" color="text.primary">
               Completa la información del taller
             </Typography>
           </Box>
