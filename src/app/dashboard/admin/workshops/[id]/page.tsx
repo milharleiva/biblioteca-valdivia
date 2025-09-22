@@ -60,13 +60,15 @@ interface Workshop {
 
 interface Participant {
   id: string;
-  user_id: string;
-  workshop_id: string;
+  userId: string;
+  workshopId: string;
   status: string;
-  enrolled_at: string;
-  user_profiles: {
+  enrollmentDate: string;
+  user: {
+    id: string;
     name: string;
     phone?: string;
+    email: string;
   };
 }
 
@@ -125,19 +127,8 @@ export default function WorkshopDetailPage() {
       const result = await response.json();
 
       if (result.success) {
-        // Map the API response to match our interface
-        const mappedParticipants = result.data.map((enrollment: any) => ({
-          id: enrollment.id,
-          user_id: enrollment.userId,
-          workshop_id: enrollment.workshopId,
-          status: enrollment.status,
-          enrolled_at: enrollment.enrollmentDate,
-          user_profiles: {
-            name: enrollment.user.name,
-            phone: enrollment.user.phone
-          }
-        }));
-        setParticipants(mappedParticipants);
+        // Use the API response directly with Prisma structure
+        setParticipants(result.data);
       } else {
         setError('Error al cargar los participantes');
         console.error('Error fetching participants:', result.error);
@@ -382,20 +373,20 @@ export default function WorkshopDetailPage() {
                                 <Avatar
                                   sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}
                                 >
-                                  {participant.user_profiles.name?.charAt(0).toUpperCase()}
+                                  {participant.user.name?.charAt(0).toUpperCase()}
                                 </Avatar>
                                 <Typography variant="subtitle2">
-                                  {participant.user_profiles.name}
+                                  {participant.user.name}
                                 </Typography>
                               </Box>
                             </TableCell>
                             <TableCell>
                               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                {participant.user_profiles.phone && (
+                                {participant.user.phone && (
                                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <Phone fontSize="small" color="action" />
                                     <Typography variant="body2">
-                                      {participant.user_profiles.phone}
+                                      {participant.user.phone}
                                     </Typography>
                                   </Box>
                                 )}
@@ -403,7 +394,7 @@ export default function WorkshopDetailPage() {
                             </TableCell>
                             <TableCell>
                               <Typography variant="body2">
-                                {new Date(participant.enrolled_at).toLocaleDateString('es-ES', {
+                                {new Date(participant.enrollmentDate).toLocaleDateString('es-ES', {
                                   year: 'numeric',
                                   month: 'short',
                                   day: 'numeric',
@@ -441,7 +432,7 @@ export default function WorkshopDetailPage() {
           <DialogTitle>Confirmar Remoción</DialogTitle>
           <DialogContent>
             <Typography>
-              ¿Estás seguro de que quieres remover a {removeDialog.participant?.user_profiles.name} del taller?
+              ¿Estás seguro de que quieres remover a {removeDialog.participant?.user.name} del taller?
               Esta acción no se puede deshacer.
             </Typography>
           </DialogContent>

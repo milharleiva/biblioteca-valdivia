@@ -49,13 +49,32 @@ export async function GET() {
       }
     })
 
+    // Get total workshop enrollments
+    const totalEnrollments = await prisma!.workshopEnrollment.count()
+
+    // Get enrollments by status
+    const activeEnrollments = await prisma!.workshopEnrollment.count({
+      where: {
+        status: 'ENROLLED'
+      }
+    })
+
+    const completedEnrollments = await prisma!.workshopEnrollment.count({
+      where: {
+        status: 'COMPLETED'
+      }
+    })
+
     return NextResponse.json({
       success: true,
       data: {
         userCount,
         workshopCount,
         totalWorkshopsThisYear,
-        activeAnnouncements
+        activeAnnouncements,
+        totalEnrollments,
+        activeEnrollments,
+        completedEnrollments
       }
     })
   } catch (error) {

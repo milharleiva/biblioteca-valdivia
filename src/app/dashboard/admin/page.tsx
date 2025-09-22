@@ -29,6 +29,7 @@ interface AdminStatistics {
   activeWorkshops: number;
   totalUsers: number;
   totalEnrollments: number;
+  activeEnrollments: number;
   workshopsThisMonth: number;
 }
 
@@ -38,6 +39,7 @@ export default function AdminPage() {
     activeWorkshops: 0,
     totalUsers: 0,
     totalEnrollments: 0,
+    activeEnrollments: 0,
     workshopsThisMonth: 0
   });
   const [loading, setLoading] = useState(true);
@@ -74,7 +76,8 @@ export default function AdminPage() {
         setStatistics({
           activeWorkshops: basicStats.workshopCount || 0,
           totalUsers: basicStats.userCount || 0,
-          totalEnrollments: 0, // This would need a separate API endpoint
+          totalEnrollments: basicStats.totalEnrollments || 0,
+          activeEnrollments: basicStats.activeEnrollments || 0,
           workshopsThisMonth: basicStats.totalWorkshopsThisYear || 0
         });
         setLastUpdated(new Date());
@@ -166,6 +169,11 @@ export default function AdminPage() {
                 <Typography variant="body2" color="text.secondary">
                   Inscripciones Totales
                 </Typography>
+                {!loading && statistics.activeEnrollments > 0 && (
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                    {statistics.activeEnrollments} activas
+                  </Typography>
+                )}
               </CardContent>
             </Card>
             <Card elevation={2}>
