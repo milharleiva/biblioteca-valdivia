@@ -133,20 +133,24 @@ export function Header() {
 
         {/* Main header */}
         <Container maxWidth="xl" sx={{ width: '100%', maxWidth: '100vw', px: { xs: 2, sm: 3 } }}>
-          <Toolbar sx={{ justifyContent: 'space-between', py: 2, px: { xs: 0, sm: 2 } }}>
+          <Toolbar sx={{ justifyContent: 'space-between', py: 2, px: { xs: 1, sm: 2 } }}>
             {/* Logo and title */}
             <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 2 } }}>
+                {/* Icon - Always visible */}
                 <IconButton
                   sx={{
                     bgcolor: 'primary.main',
                     color: 'white',
-                    '&:hover': { bgcolor: 'primary.dark' }
+                    '&:hover': { bgcolor: 'primary.dark' },
+                    width: { xs: 36, md: 48 },
+                    height: { xs: 36, md: 48 }
                   }}
-                  size="large"
+                  size="medium"
                 >
-                  <MenuBook sx={{ fontSize: 32 }} />
+                  <MenuBook sx={{ fontSize: { xs: 20, md: 32 } }} />
                 </IconButton>
+                {/* Title - Always visible */}
                 <Box sx={{ minWidth: 0 }}>
                   <Typography
                     variant="h5"
@@ -155,8 +159,8 @@ export function Header() {
                       fontWeight: 'bold',
                       color: 'text.primary',
                       lineHeight: 1.2,
-                      fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
-                      whiteSpace: { xs: 'nowrap', sm: 'normal' },
+                      fontSize: { xs: '0.9rem', sm: '1.3rem', md: '1.5rem' },
+                      whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis'
                     }}
@@ -200,15 +204,20 @@ export function Header() {
                 onClick={toggleMobileMenu}
                 sx={{
                   color: 'text.primary',
-                  '&:hover': { bgcolor: 'primary.50' }
+                  '&:hover': { bgcolor: 'primary.50' },
+                  p: 1.5
                 }}
               >
-                <MenuIcon />
+                <MenuIcon sx={{ fontSize: 24 }} />
               </IconButton>
             </Box>
 
             {/* Auth buttons / User menu */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{
+              display: { xs: 'none', md: 'flex' },
+              alignItems: 'center',
+              gap: 1
+            }}>
               {!user ? (
                 // Not logged in - show login/register buttons
                 <Box sx={{ display: 'flex', gap: 1 }}>
@@ -333,14 +342,14 @@ export function Header() {
         open={mobileMenuOpen}
         onClose={handleMobileMenuClose}
         PaperProps={{
-          sx: { width: 280 }
+          sx: { width: 280, mx: 2 }
         }}
       >
-        <Box sx={{ p: 2, bgcolor: 'primary.main', color: 'white' }}>
+        <Box sx={{ p: 3, bgcolor: 'primary.main', color: 'white' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <MenuBook />
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>
                 Biblioteca Municipal de Valdivia
               </Typography>
             </Box>
@@ -353,7 +362,7 @@ export function Header() {
           </Box>
         </Box>
 
-        <List sx={{ pt: 0 }}>
+        <List sx={{ pt: 0, px: 2 }}>
           {navigationItems.map((item) => (
             <ListItem key={item.href} disablePadding>
               <ListItemButton
@@ -362,12 +371,15 @@ export function Header() {
                 onClick={handleMobileMenuClose}
                 sx={{
                   py: 2,
+                  px: 2,
+                  borderRadius: 1,
+                  mb: 0.5,
                   '&:hover': {
                     bgcolor: 'primary.50'
                   }
                 }}
               >
-                <ListItemIcon sx={{ color: 'primary.main' }}>
+                <ListItemIcon sx={{ color: 'primary.main', minWidth: 40 }}>
                   {item.icon}
                 </ListItemIcon>
                 <ListItemText
@@ -390,9 +402,9 @@ export function Header() {
                   component={Link}
                   href="/auth/login"
                   onClick={handleMobileMenuClose}
-                  sx={{ py: 2 }}
+                  sx={{ py: 2, px: 2, borderRadius: 1, mb: 0.5 }}
                 >
-                  <ListItemIcon sx={{ color: 'primary.main' }}>
+                  <ListItemIcon sx={{ color: 'primary.main', minWidth: 40 }}>
                     <Login />
                   </ListItemIcon>
                   <ListItemText primary="Iniciar Sesión" />
@@ -403,9 +415,9 @@ export function Header() {
                   component={Link}
                   href="/auth/register"
                   onClick={handleMobileMenuClose}
-                  sx={{ py: 2 }}
+                  sx={{ py: 2, px: 2, borderRadius: 1, mb: 0.5 }}
                 >
-                  <ListItemIcon sx={{ color: 'primary.main' }}>
+                  <ListItemIcon sx={{ color: 'primary.main', minWidth: 40 }}>
                     <PersonAdd />
                   </ListItemIcon>
                   <ListItemText primary="Registrarse" />
@@ -414,7 +426,7 @@ export function Header() {
             </>
           ) : (
             <>
-              <ListItem sx={{ py: 1 }}>
+              <ListItem sx={{ py: 1, px: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
                   <Avatar
                     sx={{
@@ -448,9 +460,9 @@ export function Header() {
                   component={Link}
                   href="/dashboard"
                   onClick={handleMobileMenuClose}
-                  sx={{ py: 2 }}
+                  sx={{ py: 2, px: 2, borderRadius: 1, mb: 0.5 }}
                 >
-                  <ListItemIcon sx={{ color: 'primary.main' }}>
+                  <ListItemIcon sx={{ color: 'primary.main', minWidth: 40 }}>
                     <Dashboard />
                   </ListItemIcon>
                   <ListItemText primary="Mi Cuenta" />
@@ -461,9 +473,9 @@ export function Header() {
                   component={Link}
                   href="/profile"
                   onClick={handleMobileMenuClose}
-                  sx={{ py: 2 }}
+                  sx={{ py: 2, px: 2, borderRadius: 1, mb: 0.5 }}
                 >
-                  <ListItemIcon sx={{ color: 'primary.main' }}>
+                  <ListItemIcon sx={{ color: 'primary.main', minWidth: 40 }}>
                     <AccountCircle />
                   </ListItemIcon>
                   <ListItemText primary="Mi Perfil" />
@@ -475,9 +487,9 @@ export function Header() {
                     component={Link}
                     href="/dashboard/admin"
                     onClick={handleMobileMenuClose}
-                    sx={{ py: 2 }}
+                    sx={{ py: 2, px: 2, borderRadius: 1, mb: 0.5 }}
                   >
-                    <ListItemIcon sx={{ color: 'warning.main' }}>
+                    <ListItemIcon sx={{ color: 'warning.main', minWidth: 40 }}>
                       <AdminPanelSettings />
                     </ListItemIcon>
                     <ListItemText primary="Panel Admin" />
@@ -490,9 +502,9 @@ export function Header() {
                     handleSignOut();
                     handleMobileMenuClose();
                   }}
-                  sx={{ py: 2, color: 'error.main' }}
+                  sx={{ py: 2, px: 2, borderRadius: 1, mb: 0.5, color: 'error.main' }}
                 >
-                  <ListItemIcon sx={{ color: 'error.main' }}>
+                  <ListItemIcon sx={{ color: 'error.main', minWidth: 40 }}>
                     <ExitToApp />
                   </ListItemIcon>
                   <ListItemText primary="Cerrar Sesión" />
