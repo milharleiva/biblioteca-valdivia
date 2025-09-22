@@ -128,33 +128,25 @@ export function Header() {
         <Container maxWidth="xl">
           <Toolbar sx={{ justifyContent: 'space-between', py: 2 }}>
             {/* Logo and title */}
-            <MotionDiv
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <IconButton
-                    sx={{
-                      bgcolor: 'primary.main',
-                      color: 'white',
-                      '&:hover': { bgcolor: 'primary.dark' }
-                    }}
-                    size="large"
-                  >
-                    <MenuBook sx={{ fontSize: 32 }} />
-                  </IconButton>
-                  <Box>
-                    <Typography variant="h5" component="h1" sx={{ fontWeight: 'bold', color: 'text.primary', lineHeight: 1.2 }}>
-                      Biblioteca Municipal
-                    </Typography>
-                    <Typography variant="body1" sx={{ color: 'primary.main', fontWeight: 'medium' }}>
-                      Valdivia
-                    </Typography>
-                  </Box>
+            <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <IconButton
+                  sx={{
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    '&:hover': { bgcolor: 'primary.dark' }
+                  }}
+                  size="large"
+                >
+                  <MenuBook sx={{ fontSize: 32 }} />
+                </IconButton>
+                <Box>
+                  <Typography variant="h5" component="h1" sx={{ fontWeight: 'bold', color: 'text.primary', lineHeight: 1.2 }}>
+                    Biblioteca Municipal de Valdivia
+                  </Typography>
                 </Box>
-              </Link>
-            </MotionDiv>
+              </Box>
+            </Link>
 
             {/* Navigation Links - Desktop */}
             <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
@@ -330,7 +322,7 @@ export function Header() {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <MenuBook />
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Biblioteca Municipal
+                Biblioteca Municipal de Valdivia
               </Typography>
             </Box>
             <IconButton
