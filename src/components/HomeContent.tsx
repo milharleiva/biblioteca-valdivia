@@ -10,6 +10,7 @@ import {
   Button,
   Card,
   CardContent,
+  CardActions,
   Paper,
   Divider,
   Skeleton
@@ -368,12 +369,20 @@ export default function HomeContent() {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 4, textAlign: 'center' }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 4, textAlign: 'center', color: 'text.primary' }}>
                 Anuncios Importantes
               </Typography>
 
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {announcements.slice(0, 3).map((announcement, index) => {
+              <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  sm: 'repeat(2, 1fr)',
+                  lg: 'repeat(3, 1fr)'
+                },
+                gap: { xs: 2, md: 3 }
+              }}>
+                {announcements.slice(0, 6).map((announcement, index) => {
                   const getAnnouncementConfig = (type: string) => {
                     switch (type) {
                       case 'important': return { icon: <PriorityHigh />, color: 'error' };
@@ -388,42 +397,97 @@ export default function HomeContent() {
                   return (
                     <MotionDiv
                       key={announcement.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1, duration: 0.5 }}
                       viewport={{ once: true }}
+                      whileHover={{ y: -5 }}
                     >
-                      <Paper
+                      <Card
                         elevation={2}
                         sx={{
-                          p: 3,
-                          borderLeft: `4px solid`,
-                          borderLeftColor: `${config.color}.main`,
+                          height: '100%',
+                          borderTop: `4px solid`,
+                          borderTopColor: `${config.color}.main`,
                           '&:hover': {
-                            elevation: 4,
-                            transform: 'translateY(-2px)',
-                            transition: 'all 0.2s ease-in-out'
+                            elevation: 8,
+                            transition: 'all 0.3s ease-in-out'
                           }
                         }}
                       >
-                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                          <Box sx={{ color: `${config.color}.main`, mt: 0.5 }}>
-                            {config.icon}
+                        <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+                            <Box sx={{
+                              color: `${config.color}.main`,
+                              p: 1,
+                              borderRadius: 2,
+                              bgcolor: `${config.color}.50`,
+                              display: 'flex',
+                              alignItems: 'center'
+                            }}>
+                              {config.icon}
+                            </Box>
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="h6" sx={{
+                                fontWeight: 'bold',
+                                mb: 1,
+                                color: 'text.primary',
+                                fontSize: { xs: '1rem', sm: '1.1rem' },
+                                lineHeight: 1.3
+                              }}>
+                                {announcement.title}
+                              </Typography>
+                            </Box>
                           </Box>
-                          <Box sx={{ flex: 1 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                              {announcement.title}
-                            </Typography>
-                            <Typography variant="body1" color="text.secondary">
-                              {announcement.excerpt || announcement.content.substring(0, 150) + '...'}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Paper>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              flex: 1,
+                              lineHeight: 1.5,
+                              overflow: 'hidden',
+                              display: '-webkit-box',
+                              WebkitLineClamp: 4,
+                              WebkitBoxOrient: 'vertical'
+                            }}
+                          >
+                            {announcement.excerpt || announcement.content.substring(0, 120) + '...'}
+                          </Typography>
+                        </CardContent>
+                      </Card>
                     </MotionDiv>
                   );
                 })}
               </Box>
+
+              {/* Botón Ver Todos los Anuncios si hay más de 6 */}
+              {announcements.length > 6 && (
+                <MotionDiv
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  viewport={{ once: true }}
+                >
+                  <Box sx={{ textAlign: 'center', mt: 4 }}>
+                    <Button
+                      variant="outlined"
+                      size="large"
+                      href="/anuncios"
+                      endIcon={<ArrowForward />}
+                      sx={{
+                        borderColor: 'primary.main',
+                        color: 'primary.main',
+                        '&:hover': {
+                          borderColor: 'primary.dark',
+                          bgcolor: 'primary.50'
+                        }
+                      }}
+                    >
+                      Ver Todos los Anuncios
+                    </Button>
+                  </Box>
+                </MotionDiv>
+              )}
             </MotionDiv>
           </Container>
         )}
@@ -436,7 +500,7 @@ export default function HomeContent() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 4, textAlign: 'center' }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 4, textAlign: 'center', color: 'text.primary' }}>
               Próximos Talleres
             </Typography>
 
@@ -454,16 +518,17 @@ export default function HomeContent() {
                 ))}
               </Box>
             ) : workshops.length > 0 ? (
-              <Box sx={{
-                display: 'grid',
-                gridTemplateColumns: {
-                  xs: '1fr',
-                  sm: 'repeat(auto-fit, minmax(300px, 1fr))',
-                  md: 'repeat(auto-fit, minmax(350px, 1fr))'
-                },
-                gap: { xs: 2, sm: 3 }
-              }}>
-                {workshops.map((workshop, index) => (
+              <>
+                <Box sx={{
+                  display: 'grid',
+                  gridTemplateColumns: {
+                    xs: '1fr',
+                    sm: 'repeat(2, 1fr)',
+                    lg: 'repeat(3, 1fr)'
+                  },
+                  gap: { xs: 2, sm: 3 }
+                }}>
+                  {workshops.slice(0, 6).map((workshop, index) => (
                   <MotionDiv
                     key={workshop.id}
                     initial={{ opacity: 0, y: 30 }}
@@ -483,7 +548,7 @@ export default function HomeContent() {
                       }}
                     >
                       <CardContent>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'text.primary' }}>
                           {workshop.title}
                         </Typography>
 
@@ -533,8 +598,38 @@ export default function HomeContent() {
                       </CardContent>
                     </Card>
                   </MotionDiv>
-                ))}
-              </Box>
+                  ))}
+                </Box>
+
+                {/* Botón Ver Todos los Talleres si hay más de 6 */}
+                {workshops.length > 6 && (
+                  <MotionDiv
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ delay: 0.5, duration: 0.5 }}
+                    viewport={{ once: true }}
+                  >
+                    <Box sx={{ textAlign: 'center', mt: 4 }}>
+                      <Button
+                        variant="outlined"
+                        size="large"
+                        href="/workshops"
+                        endIcon={<ArrowForward />}
+                        sx={{
+                          borderColor: 'success.main',
+                          color: 'success.main',
+                          '&:hover': {
+                            borderColor: 'success.dark',
+                            bgcolor: 'success.50'
+                          }
+                        }}
+                      >
+                        Ver Todos los Talleres
+                      </Button>
+                    </Box>
+                  </MotionDiv>
+                )}
+              </>
             ) : (
               <Box sx={{ textAlign: 'center', py: 8 }}>
                 <Event sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
@@ -547,25 +642,6 @@ export default function HomeContent() {
               </Box>
             )}
 
-            {workshops.length > 0 && (
-              <MotionDiv
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-                viewport={{ once: true }}
-              >
-                <Box sx={{ textAlign: 'center', mt: 4 }}>
-                  <Button
-                    variant="outlined"
-                    size="large"
-                    href="/workshops"
-                    endIcon={<ArrowForward />}
-                  >
-                    Ver Todos los Talleres
-                  </Button>
-                </Box>
-              </MotionDiv>
-            )}
           </MotionDiv>
         </Container>
 
@@ -578,7 +654,7 @@ export default function HomeContent() {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 6, textAlign: 'center' }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 6, textAlign: 'center', color: 'text.primary' }}>
                 Nuestros Servicios
               </Typography>
 
@@ -653,7 +729,7 @@ export default function HomeContent() {
                         {service.icon}
                       </Box>
 
-                      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'text.primary' }}>
                         {service.title}
                       </Typography>
 
@@ -685,7 +761,7 @@ export default function HomeContent() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 6, textAlign: 'center' }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 6, textAlign: 'center', color: 'text.primary' }}>
               Información y Contacto
             </Typography>
 
@@ -702,7 +778,7 @@ export default function HomeContent() {
                 viewport={{ once: true }}
               >
                 <Paper elevation={2} sx={{ p: 4, height: '100%' }}>
-                  <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3 }}>
+                  <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: 'text.primary' }}>
                     Contáctanos
                   </Typography>
 
@@ -748,7 +824,7 @@ export default function HomeContent() {
                 viewport={{ once: true }}
               >
                 <Paper elevation={2} sx={{ p: 4, height: '100%' }}>
-                  <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3 }}>
+                  <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: 'text.primary' }}>
                     <Schedule sx={{ mr: 1, verticalAlign: 'middle' }} />
                     Horarios de Atención
                   </Typography>
@@ -768,7 +844,7 @@ export default function HomeContent() {
 
                   <Divider sx={{ my: 3 }} />
 
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'text.primary' }}>
                     Contacto
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
