@@ -135,20 +135,28 @@ export default function AnnouncementsPage() {
   };
 
   const handleDelete = async () => {
-    if (!deleteDialog.announcement || !supabase) return;
+    if (!deleteDialog.announcement) return;
 
     try {
-      const { error } = await supabase
-        .from('announcements')
-        .delete()
-        .eq('id', deleteDialog.announcement.id);
+      const response = await fetch('/api/admin/announcements', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: deleteDialog.announcement.id
+        })
+      });
 
-      if (error) {
-        setError('Error al eliminar el anuncio');
-        console.error('Error deleting announcement:', error);
-      } else {
+      const result = await response.json();
+
+      if (response.ok && result.success) {
         fetchAnnouncements();
         setDeleteDialog({ open: false, announcement: null });
+        setError(''); // Clear any previous errors
+      } else {
+        setError('Error al eliminar el anuncio: ' + (result.error || 'Error desconocido'));
+        console.error('API error:', result);
       }
     } catch (error) {
       setError('Error inesperado al eliminar el anuncio');
@@ -175,11 +183,7 @@ export default function AnnouncementsPage() {
   };
 
   if (profile?.role !== 'admin') {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <Typography>Acceso denegado. Esta página es solo para administradores.</Typography>
-      </Box>
-    );
+    return <LoadingScreen message="Verificando permisos de administrador" />;
   }
 
   if (loading) {

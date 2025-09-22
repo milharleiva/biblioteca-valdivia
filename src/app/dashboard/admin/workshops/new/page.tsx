@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
+import LoadingScreen from '@/components/LoadingScreen';
 import {
   Box,
   Container,
@@ -66,11 +67,7 @@ export default function NewWorkshopPage() {
 
   // Redirect if not admin
   if (profile?.role !== 'admin') {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <Typography>Acceso denegado. Esta página es solo para administradores.</Typography>
-      </Box>
-    );
+    return <LoadingScreen message="Verificando permisos de administrador" />;
   }
 
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

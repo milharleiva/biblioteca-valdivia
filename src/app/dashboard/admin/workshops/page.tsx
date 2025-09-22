@@ -163,11 +163,7 @@ export default function AdminWorkshopsPage() {
 
   // Redirect if not admin
   if (profile?.role !== 'admin') {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <Typography>Acceso denegado. Esta página es solo para administradores.</Typography>
-      </Box>
-    );
+    return <LoadingScreen message="Verificando permisos de administrador" />;
   }
 
   if (loading) {
