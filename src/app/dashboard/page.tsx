@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingScreen from '@/components/LoadingScreen';
 import {
@@ -23,19 +24,66 @@ import {
   Settings,
   ExitToApp,
   Home,
-  ArrowBack
+  ArrowBack,
+  CalendarMonth,
+  LocationOn,
+  Schedule
 } from '@mui/icons-material';
 import { MotionDiv } from '@/components/MotionWrapper';
 import Link from 'next/link';
 
+interface Workshop {
+  id: string;
+  title: string;
+  description: string;
+  instructor: string;
+  startDate: string;
+  endDate: string;
+  schedule?: string;
+  location: string;
+}
+
+interface Enrollment {
+  id: string;
+  workshop_id: string;
+  user_id: string;
+  status: string;
+  enrolled_at: string;
+  workshop: Workshop;
+}
+
 export default function DashboardPage() {
   const { user, profile, signOut } = useAuth();
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [loadingEnrollments, setLoadingEnrollments] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchEnrollments();
+    }
+  }, [user]);
+
+  const fetchEnrollments = async () => {
+    try {
+      const response = await fetch(`/api/users/${user!.id}/enrollments`);
+      const result = await response.json();
+
+      if (result.success) {
+        setEnrollments(result.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching enrollments:', error);
+    } finally {
+      setLoadingEnrollments(false);
+    }
+  };
 
   if (!user || !profile) {
     return <LoadingScreen message="Cargando tu dashboard" />;
   }
 
   const isAdmin = profile.role === 'admin';
+  const activeEnrollments = enrollments.filter(e => e.status === 'enrolled');
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5' }}>
@@ -223,16 +271,77 @@ export default function DashboardPage() {
             >
               <Paper elevation={2} sx={{ p: 3 }}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>
-                  Actividad Reciente
+                  Mis Talleres Inscritos
                 </Typography>
-                <Box sx={{ textAlign: 'center', py: 6 }}>
-                  <Typography variant="body1" color="text.secondary">
-                    No hay actividad reciente para mostrar.
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    Tus inscripciones a talleres y actividades aparecerán aquí.
-                  </Typography>
-                </Box>
+                {loadingEnrollments ? (
+                  <Box sx={{ textAlign: 'center', py: 6 }}>
+                    <Typography variant="body1" color="text.secondary">
+                      Cargando inscripciones...
+                    </Typography>
+                  </Box>
+                ) : activeEnrollments.length === 0 ? (
+                  <Box sx={{ textAlign: 'center', py: 6 }}>
+                    <Event sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+                    <Typography variant="body1" color="text.secondary">
+                      No estás inscrito en ningún taller.
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      Explora talleres disponibles y únete a uno.
+                    </Typography>
+                    <Button
+                      component={Link}
+                      href="/workshops"
+                      variant="contained"
+                      sx={{ mt: 2 }}
+                      startIcon={<Event />}
+                    >
+                      Ver Talleres
+                    </Button>
+                  </Box>
+                ) : (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {activeEnrollments.map((enrollment) => (
+                      <Card key={enrollment.id} variant="outlined" sx={{ '&:hover': { bgcolor: 'grey.50' } }}>
+                        <CardContent>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                            {enrollment.workshop.title}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                            {enrollment.workshop.description}
+                          </Typography>
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Person fontSize="small" color="action" />
+                              <Typography variant="body2">
+                                {enrollment.workshop.instructor}
+                              </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <CalendarMonth fontSize="small" color="action" />
+                              <Typography variant="body2">
+                                {new Date(enrollment.workshop.startDate).toLocaleDateString('es-ES')} - {new Date(enrollment.workshop.endDate).toLocaleDateString('es-ES')}
+                              </Typography>
+                            </Box>
+                            {enrollment.workshop.schedule && (
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Schedule fontSize="small" color="action" />
+                                <Typography variant="body2">
+                                  {enrollment.workshop.schedule}
+                                </Typography>
+                              </Box>
+                            )}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <LocationOn fontSize="small" color="action" />
+                              <Typography variant="body2">
+                                {enrollment.workshop.location}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </Box>
+                )}
               </Paper>
             </MotionDiv>
             </Box>
