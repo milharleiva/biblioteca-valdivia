@@ -202,8 +202,35 @@ export default function WorkshopsPage() {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <Typography>Cargando talleres...</Typography>
+      <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Box sx={{
+          bgcolor: 'white',
+          borderRadius: 3,
+          boxShadow: 3,
+          p: 6,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2
+        }}>
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              border: '3px solid',
+              borderColor: 'primary.main',
+              borderTopColor: 'transparent',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              '@keyframes spin': {
+                '0%': { transform: 'rotate(0deg)' },
+                '100%': { transform: 'rotate(360deg)' }
+              }
+            }}
+          />
+          <Typography variant="h6" color="text.secondary">
+            Cargando talleres...
+          </Typography>
+        </Box>
       </Box>
     );
   }

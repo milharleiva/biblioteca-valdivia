@@ -212,16 +212,16 @@ export async function POST(request: NextRequest) {
     console.log(`\n=== RESUMEN FINAL ===`);
     console.log(`Contenedores encontrados: ${rawBookData.totalContainers}`);
     console.log(`Libros procesados: ${processedBooks.length}`);
-    console.log(`Libros devueltos: ${Math.min(processedBooks.length, 20)}`);
+    console.log(`Libros devueltos: ${Math.min(processedBooks.length, 40)}`);
 
     console.log(`\n=== LISTA FINAL DE LIBROS (TODOS) ===`);
-    processedBooks.slice(0, 20).forEach((book: ProcessedBook, index: number) => {
+    processedBooks.slice(0, 40).forEach((book: ProcessedBook, index: number) => {
       console.log(`${index + 1}. "${book.title}" - ${book.author}`);
       console.log(`   URL: ${book.detailUrl ? 'SÍ' : 'NO'}`);
       console.log(`   Doc Number: ${book.detailUrl ? book.detailUrl.match(/doc_number=(\d+)/)?.[1] || 'N/A' : 'N/A'}`);
     });
 
-    const finalBooks = processedBooks.slice(0, 20);
+    const finalBooks = processedBooks.slice(0, 40);
 
     console.log(`Libros encontrados en Valdivia: ${finalBooks.length}`);
     console.log(`Código de biblioteca utilizado: ${valdiviaCode}`);
