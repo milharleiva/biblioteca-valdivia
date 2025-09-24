@@ -15,7 +15,7 @@ export default function SobreNosotros() {
                 Biblioteca Municipal de Valdivia
               </h1>
               <p className="text-xl md:text-2xl text-blue-100 mb-8">
-                Un siglo preservando la cultura y el conocimiento de Los Ríos
+                Desde 1935 preservando la cultura y el conocimiento de Los Ríos
               </p>
             </div>
           </div>
@@ -31,20 +31,25 @@ export default function SobreNosotros() {
                 </h2>
                 <div className="space-y-6 text-lg text-gray-600">
                   <p>
-                    La Biblioteca Municipal de Valdivia ha sido durante décadas un pilar
-                    fundamental en la promoción de la cultura, educación y el acceso
-                    libre al conocimiento en la Región de Los Ríos.
+                    La Biblioteca Municipal de Valdivia fue fundada el <strong>25 de abril de 1935</strong> durante
+                    la alcaldía de Jorge Bustos León. Sus instalaciones iniciales estuvieron ubicadas bajo el
+                    ala de la Escuela N°1, marcando el inicio de décadas de servicio a la comunidad.
                   </p>
                   <p>
-                    Ubicada en el corazón de Valdivia, en <strong>Av. Ramón Picarte 2102</strong>,
+                    Ubicada actualmente en <strong>Avenida Los Robles N°4, Isla Teja</strong>,
                     nuestra biblioteca no solo conserva el patrimonio cultural regional, sino que
                     también se proyecta hacia el futuro con servicios innovadores y actividades
                     culturales que enriquecen nuestra comunidad.
                   </p>
                   <p>
-                    Durante años, hemos sido testigos y protagonistas de la evolución cultural
+                    Durante casi 90 años, hemos sido testigos y protagonistas de la evolución cultural
                     de Valdivia, adaptándonos constantemente a las necesidades de nuestra comunidad
                     y manteniéndonos como un espacio de encuentro, aprendizaje y crecimiento personal.
+                  </p>
+                  <p>
+                    Como parte de la <strong>Corporación Cultural Municipal Valdivia</strong>, trabajamos
+                    día a día para promover y valorar las expresiones culturales artísticas y patrimoniales
+                    de nuestra región.
                   </p>
                 </div>
               </div>
@@ -53,20 +58,20 @@ export default function SobreNosotros() {
                 <h3 className="text-2xl font-semibold text-gray-800 mb-6">Datos Destacados</h3>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-600 mb-2">Centro</div>
-                    <div className="text-sm text-gray-600">Cultural de Valdivia</div>
+                    <div className="text-3xl font-bold text-blue-600 mb-2">1935</div>
+                    <div className="text-sm text-gray-600">Año de Fundación</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600 mb-2">Comunidad</div>
-                    <div className="text-sm text-gray-600">Conectada</div>
+                    <div className="text-3xl font-bold text-green-600 mb-2">89+</div>
+                    <div className="text-sm text-gray-600">Años de Servicio</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-600 mb-2">Talleres</div>
-                    <div className="text-sm text-gray-600">Culturales</div>
+                    <div className="text-3xl font-bold text-purple-600 mb-2">Isla Teja</div>
+                    <div className="text-sm text-gray-600">Ubicación Actual</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-orange-600 mb-2">Acceso</div>
-                    <div className="text-sm text-gray-600">Libre y Gratuito</div>
+                    <div className="text-3xl font-bold text-orange-600 mb-2">CCM</div>
+                    <div className="text-sm text-gray-600">Corporación Cultural</div>
                   </div>
                 </div>
               </div>
@@ -185,7 +190,7 @@ export default function SobreNosotros() {
                       </svg>
                       <div>
                         <h4 className="font-semibold text-gray-800">Dirección</h4>
-                        <p className="text-gray-600">Av. Ramón Picarte 2102, 5100402 Valdivia, Los Ríos</p>
+                        <p className="text-gray-600">Avenida Los Robles N°4, Isla Teja, Valdivia, Los Ríos</p>
                       </div>
                     </div>
 
@@ -196,8 +201,7 @@ export default function SobreNosotros() {
                       <div>
                         <h4 className="font-semibold text-gray-800">Horarios de Atención</h4>
                         <div className="text-gray-600">
-                          <p>Lunes a Viernes: 9:00 - 18:00</p>
-                          <p>Sábados: 9:00 - 14:00</p>
+                          <p>Lunes a Viernes: 10:00 - 18:00</p>
                           <p>Domingos: Cerrado</p>
                         </div>
                       </div>
@@ -210,8 +214,8 @@ export default function SobreNosotros() {
                       <div>
                         <h4 className="font-semibold text-gray-800">Contacto</h4>
                         <div className="text-gray-600">
-                          <p>Teléfono: (63) 221 7351</p>
-                          <p>Email: biblioteca@valdivia.cl</p>
+                          <p>Teléfono: 63 2217351</p>
+                          <p>Email: bpmvaldivia@gmail.com</p>
                         </div>
                       </div>
                     </div>
@@ -245,11 +249,61 @@ export default function SobreNosotros() {
               <h2 className="text-3xl font-bold text-gray-800 mb-6">
                 Nuestro Compromiso
               </h2>
-              <p className="text-xl text-gray-600 mb-12 max-w-4xl mx-auto">
+              <p className="text-xl text-gray-600 mb-8 max-w-4xl mx-auto">
                 Contamos con un equipo dedicado de profesionales comprometidos con el desarrollo
                 cultural de Valdivia. Trabajamos día a día para ofrecer servicios de calidad y
                 crear experiencias enriquecedoras para toda nuestra comunidad.
               </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                  <div className="text-center">
+                    <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <h4 className="font-semibold text-gray-800 mb-1">Victoria Vicencio</h4>
+                    <p className="text-sm text-gray-600">Directora</p>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                  <div className="text-center">
+                    <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    </div>
+                    <h4 className="font-semibold text-gray-800 mb-1">Iván Reinoso</h4>
+                    <p className="text-sm text-gray-600">Encargado Bibliomóvil</p>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                  <div className="text-center">
+                    <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <h4 className="font-semibold text-gray-800 mb-1">Camilo Cood Schröder</h4>
+                    <p className="text-sm text-gray-600">Encargado TI</p>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                  <div className="text-center">
+                    <div className="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                    <h4 className="font-semibold text-gray-800 mb-1">Personal Administrativo</h4>
+                    <p className="text-sm text-gray-600">Juana Rosas, Sandro Beltrán, Irene Soto, Waleska Salvo, Edgardo Alvarado</p>
+                  </div>
+                </div>
+              </div>
 
               <div className="bg-blue-50 p-8 rounded-xl">
                 <h3 className="text-2xl font-semibold text-gray-800 mb-4">

@@ -39,12 +39,7 @@ export default function Horarios() {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
                       <span className="font-medium text-gray-800">Lunes a Viernes</span>
-                      <span className="text-blue-600 font-bold text-lg">9:00 - 18:00</span>
-                    </div>
-
-                    <div className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
-                      <span className="font-medium text-gray-800">Sábados</span>
-                      <span className="text-green-600 font-bold text-lg">9:00 - 14:00</span>
+                      <span className="text-blue-600 font-bold text-lg">10:00 - 18:00</span>
                     </div>
 
                     <div className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
@@ -73,12 +68,7 @@ export default function Horarios() {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
                       <span className="font-medium text-gray-800">Lunes a Viernes</span>
-                      <span className="text-purple-600 font-bold text-lg">9:00 - 17:00</span>
-                    </div>
-
-                    <div className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
-                      <span className="font-medium text-gray-800">Sábados</span>
-                      <span className="text-purple-600 font-bold text-lg">9:00 - 13:00</span>
+                      <span className="text-purple-600 font-bold text-lg">10:00 - 17:00</span>
                     </div>
 
                     <div className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
@@ -120,11 +110,7 @@ export default function Horarios() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Lun - Vie:</span>
-                    <span className="font-medium">9:00 - 18:00</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Sábados:</span>
-                    <span className="font-medium">9:00 - 14:00</span>
+                    <span className="font-medium">10:00 - 18:00</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Domingos:</span>
@@ -392,7 +378,7 @@ export default function Horarios() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21L6.3 11.27a11.054 11.054 0 005.43 5.43l1.838-3.924a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                   <h3 className="font-semibold text-gray-800 mb-2">Teléfono</h3>
-                  <p className="text-gray-600">(63) 221-1234</p>
+                  <p className="text-gray-600">63 2217351</p>
                 </div>
 
                 <div className="bg-white p-6 rounded-xl shadow-lg">
@@ -400,7 +386,7 @@ export default function Horarios() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <h3 className="font-semibold text-gray-800 mb-2">Email</h3>
-                  <p className="text-gray-600">info@bibliotecaslosrios.cl</p>
+                  <p className="text-gray-600">bpmvaldivia@gmail.com</p>
                 </div>
               </div>
             </div>
