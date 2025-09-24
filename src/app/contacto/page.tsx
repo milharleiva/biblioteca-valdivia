@@ -40,8 +40,8 @@ export default function Contacto() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Dirección</h3>
                   <p className="text-gray-600">
-                    Av. Ramón Picarte 2102<br />
-                    5100402 Valdivia<br />
+                    Avenida Los Robles N°4<br />
+                    Isla Teja, Valdivia<br />
                     Los Ríos, Chile
                   </p>
                 </div>
@@ -55,10 +55,9 @@ export default function Contacto() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Teléfono</h3>
                   <p className="text-gray-600">
-                    (63) 221 7351<br />
+                    63 2217351<br />
                     <span className="text-sm">
-                      Lun-Vie: 9:00-18:00<br />
-                      Sáb: 9:00-14:00
+                      Lun-Vie: 10:00-18:00
                     </span>
                   </p>
                 </div>
@@ -72,7 +71,7 @@ export default function Contacto() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Email</h3>
                   <p className="text-gray-600">
-                    biblioteca@valdivia.cl<br />
+                    bpmvaldivia@gmail.com<br />
                     <span className="text-sm">
                       Respuesta en 24-48 hrs
                     </span>
@@ -88,8 +87,7 @@ export default function Contacto() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Horarios</h3>
                   <p className="text-gray-600">
-                    Lun-Vie: 9:00-18:00<br />
-                    Sábados: 9:00-14:00<br />
+                    Lun-Vie: 10:00-18:00<br />
                     Domingos: Cerrado
                   </p>
                 </div>
@@ -111,19 +109,19 @@ export default function Contacto() {
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-medium text-gray-800">Dirección</h4>
-                      <p className="text-gray-600 text-sm">direccion@valdivia.cl</p>
+                      <p className="text-gray-600 text-sm">Victoria Vicencio</p>
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-800">Actividades Culturales</h4>
-                      <p className="text-gray-600 text-sm">talleres@valdivia.cl</p>
+                      <h4 className="font-medium text-gray-800">Bibliomóvil</h4>
+                      <p className="text-gray-600 text-sm">Iván Reinoso</p>
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-800">Archivo Histórico</h4>
-                      <p className="text-gray-600 text-sm">archivo@valdivia.cl</p>
+                      <h4 className="font-medium text-gray-800">TI</h4>
+                      <p className="text-gray-600 text-sm">Camilo Cood Schröder</p>
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-800">Soporte Técnico</h4>
-                      <p className="text-gray-600 text-sm">soporte@valdivia.cl</p>
+                      <h4 className="font-medium text-gray-800">Contacto General</h4>
+                      <p className="text-gray-600 text-sm">bpmvaldivia@gmail.com</p>
                     </div>
                   </div>
                 </div>
@@ -142,7 +140,7 @@ export default function Contacto() {
                         <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
-                        Llamar directamente al (63) 221 7351
+                        Llamar directamente al 63 2217351
                       </li>
                       <li className="flex items-center">
                         <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
