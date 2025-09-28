@@ -16,7 +16,9 @@
       "Bash(pkill:*)",
       "Bash(xcopy:*)",
       "Bash(robocopy:*)",
-      "WebFetch(domain:www.ccm-valdivia.cl)"
+      "WebFetch(domain:www.ccm-valdivia.cl)",
+      "Bash(tree:*)",
+      "Bash(dir /s)"
     ],
     "deny": [],
     "ask": []
