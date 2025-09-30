@@ -18,7 +18,12 @@
       "Bash(robocopy:*)",
       "WebFetch(domain:www.ccm-valdivia.cl)",
       "Bash(tree:*)",
-      "Bash(dir /s)"
+      "Bash(dir /s)",
+      "Bash(set DATABASE_URL=\"postgresql://postgres.duhthdwmswbeimgbxguw:Gaara1811.-@aws-1-us-east-2.pooler.supabase.com:6543/postgres?pgbouncer=true&connect_timeout=60\")",
+      "WebFetch(domain:www.prisma.io)",
+      "WebSearch",
+      "Bash(telnet:*)",
+      "Bash(nc:*)"
     ],
     "deny": [],
     "ask": []
