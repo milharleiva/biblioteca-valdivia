@@ -23,7 +23,9 @@
       "WebFetch(domain:www.prisma.io)",
       "WebSearch",
       "Bash(telnet:*)",
-      "Bash(nc:*)"
+      "Bash(nc:*)",
+      "Bash(rm:*)",
+      "Bash(npx next lint:*)"
     ],
     "deny": [],
     "ask": []

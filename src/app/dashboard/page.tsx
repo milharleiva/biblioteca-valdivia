@@ -23,7 +23,6 @@ import {
   LibraryBooks,
   Settings,
   ExitToApp,
-  Home,
   ArrowBack,
   CalendarMonth,
   LocationOn,

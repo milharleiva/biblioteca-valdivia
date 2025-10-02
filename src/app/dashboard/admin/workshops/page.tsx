@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-// import { createClient } from '@/lib/supabase/client'; // No longer used
 import LoadingScreen from '@/components/LoadingScreen';
 import {
   Box,

@@ -27,7 +27,6 @@ import {
   Event,
   Person,
   LocationOn,
-  Schedule,
   Description,
   Groups,
   PhotoCamera,
