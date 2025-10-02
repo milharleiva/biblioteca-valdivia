@@ -23,6 +23,21 @@ export async function GET(request: NextRequest) {
 
     const profile = await prisma!.userProfile.findUnique({
       where: { userId },
+      select: {
+        id: true,
+        userId: true,
+        email: true,
+        name: true,
+        phone: true,
+        address: true,
+        birthDate: true,
+        emergencyContact: true,
+        emergencyPhone: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true
+      }
     })
 
     return NextResponse.json({
