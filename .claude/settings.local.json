@@ -25,7 +25,9 @@
       "Bash(telnet:*)",
       "Bash(nc:*)",
       "Bash(rm:*)",
-      "Bash(npx next lint:*)"
+      "Bash(npx next lint:*)",
+      "Bash(dir \"C:\\Users\\exbunner\\Documents\\GitHub\\biblioteca-valdivia\\prisma\" /s)",
+      "Bash(rmdir:*)"
     ],
     "deny": [],
     "ask": []

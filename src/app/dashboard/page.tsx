@@ -299,8 +299,8 @@ export default function DashboardPage() {
                   </Box>
                 ) : (
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {activeEnrollments.map((enrollment) => (
-                      <Card key={enrollment.id} variant="outlined" sx={{ '&:hover': { bgcolor: 'grey.50' } }}>
+                    {activeEnrollments.map((enrollment, index) => (
+                      <Card key={`enrollment-${enrollment.workshop_id}-${index}`} variant="outlined" sx={{ '&:hover': { bgcolor: 'grey.50' } }}>
                         <CardContent>
                           <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
                             {enrollment.workshop.title}

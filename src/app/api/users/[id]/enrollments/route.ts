@@ -4,7 +4,7 @@ import { prisma, isPrismaAvailable } from '@/lib/prisma';
 // GET /api/users/[id]/enrollments - Obtener las inscripciones de un usuario
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     if (!(await isPrismaAvailable())) {
@@ -14,7 +14,8 @@ export async function GET(
       )
     }
 
-    const userId = params.id;
+    const { id } = await params;
+    const userId = id;
 
     if (!userId) {
       return NextResponse.json(
