@@ -35,7 +35,6 @@ model Workshop {
   title               String
   description         String
   instructor          String
-  instructorBio       String?              @map("instructor_bio")
   category            WorkshopCategory     @default(GENERAL)
   maxParticipants     Int                  @default(20) @map("max_participants")
   currentParticipants Int                  @default(0) @map("current_participants")
@@ -44,10 +43,6 @@ model Workshop {
   schedule            String?
   location            String
   imageUrl            String?              @map("image_url")
-  requirements        String?
-  materials           String?
-  targetAudience      String?              @map("target_audience")
-  difficultyLevel     DifficultyLevel      @default(BEGINNER) @map("difficulty_level")
   isActive            Boolean              @default(true) @map("is_active")
   isFeatured          Boolean              @default(false) @map("is_featured")
   createdBy           String?              @map("created_by")
@@ -111,11 +106,6 @@ enum WorkshopCategory {
   CULTURE    @map("cultura")
 }
 
-enum DifficultyLevel {
-  BEGINNER     @map("principiante")
-  INTERMEDIATE @map("intermedio")
-  ADVANCED     @map("avanzado")
-}
 
 enum EnrollmentStatus {
   ENROLLED  @map("enrolled")

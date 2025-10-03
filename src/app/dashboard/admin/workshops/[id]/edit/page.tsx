@@ -67,7 +67,6 @@ export default function EditWorkshopPage() {
     title: '',
     description: '',
     instructor: '',
-    instructorBio: '',
     category: 'general',
     maxParticipants: 20,
     startDate: '',
@@ -77,10 +76,6 @@ export default function EditWorkshopPage() {
     location: '',
     imageUrl: '',
     imageFile: null as File | null,
-    requirements: '',
-    materials: '',
-    targetAudience: '',
-    difficultyLevel: 'principiante',
     isActive: true
   });
 
@@ -130,7 +125,6 @@ export default function EditWorkshopPage() {
           title: data.title || '',
           description: data.description || '',
           instructor: data.instructor || '',
-          instructorBio: data.instructorBio || '',
           category: data.category || 'general',
           maxParticipants: data.maxParticipants || 20,
           startDate: startDate,
@@ -138,10 +132,6 @@ export default function EditWorkshopPage() {
           endDate: endDate,
           endTime: endTime,
           location: data.location || '',
-          requirements: data.requirements || '',
-          materials: data.materials || '',
-          targetAudience: data.targetAudience || '',
-          difficultyLevel: data.difficultyLevel || 'principiante',
           imageUrl: data.imageUrl || '',
           isActive: data.isActive ?? true
         });
@@ -247,7 +237,6 @@ export default function EditWorkshopPage() {
         title: formData.title,
         description: formData.description,
         instructor: formData.instructor,
-        instructor_bio: formData.instructorBio,
         category: formData.category,
         max_participants: maxParticipants,
         start_date: `${formData.startDate}T${formData.startTime}:00`,
@@ -255,10 +244,6 @@ export default function EditWorkshopPage() {
         schedule: `${formData.startTime} - ${formData.endTime}`,
         location: formData.location,
         image_url: imageUrl,
-        requirements: formData.requirements,
-        materials: formData.materials,
-        target_audience: formData.targetAudience,
-        difficulty_level: formData.difficultyLevel,
         is_active: formData.isActive
       };
 
