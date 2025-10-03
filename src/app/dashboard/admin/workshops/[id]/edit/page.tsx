@@ -84,7 +84,15 @@ export default function EditWorkshopPage() {
     isActive: true
   });
 
-  const supabase = createClient();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    // Only create Supabase client on the client side
+    if (typeof window !== 'undefined') {
+      const client = createClient();
+      setSupabase(client);
+    }
+  }, []);
 
   const fetchWorkshop = async () => {
     try {

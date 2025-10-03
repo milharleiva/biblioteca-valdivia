@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
@@ -63,7 +63,15 @@ export default function NewWorkshopPage() {
     isActive: true
   });
 
-  const supabase = createClient();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    // Only create Supabase client on the client side
+    if (typeof window !== 'undefined') {
+      const client = createClient();
+      setSupabase(client);
+    }
+  }, []);
 
   // Redirect if not admin
   if (profile?.role !== 'admin') {
@@ -137,7 +145,7 @@ export default function NewWorkshopPage() {
     try {
       // Upload image if provided
       let imageUrl = '';
-      if (formData.imageFile) {
+      if (formData.imageFile && supabase) {
         const fileExt = formData.imageFile.name.split('.').pop();
         const fileName = `workshop-${Date.now()}.${fileExt}`;
 
