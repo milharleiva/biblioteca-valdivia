@@ -80,7 +80,15 @@ export default function AdminUsersPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const supabase = createClient();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    // Only create Supabase client on the client side
+    if (typeof window !== 'undefined') {
+      const client = createClient();
+      setSupabase(client);
+    }
+  }, []);
 
   const fetchUsers = async (showLoading = true) => {
     try {
@@ -141,7 +149,7 @@ export default function AdminUsersPage() {
   };
 
   const handleDelete = async () => {
-    if (!deleteDialog.user) return;
+    if (!deleteDialog.user || !supabase) return;
 
     try {
       // First delete the user profile
