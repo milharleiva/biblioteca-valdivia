@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  // Force regeneration after removing avatar_url and workshop fields
 }
 
 datasource db {
