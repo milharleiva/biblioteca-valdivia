@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
@@ -30,7 +30,6 @@ import {
   Description,
   Groups,
   PhotoCamera,
-  School,
   Category
 } from '@mui/icons-material';
 import { MotionDiv } from '@/components/MotionWrapper';
@@ -47,7 +46,6 @@ export default function NewWorkshopPage() {
     title: '',
     description: '',
     instructor: '',
-    instructorBio: '',
     category: 'general',
     maxParticipants: 20,
     startDate: '',
@@ -56,14 +54,18 @@ export default function NewWorkshopPage() {
     endTime: '17:00',
     location: '',
     imageFile: null as File | null,
-    requirements: '',
-    materials: '',
-    targetAudience: '',
-    difficultyLevel: 'principiante',
     isActive: true
   });
 
-  const supabase = createClient();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    // Only create Supabase client on the client side
+    if (typeof window !== 'undefined') {
+      const client = createClient();
+      setSupabase(client);
+    }
+  }, []);
 
   // Redirect if not admin
   if (profile?.role !== 'admin') {
@@ -137,7 +139,7 @@ export default function NewWorkshopPage() {
     try {
       // Upload image if provided
       let imageUrl = '';
-      if (formData.imageFile) {
+      if (formData.imageFile && supabase) {
         const fileExt = formData.imageFile.name.split('.').pop();
         const fileName = `workshop-${Date.now()}.${fileExt}`;
 
@@ -157,7 +159,6 @@ export default function NewWorkshopPage() {
         title: formData.title,
         description: formData.description,
         instructor: formData.instructor,
-        instructor_bio: formData.instructorBio,
         category: formData.category,
         max_participants: maxParticipants,
         start_date: `${formData.startDate}T${formData.startTime}:00`,
@@ -165,10 +166,6 @@ export default function NewWorkshopPage() {
         schedule: `${formData.startTime} - ${formData.endTime}`,
         location: formData.location,
         image_url: imageUrl,
-        requirements: formData.requirements,
-        materials: formData.materials,
-        target_audience: formData.targetAudience,
-        difficulty_level: formData.difficultyLevel,
         is_active: formData.isActive,
         created_by: user?.id
       };
@@ -294,46 +291,22 @@ export default function NewWorkshopPage() {
                   />
                 </Box>
 
-                <TextField
-                  fullWidth
-                  label="Biografía del Instructor (opcional)"
-                  value={formData.instructorBio}
-                  onChange={handleChange('instructorBio')}
-                  multiline
-                  rows={2}
-                  placeholder="Breve descripción del instructor..."
-                />
 
-                <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
-                  <FormControl fullWidth>
-                    <InputLabel>Categoría</InputLabel>
-                    <Select
-                      value={formData.category}
-                      onChange={handleSelectChange('category')}
-                      startAdornment={<Category sx={{ mr: 1, color: 'action.active' }} />}
-                    >
-                      <MenuItem value="general">General</MenuItem>
-                      <MenuItem value="tecnologia">Tecnología</MenuItem>
-                      <MenuItem value="arte">Arte</MenuItem>
-                      <MenuItem value="literatura">Literatura</MenuItem>
-                      <MenuItem value="educacion">Educación</MenuItem>
-                      <MenuItem value="cultura">Cultura</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  <FormControl fullWidth>
-                    <InputLabel>Nivel de Dificultad</InputLabel>
-                    <Select
-                      value={formData.difficultyLevel}
-                      onChange={handleSelectChange('difficultyLevel')}
-                      startAdornment={<School sx={{ mr: 1, color: 'action.active' }} />}
-                    >
-                      <MenuItem value="principiante">Principiante</MenuItem>
-                      <MenuItem value="intermedio">Intermedio</MenuItem>
-                      <MenuItem value="avanzado">Avanzado</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
+                <FormControl fullWidth>
+                  <InputLabel>Categoría</InputLabel>
+                  <Select
+                    value={formData.category}
+                    onChange={handleSelectChange('category')}
+                    startAdornment={<Category sx={{ mr: 1, color: 'action.active' }} />}
+                  >
+                    <MenuItem value="general">General</MenuItem>
+                    <MenuItem value="tecnologia">Tecnología</MenuItem>
+                    <MenuItem value="arte">Arte</MenuItem>
+                    <MenuItem value="literatura">Literatura</MenuItem>
+                    <MenuItem value="educacion">Educación</MenuItem>
+                    <MenuItem value="cultura">Cultura</MenuItem>
+                  </Select>
+                </FormControl>
 
                 {/* Fechas */}
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, mb: 3 }}>
@@ -435,33 +408,6 @@ export default function NewWorkshopPage() {
                   </Box>
                 </Box>
 
-                <TextField
-                  fullWidth
-                  label="Requisitos (opcional)"
-                  value={formData.requirements}
-                  onChange={handleChange('requirements')}
-                  multiline
-                  rows={2}
-                  placeholder="Ej: Conocimientos básicos de..."
-                />
-
-                <TextField
-                  fullWidth
-                  label="Materiales (opcional)"
-                  value={formData.materials}
-                  onChange={handleChange('materials')}
-                  multiline
-                  rows={2}
-                  placeholder="Ej: Cuaderno, lápiz, laptop..."
-                />
-
-                <TextField
-                  fullWidth
-                  label="Público Objetivo (opcional)"
-                  value={formData.targetAudience}
-                  onChange={handleChange('targetAudience')}
-                  placeholder="Ej: Estudiantes, adultos mayores, profesionales..."
-                />
 
                 <FormControlLabel
                   control={

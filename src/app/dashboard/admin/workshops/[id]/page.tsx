@@ -53,7 +53,6 @@ interface Workshop {
   schedule: string;
   location: string;
   image_url?: string;
-  requirements?: string;
   is_active: boolean;
   created_at: string;
 }
@@ -136,8 +135,6 @@ export default function WorkshopDetailPage() {
     } catch (error) {
       setError('Error inesperado al cargar los participantes');
       console.error('Error:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -166,10 +163,22 @@ export default function WorkshopDetailPage() {
   };
 
   useEffect(() => {
-    if (workshopId && profile?.role === 'admin') {
-      fetchWorkshopDetails();
-      fetchParticipants();
-    }
+    const loadData = async () => {
+      if (workshopId && profile?.role === 'admin') {
+        setLoading(true);
+        setError('');
+        try {
+          await fetchWorkshopDetails();
+          await fetchParticipants();
+        } catch (error) {
+          console.error('Error loading workshop data:', error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadData();
   }, [workshopId, profile]);
 
   // Redirect if not admin
@@ -183,9 +192,23 @@ export default function WorkshopDetailPage() {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <CircularProgress />
-        <Typography sx={{ ml: 2 }}>Cargando detalles del taller...</Typography>
+      <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Box sx={{
+          bgcolor: 'white',
+          borderRadius: 3,
+          boxShadow: 3,
+          p: 4,
+          textAlign: 'center',
+          minWidth: 300
+        }}>
+          <CircularProgress size={60} sx={{ mb: 2 }} />
+          <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold' }}>
+            Cargando detalles del taller
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Esto puede tomar unos segundos...
+          </Typography>
+        </Box>
       </Box>
     );
   }

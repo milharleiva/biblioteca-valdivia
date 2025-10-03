@@ -121,7 +121,6 @@ export async function POST(request: NextRequest) {
       title,
       description,
       instructor,
-      instructor_bio,
       category = 'general',
       max_participants = 20,
       start_date,
@@ -129,10 +128,6 @@ export async function POST(request: NextRequest) {
       schedule,
       location,
       image_url,
-      requirements,
-      materials,
-      target_audience,
-      difficulty_level = 'principiante',
       is_active = true,
       created_by,
     } = body
@@ -160,18 +155,11 @@ export async function POST(request: NextRequest) {
       'cultura': 'CULTURE'
     };
 
-    const difficultyMapping: { [key: string]: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' } = {
-      'principiante': 'BEGINNER',
-      'intermedio': 'INTERMEDIATE',
-      'avanzado': 'ADVANCED'
-    };
-
     const workshop = await prisma!.workshop.create({
       data: {
         title,
         description,
         instructor,
-        instructorBio: instructor_bio,
         category: categoryMapping[category] || 'GENERAL',
         maxParticipants: max_participants,
         startDate: new Date(start_date),
@@ -179,10 +167,6 @@ export async function POST(request: NextRequest) {
         schedule: schedule || '', // Campo opcional para compatibilidad
         location,
         imageUrl: image_url,
-        requirements,
-        materials,
-        targetAudience: target_audience,
-        difficultyLevel: difficultyMapping[difficulty_level] || 'BEGINNER',
         isActive: is_active,
         createdBy: created_by,
       },
@@ -269,7 +253,6 @@ export async function PUT(request: NextRequest) {
       title,
       description,
       instructor,
-      instructor_bio,
       category = 'general',
       max_participants = 20,
       start_date,
@@ -277,10 +260,6 @@ export async function PUT(request: NextRequest) {
       schedule,
       location,
       image_url,
-      requirements,
-      materials,
-      target_audience,
-      difficulty_level = 'principiante',
       is_active = true,
     } = body
 
@@ -304,19 +283,12 @@ export async function PUT(request: NextRequest) {
       'cultura': 'CULTURE'
     };
 
-    const difficultyMapping: { [key: string]: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' } = {
-      'principiante': 'BEGINNER',
-      'intermedio': 'INTERMEDIATE',
-      'avanzado': 'ADVANCED'
-    };
-
     const workshop = await prisma!.workshop.update({
       where: { id },
       data: {
         title,
         description,
         instructor,
-        instructorBio: instructor_bio,
         category: categoryMapping[category] || 'GENERAL',
         maxParticipants: max_participants,
         startDate: new Date(start_date),
@@ -324,10 +296,6 @@ export async function PUT(request: NextRequest) {
         schedule: schedule || '',
         location,
         imageUrl: image_url,
-        requirements,
-        materials,
-        targetAudience: target_audience,
-        difficultyLevel: difficultyMapping[difficulty_level] || 'BEGINNER',
         isActive: is_active,
       },
       include: {
