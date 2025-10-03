@@ -1,6 +1,12 @@
 {
   "buildCommand": "npm run vercel-build",
+  "installCommand": "npm install && npx prisma generate",
   "env": {
     "VERCEL_FORCE_NO_BUILD_CACHE": "1"
+  },
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
   }
 }
