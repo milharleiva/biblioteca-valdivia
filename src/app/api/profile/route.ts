@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const profile = await prisma!.userProfile.findUnique({
+    let profile = await prisma!.userProfile.findUnique({
       where: { userId },
       select: {
         id: true,
@@ -39,6 +39,43 @@ export async function GET(request: NextRequest) {
         updatedAt: true
       }
     })
+
+    // Si no existe el perfil, intentar crearlo
+    if (!profile) {
+      console.log('Profile not found, attempting to create one for userId:', userId)
+      try {
+        // Obtener datos del usuario de Supabase auth
+        // Por ahora crear con datos básicos
+        profile = await prisma!.userProfile.create({
+          data: {
+            userId,
+            email: `user-${userId}@temp.com`, // Email temporal
+            name: 'Usuario',
+            role: 'USER'
+          },
+          select: {
+            id: true,
+            userId: true,
+            email: true,
+            name: true,
+            phone: true,
+            address: true,
+            birthDate: true,
+            emergencyContact: true,
+            emergencyPhone: true,
+            role: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true
+          }
+        })
+        console.log('Profile created successfully for userId:', userId)
+      } catch (createError) {
+        console.error('Error creating profile:', createError)
+        // Si falla la creación, devolver null
+        profile = null
+      }
+    }
 
     return NextResponse.json({
       success: true,
