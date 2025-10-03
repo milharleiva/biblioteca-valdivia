@@ -30,7 +30,9 @@
       "Bash(rmdir:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(set DATABASE_URL=postgresql://postgres.geicnomksnrvykxttlka:4AQiKWflHXJxSKAM@aws-1-us-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true)"
+      "Bash(set DATABASE_URL=postgresql://postgres.geicnomksnrvykxttlka:4AQiKWflHXJxSKAM@aws-1-us-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true)",
+      "Bash(del .env.local)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

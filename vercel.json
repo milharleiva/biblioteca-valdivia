@@ -2,7 +2,8 @@
   "buildCommand": "npm run vercel-build",
   "installCommand": "npm install && npx prisma generate",
   "env": {
-    "VERCEL_FORCE_NO_BUILD_CACHE": "1"
+    "VERCEL_FORCE_NO_BUILD_CACHE": "1",
+    "FORCE_CACHE_CLEAR": "2"
   },
   "functions": {
     "src/app/api/**/*.ts": {
