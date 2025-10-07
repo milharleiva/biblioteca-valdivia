@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma, isPrismaAvailable } from './prisma';
 
 export interface CachedBook {
   id: string;
@@ -25,6 +23,12 @@ export const CACHE_CONFIG: BookCacheConfig = {
 };
 
 export async function searchInCache(searchTerm: string): Promise<CachedBook[]> {
+  // Verificar si Prisma está disponible
+  if (!prisma || !(await isPrismaAvailable())) {
+    console.warn('⚠️ Prisma no disponible, saltando búsqueda en caché');
+    return [];
+  }
+
   const now = new Date();
 
   // Normalizar término de búsqueda
@@ -92,6 +96,12 @@ export async function saveToCache(
   searchTerm: string,
   sourceUrl: string
 ): Promise<void> {
+  // Verificar si Prisma está disponible
+  if (!prisma || !(await isPrismaAvailable())) {
+    console.warn('⚠️ Prisma no disponible, saltando guardado en caché');
+    return;
+  }
+
   if (!books || books.length === 0) return;
 
   const now = new Date();

@@ -53,7 +53,11 @@ export async function POST(request: NextRequest) {
 
     // 1. BUSCAR EN CACHÉ PRIMERO
     console.log('🔍 Buscando en caché...');
+    const startCacheTime = Date.now();
     const cachedBooks = await searchInCache(normalizedSearchTerm);
+    const cacheTime = Date.now() - startCacheTime;
+
+    console.log(`⏱️ Búsqueda en caché completada en ${cacheTime}ms`);
 
     if (cachedBooks.length > 0) {
       console.log(`✅ CACHÉ HIT: ${cachedBooks.length} libros encontrados en caché`);
@@ -64,10 +68,11 @@ export async function POST(request: NextRequest) {
         searchTerm: normalizedSearchTerm,
         source: 'cache',
         cacheHit: true,
-        responseTime: 'instant',
+        responseTime: `${cacheTime}ms (cache)`,
         debugInfo: {
           cacheBooks: cachedBooks.length,
-          ttlHours: CACHE_CONFIG.TTL_HOURS
+          ttlHours: CACHE_CONFIG.TTL_HOURS,
+          cacheQueryTime: `${cacheTime}ms`
         }
       });
     }
@@ -236,7 +241,12 @@ export async function POST(request: NextRequest) {
     // 3. GUARDAR EN CACHÉ PARA FUTURAS BÚSQUEDAS
     if (finalBooks.length > 0) {
       console.log(`\n💾 Guardando ${finalBooks.length} libros en caché...`);
+      const startSaveTime = Date.now();
       await saveToCache(finalBooks, normalizedSearchTerm, searchUrl);
+      const saveTime = Date.now() - startSaveTime;
+      console.log(`✅ Guardado en caché completado en ${saveTime}ms`);
+    } else {
+      console.log(`\n⚠️ No se encontraron libros para guardar en caché`);
     }
 
     console.log(`\n=== RESUMEN FINAL ===`);
