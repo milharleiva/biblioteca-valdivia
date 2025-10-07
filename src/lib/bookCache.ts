@@ -43,28 +43,49 @@ export async function searchInCache(searchTerm: string): Promise<CachedBook[]> {
   };
 
   const normalizedSearchTerm = normalizeText(searchTerm);
-  const searchWords = normalizedSearchTerm.split(' ').filter(word => word.length > 0);
+  console.log(`🔍 Cache search for: "${searchTerm}" (normalized: "${normalizedSearchTerm}")`);
+  const startCacheQuery = Date.now();
 
   try {
-    // Buscar por múltiples palabras clave
-    const orConditions = searchWords.flatMap(word => [
-      { searchTerm: { contains: word, mode: 'insensitive' } },
-      { title: { contains: word, mode: 'insensitive' } },
-      { author: { contains: word, mode: 'insensitive' } }
-    ]);
-
-    const cachedBooks = await prisma.bookCache.findMany({
+    // 1. PRIMERO: Búsqueda exacta por searchTerm (más rápida)
+    console.log(`   Intentando búsqueda exacta...`);
+    let cachedBooks = await prisma.bookCache.findMany({
       where: {
         AND: [
           { expiresAt: { gt: now } },
-          {
-            OR: orConditions
-          }
+          { searchTerm: { equals: normalizedSearchTerm, mode: 'insensitive' } }
         ]
       },
       orderBy: { lastAccessed: 'desc' },
       take: 40
     });
+
+    // 2. Si no hay coincidencia exacta, búsqueda parcial (más lenta)
+    if (cachedBooks.length === 0) {
+      console.log(`   Sin coincidencia exacta, intentando búsqueda parcial...`);
+      const searchWords = normalizedSearchTerm.split(' ').filter(word => word.length > 0);
+
+      // Solo buscar en searchTerm para evitar múltiples OR conditions
+      const orConditions = searchWords.map(word => ({
+        searchTerm: { contains: word, mode: 'insensitive' }
+      }));
+
+      cachedBooks = await prisma.bookCache.findMany({
+        where: {
+          AND: [
+            { expiresAt: { gt: now } },
+            {
+              OR: orConditions
+            }
+          ]
+        },
+        orderBy: { lastAccessed: 'desc' },
+        take: 40
+      });
+    }
+
+    const cacheQueryTime = Date.now() - startCacheQuery;
+    console.log(`⏱️ Cache query completed in ${cacheQueryTime}ms (found ${cachedBooks.length} books)`);
 
     // Actualizar lastAccessed para los libros encontrados
     if (cachedBooks.length > 0) {
