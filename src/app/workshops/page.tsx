@@ -41,7 +41,6 @@ interface Workshop {
   schedule?: string;
   location: string;
   imageUrl?: string;
-  requirements?: string;
   isActive: boolean;
   _count?: {
     enrollments: number;

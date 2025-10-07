@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  // Force regeneration after removing avatar_url and workshop fields
 }
 
 datasource db {
@@ -9,26 +10,24 @@ datasource db {
 }
 
 model UserProfile {
-  id               String    @id @default(cuid())
-  userId           String    @unique @map("user_id")
-  email            String?   @unique
-  name             String
-  phone            String?
-  address          String?
-  birthDate        DateTime? @map("birth_date") @db.Date
-  emergencyContact String?   @map("emergency_contact")
-  emergencyPhone   String?   @map("emergency_phone")
-  role             Role      @default(USER)
-  avatarUrl        String?   @map("avatar_url")
-  preferences      Json      @default("{}")
-  isActive         Boolean   @default(true) @map("is_active")
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
-
-  // Relations
-  workshopsCreated     Workshop[]           @relation("WorkshopCreator")
-  workshopEnrollments  WorkshopEnrollment[]
+  id                   String               @id @default(cuid())
+  userId               String               @unique @map("user_id")
+  email                String?              @unique
+  name                 String
+  phone                String?
+  address              String?
+  birthDate            DateTime?            @map("birth_date") @db.Date
+  emergencyContact     String?              @map("emergency_contact")
+  emergencyPhone       String?              @map("emergency_phone")
+  role                 Role                 @default(USER)
+  preferences          Json?
+  avatarUrl            String?              @map("avatar_url")
+  isActive             Boolean              @default(true) @map("is_active")
+  createdAt            DateTime             @default(now()) @map("created_at")
+  updatedAt            DateTime             @updatedAt @map("updated_at")
   announcementsCreated Announcement[]       @relation("AnnouncementCreator")
+  workshopEnrollments  WorkshopEnrollment[]
+  workshopsCreated     Workshop[]           @relation("WorkshopCreator")
 
   @@map("user_profiles")
 }
@@ -38,7 +37,6 @@ model Workshop {
   title               String
   description         String
   instructor          String
-  instructorBio       String?              @map("instructor_bio")
   category            WorkshopCategory     @default(GENERAL)
   maxParticipants     Int                  @default(20) @map("max_participants")
   currentParticipants Int                  @default(0) @map("current_participants")
@@ -47,10 +45,6 @@ model Workshop {
   schedule            String?
   location            String
   imageUrl            String?              @map("image_url")
-  requirements        String?
-  materials           String?
-  targetAudience      String?              @map("target_audience")
-  difficultyLevel     DifficultyLevel      @default(BEGINNER) @map("difficulty_level")
   isActive            Boolean              @default(true) @map("is_active")
   isFeatured          Boolean              @default(false) @map("is_featured")
   createdBy           String?              @map("created_by")
@@ -63,21 +57,15 @@ model Workshop {
 }
 
 model WorkshopEnrollment {
-  id                  String           @id @default(cuid())
-  userId              String           @map("user_id")
-  workshopId          String           @map("workshop_id")
-  status              EnrollmentStatus @default(ENROLLED)
-  enrollmentDate      DateTime         @default(now()) @map("enrollment_date")
-  completionDate      DateTime?        @map("completion_date")
-  attendanceConfirmed Boolean          @default(false) @map("attendance_confirmed")
-  rating              Int?             @db.SmallInt
-  feedback            String?
-  certificateIssued   Boolean          @default(false) @map("certificate_issued")
-  notes               String?
-  createdAt           DateTime         @default(now()) @map("created_at")
-  updatedAt           DateTime         @updatedAt @map("updated_at")
-  user                UserProfile      @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  workshop            Workshop         @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+  id             String           @id @default(cuid())
+  userId         String           @map("user_id")
+  workshopId     String           @map("workshop_id")
+  status         EnrollmentStatus @default(ENROLLED)
+  enrollmentDate DateTime         @default(now()) @map("enrollment_date")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  user           UserProfile      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  workshop       Workshop         @relation(fields: [workshopId], references: [id], onDelete: Cascade)
 
   @@unique([userId, workshopId])
   @@map("workshop_enrollments")
@@ -99,7 +87,6 @@ model Announcement {
   linkText       String?          @map("link_text")
   targetAudience TargetAudience   @default(ALL) @map("target_audience")
   createdBy      String?          @map("created_by")
-  viewsCount     Int              @default(0) @map("views_count")
   createdAt      DateTime         @default(now()) @map("created_at")
   updatedAt      DateTime         @updatedAt @map("updated_at")
   creator        UserProfile?     @relation("AnnouncementCreator", fields: [createdBy], references: [userId])
@@ -121,11 +108,6 @@ enum WorkshopCategory {
   CULTURE    @map("cultura")
 }
 
-enum DifficultyLevel {
-  BEGINNER     @map("principiante")
-  INTERMEDIATE @map("intermedio")
-  ADVANCED     @map("avanzado")
-}
 
 enum EnrollmentStatus {
   ENROLLED  @map("enrolled")
@@ -147,4 +129,47 @@ enum TargetAudience {
   ALL   @map("all")
   USERS @map("users")
   STAFF @map("staff")
+}
+
+model BookCache {
+  id            String   @id @default(cuid())
+
+  // Datos del libro
+  title         String
+  author        String
+  availability  String
+  library       String
+  detailUrl     String?
+  docNumber     String?  // Para identificación única
+
+  // Metadatos de caché
+  searchTerm    String   // Término que encontró este libro
+  sourceUrl     String   // URL original del catálogo
+  region        String   @default("Los Ríos")
+  comuna        String   @default("Valdivia")
+
+  // Control de TTL
+  cachedAt      DateTime @default(now()) @map("cached_at")
+  lastAccessed  DateTime @default(now()) @map("last_accessed")
+  expiresAt     DateTime @map("expires_at")
+
+  // Índices para búsqueda rápida
+  @@index([searchTerm])
+  @@index([title])
+  @@index([author])
+  @@index([docNumber])
+  @@index([expiresAt])
+  @@map("book_cache")
+}
+
+model SearchQuery {
+  id           String   @id @default(cuid())
+  query        String   @unique
+  resultCount  Int      @map("result_count")
+  lastSearched DateTime @default(now()) @map("last_searched")
+  searchCount  Int      @default(1) @map("search_count")
+
+  @@index([query])
+  @@index([lastSearched])
+  @@map("search_queries")
 }

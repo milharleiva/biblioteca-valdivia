@@ -233,9 +233,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
 
           console.log('🔵 Status del API call:', createResponse.status);
+          console.log('🔵 Response headers:', Object.fromEntries(createResponse.headers.entries()));
 
           const createResult = await createResponse.json();
           console.log('🔵 Respuesta del API:', createResult);
+
+          if (!createResponse.ok) {
+            console.error('🔴 API call failed with status:', createResponse.status);
+            console.error('🔴 API response:', createResult);
+          }
 
           if (createResult.success) {
             console.log('✅ User profile created successfully');

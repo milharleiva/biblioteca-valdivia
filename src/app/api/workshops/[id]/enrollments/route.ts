@@ -3,7 +3,7 @@ import { prisma, isPrismaAvailable } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     if (!(await isPrismaAvailable())) {
@@ -13,7 +13,8 @@ export async function GET(
       )
     }
 
-    const workshopId = params.id;
+    const { id } = await params;
+    const workshopId = id;
 
     if (!workshopId) {
       return NextResponse.json(
@@ -59,7 +60,7 @@ export async function GET(
 // POST /api/workshops/[id]/enrollments - Inscribirse a un taller
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     if (!(await isPrismaAvailable())) {
@@ -69,7 +70,8 @@ export async function POST(
       )
     }
 
-    const workshopId = params.id;
+    const { id } = await params;
+    const workshopId = id;
     const body = await request.json();
     const { userId } = body;
 
@@ -182,7 +184,7 @@ export async function POST(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     if (!(await isPrismaAvailable())) {
@@ -192,7 +194,8 @@ export async function DELETE(
       )
     }
 
-    const workshopId = params.id;
+    const { id } = await params;
+    const workshopId = id;
     const { searchParams } = new URL(request.url);
     const enrollmentId = searchParams.get('enrollmentId');
 
