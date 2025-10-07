@@ -1,11 +1,11 @@
 import { PrismaClient } from '@prisma/client'
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
+  prisma: PrismaClient | null | undefined
 }
 
 // Create Prisma client and test if it works
-const createPrismaClient = () => {
+const createPrismaClient = (): PrismaClient | null => {
   try {
     // Check if we're in a serverless environment (Vercel)
     const isServerless = process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTION_NAME
