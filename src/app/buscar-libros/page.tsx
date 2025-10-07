@@ -32,7 +32,10 @@ export default function BuscarLibros() {
     setBooks([]);
 
     try {
-      const response = await fetch('/api/scrape-books', {
+      const startTime = Date.now();
+
+      // Intentar nueva API con caché primero
+      const response = await fetch('/api/books/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,10 +44,37 @@ export default function BuscarLibros() {
       });
 
       if (!response.ok) {
-        throw new Error('Error al buscar libros');
+        // Fallback a API antigua si falla la nueva
+        console.warn('Nueva API falló, usando fallback...');
+        const fallbackResponse = await fetch('/api/scrape-books', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ searchTerm }),
+        });
+
+        if (!fallbackResponse.ok) {
+          throw new Error('Error al buscar libros');
+        }
+
+        const fallbackData = await fallbackResponse.json();
+        setBooks(fallbackData.books || []);
+        return;
       }
 
       const data = await response.json();
+      const responseTime = Date.now() - startTime;
+
+      // Log para depuración
+      console.log('📊 Búsqueda completada:', {
+        term: searchTerm,
+        source: data.source,
+        cacheHit: data.cacheHit,
+        books: data.books?.length || 0,
+        responseTime: data.cacheHit ? `${responseTime}ms (caché)` : data.responseTime
+      });
+
       setBooks(data.books || []);
     } catch (err) {
       setError('Error al realizar la búsqueda. Intenta de nuevo.');

@@ -130,3 +130,46 @@ enum TargetAudience {
   USERS @map("users")
   STAFF @map("staff")
 }
+
+model BookCache {
+  id            String   @id @default(cuid())
+
+  // Datos del libro
+  title         String
+  author        String
+  availability  String
+  library       String
+  detailUrl     String?
+  docNumber     String?  // Para identificación única
+
+  // Metadatos de caché
+  searchTerm    String   // Término que encontró este libro
+  sourceUrl     String   // URL original del catálogo
+  region        String   @default("Los Ríos")
+  comuna        String   @default("Valdivia")
+
+  // Control de TTL
+  cachedAt      DateTime @default(now()) @map("cached_at")
+  lastAccessed  DateTime @default(now()) @map("last_accessed")
+  expiresAt     DateTime @map("expires_at")
+
+  // Índices para búsqueda rápida
+  @@index([searchTerm])
+  @@index([title])
+  @@index([author])
+  @@index([docNumber])
+  @@index([expiresAt])
+  @@map("book_cache")
+}
+
+model SearchQuery {
+  id           String   @id @default(cuid())
+  query        String   @unique
+  resultCount  Int      @map("result_count")
+  lastSearched DateTime @default(now()) @map("last_searched")
+  searchCount  Int      @default(1) @map("search_count")
+
+  @@index([query])
+  @@index([lastSearched])
+  @@map("search_queries")
+}
