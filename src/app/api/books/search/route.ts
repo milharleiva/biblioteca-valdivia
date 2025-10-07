@@ -169,15 +169,30 @@ export async function POST(request: NextRequest) {
 
       if (normalizedSearchTerm && normalizedSearchTerm !== '') {
         const searchWords = normalizedSearchTerm.toLowerCase().split(' ').filter((word: string) => word.length > 0);
-        const titleLower = rawBook.title.toLowerCase();
-        const authorLower = rawBook.author.toLowerCase();
+
+        // Normalizar texto removiendo acentos y caracteres especiales
+        const normalizeText = (text: string) => {
+          return text
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '') // Remover acentos
+            .replace(/[^\w\s]/g, ' ') // Remover caracteres especiales
+            .replace(/\s+/g, ' ') // Normalizar espacios
+            .trim();
+        };
+
+        const titleNormalized = normalizeText(rawBook.title);
+        const authorNormalized = normalizeText(rawBook.author);
 
         console.log(`  🔍 Palabras de búsqueda: ${searchWords.join(', ')}`);
+        console.log(`  📝 Título normalizado: "${titleNormalized}"`);
+        console.log(`  👤 Autor normalizado: "${authorNormalized}"`);
 
         const hasMatch = searchWords.some((word: string) => {
-          const titleMatch = titleLower.includes(word);
-          const authorMatch = authorLower.includes(word);
-          console.log(`    - Palabra "${word}": título=${titleMatch}, autor=${authorMatch}`);
+          const normalizedWord = normalizeText(word);
+          const titleMatch = titleNormalized.includes(normalizedWord);
+          const authorMatch = authorNormalized.includes(normalizedWord);
+          console.log(`    - Palabra "${normalizedWord}": título=${titleMatch}, autor=${authorMatch}`);
           return titleMatch || authorMatch;
         });
 

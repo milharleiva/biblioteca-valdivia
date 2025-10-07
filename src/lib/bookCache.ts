@@ -27,17 +27,34 @@ export const CACHE_CONFIG: BookCacheConfig = {
 export async function searchInCache(searchTerm: string): Promise<CachedBook[]> {
   const now = new Date();
 
+  // Normalizar término de búsqueda
+  const normalizeText = (text: string) => {
+    return text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Remover acentos
+      .replace(/[^\w\s]/g, ' ') // Remover caracteres especiales
+      .replace(/\s+/g, ' ') // Normalizar espacios
+      .trim();
+  };
+
+  const normalizedSearchTerm = normalizeText(searchTerm);
+  const searchWords = normalizedSearchTerm.split(' ').filter(word => word.length > 0);
+
   try {
+    // Buscar por múltiples palabras clave
+    const orConditions = searchWords.flatMap(word => [
+      { searchTerm: { contains: word, mode: 'insensitive' } },
+      { title: { contains: word, mode: 'insensitive' } },
+      { author: { contains: word, mode: 'insensitive' } }
+    ]);
+
     const cachedBooks = await prisma.bookCache.findMany({
       where: {
         AND: [
           { expiresAt: { gt: now } },
           {
-            OR: [
-              { searchTerm: { contains: searchTerm, mode: 'insensitive' } },
-              { title: { contains: searchTerm, mode: 'insensitive' } },
-              { author: { contains: searchTerm, mode: 'insensitive' } }
-            ]
+            OR: orConditions
           }
         ]
       },
