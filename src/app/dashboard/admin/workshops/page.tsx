@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-// import { createClient } from '@/lib/supabase/client'; // No longer used
 import LoadingScreen from '@/components/LoadingScreen';
 import {
   Box,
@@ -81,11 +80,6 @@ export default function AdminWorkshopsPage() {
           schedule: workshop.schedule || '',
           location: workshop.location,
           image_url: workshop.imageUrl,
-          requirements: workshop.requirements,
-          materials: workshop.materials,
-          target_audience: workshop.targetAudience,
-          difficulty_level: workshop.difficultyLevel,
-          price: workshop.price,
           is_active: workshop.isActive,
           is_featured: workshop.isFeatured,
           created_at: workshop.createdAt,

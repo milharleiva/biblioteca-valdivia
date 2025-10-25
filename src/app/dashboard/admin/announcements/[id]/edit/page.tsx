@@ -47,15 +47,25 @@ export default function EditAnnouncementPage() {
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState('');
 
-  const supabase = createClient();
+  const [supabase, setSupabase] = useState<any>(null);
 
   useEffect(() => {
-    if (profile?.role === 'admin' && announcementId) {
+    // Only create Supabase client on the client side
+    if (typeof window !== 'undefined') {
+      const client = createClient();
+      setSupabase(client);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (profile?.role === 'admin' && announcementId && supabase) {
       fetchAnnouncement();
     }
-  }, [profile, announcementId]);
+  }, [profile, announcementId, supabase]);
 
   const fetchAnnouncement = async () => {
+    if (!supabase) return;
+
     try {
       const { data, error } = await supabase
         .from('announcements')

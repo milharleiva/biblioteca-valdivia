@@ -32,7 +32,10 @@ export default function BuscarLibros() {
     setBooks([]);
 
     try {
-      const response = await fetch('/api/scrape-books', {
+      const startTime = Date.now();
+
+      // Usar nueva API con caché
+      const response = await fetch('/api/books/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,6 +48,17 @@ export default function BuscarLibros() {
       }
 
       const data = await response.json();
+      const responseTime = Date.now() - startTime;
+
+      // Log para depuración
+      console.log('📊 Búsqueda completada:', {
+        term: searchTerm,
+        source: data.source,
+        cacheHit: data.cacheHit,
+        books: data.books?.length || 0,
+        responseTime: data.cacheHit ? `${responseTime}ms (caché)` : data.responseTime
+      });
+
       setBooks(data.books || []);
     } catch (err) {
       setError('Error al realizar la búsqueda. Intenta de nuevo.');
