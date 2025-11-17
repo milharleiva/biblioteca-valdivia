@@ -30,8 +30,7 @@ import {
   Description,
   Groups,
   PhotoCamera,
-  Category,
-  School
+  Category
 } from '@mui/icons-material';
 import { MotionDiv } from '@/components/MotionWrapper';
 import Link from 'next/link';
@@ -74,7 +73,6 @@ export default function EditWorkshopPage() {
     endDate: '',
     endTime: '17:00',
     location: '',
-    imageUrl: '',
     imageFile: null as File | null,
     isActive: true
   });
@@ -132,7 +130,7 @@ export default function EditWorkshopPage() {
           endDate: endDate,
           endTime: endTime,
           location: data.location || '',
-          imageUrl: data.imageUrl || '',
+          imageFile: null,
           isActive: data.isActive ?? true
         });
       } else {
@@ -173,13 +171,11 @@ export default function EditWorkshopPage() {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData(prev => ({
-        ...prev,
-        imageFile: file
-      }));
-    }
+    const file = e.target.files?.[0] || null;
+    setFormData(prev => ({
+      ...prev,
+      imageFile: file
+    }));
   };
 
 
@@ -216,8 +212,8 @@ export default function EditWorkshopPage() {
 
     try {
       // Upload image if provided
-      let imageUrl = formData.imageUrl; // Keep existing image URL as default
-      if (formData.imageFile) {
+      let imageUrl = '';
+      if (formData.imageFile && supabase) {
         const fileExt = formData.imageFile.name.split('.').pop();
         const fileName = `workshop-${Date.now()}.${fileExt}`;
 
@@ -402,46 +398,22 @@ export default function EditWorkshopPage() {
                   />
                 </Box>
 
-                <TextField
-                  fullWidth
-                  label="Biografía del Instructor (opcional)"
-                  value={formData.instructorBio}
-                  onChange={handleChange('instructorBio')}
-                  multiline
-                  rows={2}
-                  placeholder="Breve descripción del instructor..."
-                />
 
-                <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
-                  <FormControl fullWidth>
-                    <InputLabel>Categoría</InputLabel>
-                    <Select
-                      value={formData.category}
-                      onChange={handleSelectChange('category')}
-                      startAdornment={<Category sx={{ mr: 1, color: 'action.active' }} />}
-                    >
-                      <MenuItem value="general">General</MenuItem>
-                      <MenuItem value="tecnologia">Tecnología</MenuItem>
-                      <MenuItem value="arte">Arte</MenuItem>
-                      <MenuItem value="literatura">Literatura</MenuItem>
-                      <MenuItem value="educacion">Educación</MenuItem>
-                      <MenuItem value="cultura">Cultura</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  <FormControl fullWidth>
-                    <InputLabel>Nivel de Dificultad</InputLabel>
-                    <Select
-                      value={formData.difficultyLevel}
-                      onChange={handleSelectChange('difficultyLevel')}
-                      startAdornment={<School sx={{ mr: 1, color: 'action.active' }} />}
-                    >
-                      <MenuItem value="principiante">Principiante</MenuItem>
-                      <MenuItem value="intermedio">Intermedio</MenuItem>
-                      <MenuItem value="avanzado">Avanzado</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
+                <FormControl fullWidth>
+                  <InputLabel>Categoría</InputLabel>
+                  <Select
+                    value={formData.category}
+                    onChange={handleSelectChange('category')}
+                    startAdornment={<Category sx={{ mr: 1, color: 'action.active' }} />}
+                  >
+                    <MenuItem value="general">General</MenuItem>
+                    <MenuItem value="tecnologia">Tecnología</MenuItem>
+                    <MenuItem value="arte">Arte</MenuItem>
+                    <MenuItem value="literatura">Literatura</MenuItem>
+                    <MenuItem value="educacion">Educación</MenuItem>
+                    <MenuItem value="cultura">Cultura</MenuItem>
+                  </Select>
+                </FormControl>
 
                 {/* Fechas */}
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, mb: 3 }}>
@@ -512,6 +484,7 @@ export default function EditWorkshopPage() {
                       startAdornment: <LocationOn sx={{ mr: 1, color: 'action.active' }} />
                     }}
                   />
+
                 </Box>
 
                 {/* Imagen Upload */}
@@ -539,41 +512,9 @@ export default function EditWorkshopPage() {
                         {formData.imageFile.name}
                       </Typography>
                     )}
-                    {!formData.imageFile && formData.imageUrl && (
-                      <Typography variant="body2" color="info.main">
-                        Imagen actual cargada
-                      </Typography>
-                    )}
                   </Box>
                 </Box>
 
-                <TextField
-                  fullWidth
-                  label="Requisitos (opcional)"
-                  value={formData.requirements}
-                  onChange={handleChange('requirements')}
-                  multiline
-                  rows={3}
-                  placeholder="Ej: Traer cuaderno y lápiz, conocimientos básicos..."
-                />
-
-                <TextField
-                  fullWidth
-                  label="Materiales (opcional)"
-                  value={formData.materials}
-                  onChange={handleChange('materials')}
-                  multiline
-                  rows={2}
-                  placeholder="Materiales que se proporcionarán..."
-                />
-
-                <TextField
-                  fullWidth
-                  label="Audiencia Objetivo (opcional)"
-                  value={formData.targetAudience}
-                  onChange={handleChange('targetAudience')}
-                  placeholder="Ej: Adultos mayores, jóvenes, principiantes..."
-                />
 
                 <FormControlLabel
                   control={
