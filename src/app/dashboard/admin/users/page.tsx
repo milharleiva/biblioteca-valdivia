@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { createClient } from '@/lib/supabase/client';
 import LoadingScreen from '@/components/LoadingScreen';
 import {
   Box,
@@ -80,16 +79,6 @@ export default function AdminUsersPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const [supabase, setSupabase] = useState<any>(null);
-
-  useEffect(() => {
-    // Only create Supabase client on the client side
-    if (typeof window !== 'undefined') {
-      const client = createClient();
-      setSupabase(client);
-    }
-  }, []);
-
   const fetchUsers = async (showLoading = true) => {
     try {
       if (showLoading) {
@@ -149,36 +138,36 @@ export default function AdminUsersPage() {
   };
 
   const handleDelete = async () => {
-    if (!deleteDialog.user || !supabase) return;
+    if (!deleteDialog.user) return;
 
     try {
-      // First delete the user profile
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .delete()
-        .eq('user_id', deleteDialog.user.userId);
+      console.log('Deleting user:', deleteDialog.user.userId);
 
-      if (profileError) {
-        setError('Error al eliminar el perfil del usuario');
-        console.error('Error deleting user profile:', profileError);
-        return;
+      const response = await fetch(`/api/admin/users?userId=${deleteDialog.user.userId}`, {
+        method: 'DELETE'
+      });
+
+      const result = await response.json();
+      console.log('Delete response:', result);
+
+      if (response.ok && result.success) {
+        setSuccess('Usuario eliminado exitosamente');
+        fetchUsers(); // Refresh the list
+        setDeleteDialog({ open: false, user: null });
+        setError(''); // Clear any previous errors
+      } else {
+        const errorMessage = result.error || `Error ${response.status}: ${response.statusText}`;
+        setError('Error al eliminar el usuario: ' + errorMessage);
+        console.error('API error:', result);
+
+        // Show details if available
+        if (result.details) {
+          console.error('Error details:', result.details);
+        }
       }
-
-      // Then delete the auth user (this requires service role key)
-      const { error: authError } = await supabase.auth.admin.deleteUser(deleteDialog.user.userId);
-
-      if (authError) {
-        setError('Error al eliminar la cuenta del usuario');
-        console.error('Error deleting auth user:', authError);
-        return;
-      }
-
-      setSuccess('Usuario eliminado exitosamente');
-      fetchUsers(); // Refresh the list
-      setDeleteDialog({ open: false, user: null });
     } catch (error) {
-      setError('Error inesperado al eliminar el usuario');
-      console.error('Error:', error);
+      setError('Error inesperado al eliminar el usuario: ' + (error instanceof Error ? error.message : 'Error desconocido'));
+      console.error('Unexpected error:', error);
     }
   };
 
