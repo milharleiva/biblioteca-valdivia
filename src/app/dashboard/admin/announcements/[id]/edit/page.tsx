@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { createClient } from '@/lib/supabase/client';
 import { useRouter, useParams } from 'next/navigation';
 import {
   Box,
@@ -47,44 +46,30 @@ export default function EditAnnouncementPage() {
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState('');
 
-  const [supabase, setSupabase] = useState<any>(null);
-
   useEffect(() => {
-    // Only create Supabase client on the client side
-    if (typeof window !== 'undefined') {
-      const client = createClient();
-      setSupabase(client);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (profile?.role === 'admin' && announcementId && supabase) {
+    if (profile?.role === 'admin' && announcementId) {
       fetchAnnouncement();
     }
-  }, [profile, announcementId, supabase]);
+  }, [profile, announcementId]);
 
   const fetchAnnouncement = async () => {
-    if (!supabase) return;
-
     try {
-      const { data, error } = await supabase
-        .from('announcements')
-        .select('*')
-        .eq('id', announcementId)
-        .single();
+      const response = await fetch(`/api/announcements?id=${announcementId}`);
+      const result = await response.json();
 
-      if (error) {
+      if (!response.ok || !result.success) {
         setError('Error al cargar el anuncio');
-        console.error('Error fetching announcement:', error);
-      } else if (data) {
+        console.error('Error fetching announcement:', result.error);
+      } else if (result.data) {
+        const data = result.data;
         setFormData({
-          title: data.title,
-          content: data.content,
-          type: data.type,
-          priority: data.priority,
-          is_active: data.is_active,
-          start_date: new Date(data.start_date).toISOString().slice(0, 10),
-          end_date: data.end_date ? new Date(data.end_date).toISOString().slice(0, 10) : ''
+          title: data.title || '',
+          content: data.content || '',
+          type: data.type ? data.type.toLowerCase() : 'general',
+          priority: data.priority || 1,
+          is_active: data.isActive ?? true,
+          start_date: data.startDate ? new Date(data.startDate).toISOString().slice(0, 10) : '',
+          end_date: data.endDate ? new Date(data.endDate).toISOString().slice(0, 10) : ''
         });
       }
     } catch (error) {
@@ -108,19 +93,29 @@ export default function EditAnnouncementPage() {
 
     try {
       const updateData = {
-        ...formData,
-        end_date: formData.end_date || null,
-        updated_at: new Date().toISOString()
+        id: announcementId,
+        title: formData.title,
+        content: formData.content,
+        type: formData.type,
+        priority: formData.priority,
+        is_active: formData.is_active,
+        start_date: formData.start_date,
+        end_date: formData.end_date || null
       };
 
-      const { error } = await supabase
-        .from('announcements')
-        .update(updateData)
-        .eq('id', announcementId);
+      const response = await fetch('/api/announcements', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
 
-      if (error) {
-        setError('Error al actualizar el anuncio');
-        console.error('Error updating announcement:', error);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        setError(result.error || 'Error al actualizar el anuncio');
+        console.error('Error updating announcement:', result.error);
       } else {
         router.push('/dashboard/admin/announcements');
       }
