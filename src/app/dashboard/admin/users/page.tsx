@@ -186,6 +186,17 @@ export default function AdminUsersPage() {
     if (!editDialog.user) return;
 
     try {
+      // Validate required fields
+      if (!editFormData.name || editFormData.name.trim() === '') {
+        setError('El nombre es obligatorio');
+        return;
+      }
+
+      console.log('Updating user with data:', {
+        userId: editDialog.user.userId,
+        ...editFormData
+      });
+
       const response = await fetch('/api/admin/users', {
         method: 'PUT',
         headers: {
@@ -198,6 +209,7 @@ export default function AdminUsersPage() {
       });
 
       const result = await response.json();
+      console.log('Update response:', result);
 
       if (response.ok && result.success) {
         setSuccess('Usuario actualizado exitosamente');
@@ -205,24 +217,44 @@ export default function AdminUsersPage() {
         setEditDialog({ open: false, user: null });
         setError(''); // Clear any previous errors
       } else {
-        setError('Error al actualizar el usuario: ' + (result.error || 'Error desconocido'));
+        const errorMessage = result.error || `Error ${response.status}: ${response.statusText}`;
+        setError('Error al actualizar el usuario: ' + errorMessage);
         console.error('API error:', result);
+
+        // Show details if available
+        if (result.details) {
+          console.error('Error details:', result.details);
+        }
       }
     } catch (error) {
-      setError('Error inesperado al actualizar el usuario');
-      console.error('Error:', error);
+      setError('Error inesperado al actualizar el usuario: ' + (error instanceof Error ? error.message : 'Error desconocido'));
+      console.error('Unexpected error:', error);
     }
   };
 
   const openEditDialog = (user: UserProfile) => {
+    // Format birth date properly for date input
+    let formattedBirthDate = '';
+    if (user.birthDate) {
+      try {
+        const date = new Date(user.birthDate);
+        if (!isNaN(date.getTime())) {
+          formattedBirthDate = date.toISOString().split('T')[0];
+        }
+      } catch (error) {
+        console.error('Error formatting birth date:', error);
+      }
+    }
+
     setEditFormData({
       name: user.name || '',
       phone: user.phone || '',
       address: user.address || '',
-      birth_date: user.birthDate || '',
+      birth_date: formattedBirthDate,
       role: user.role
     });
     setEditDialog({ open: true, user });
+    setError(''); // Clear any previous errors
   };
 
   useEffect(() => {

@@ -45,15 +45,42 @@ export async function PUT(request: NextRequest) {
     }
 
     // Convert birth_date to proper format if provided
-    const updateData: any = {
-      name,
-      phone,
-      address,
-      role
-    };
+    const updateData: any = {};
 
-    if (birth_date) {
-      updateData.birthDate = new Date(birth_date);
+    // Only include fields that are provided and not empty
+    if (name !== undefined && name !== null) {
+      updateData.name = name;
+    }
+    if (phone !== undefined && phone !== null) {
+      updateData.phone = phone || null; // Convert empty string to null
+    }
+    if (address !== undefined && address !== null) {
+      updateData.address = address || null; // Convert empty string to null
+    }
+    if (role !== undefined && role !== null) {
+      updateData.role = role;
+    }
+
+    // Handle birth_date specially - only update if provided and valid
+    if (birth_date && birth_date.trim() !== '') {
+      try {
+        updateData.birthDate = new Date(birth_date);
+        // Verify the date is valid
+        if (isNaN(updateData.birthDate.getTime())) {
+          return NextResponse.json(
+            { success: false, error: 'Fecha de nacimiento inválida' },
+            { status: 400 }
+          );
+        }
+      } catch (error) {
+        return NextResponse.json(
+          { success: false, error: 'Formato de fecha de nacimiento inválido' },
+          { status: 400 }
+        );
+      }
+    } else if (birth_date === '') {
+      // If explicitly set to empty string, set to null
+      updateData.birthDate = null;
     }
 
     const updatedUser = await prisma.userProfile.update({
