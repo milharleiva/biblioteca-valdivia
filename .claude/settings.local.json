@@ -35,7 +35,8 @@
       "Bash(git push:*)",
       "Bash(del test-cache.js check-cache.js)",
       "Bash(grep:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(dir public)"
     ],
     "deny": [],
     "ask": []

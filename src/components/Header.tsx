@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -137,19 +138,33 @@ export function Header() {
             {/* Logo and title */}
             <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 2 } }}>
-                {/* Icon - Always visible */}
-                <IconButton
+                {/* Logo - Always visible */}
+                <Box
                   sx={{
-                    bgcolor: 'primary.main',
-                    color: 'white',
-                    '&:hover': { bgcolor: 'primary.dark' },
                     width: { xs: 36, md: 48 },
-                    height: { xs: 36, md: 48 }
+                    height: { xs: 36, md: 48 },
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    '&:hover': {
+                      transform: 'scale(1.05)',
+                      transition: 'transform 0.3s ease'
+                    }
                   }}
-                  size="medium"
                 >
-                  <MenuBook sx={{ fontSize: { xs: 20, md: 32 } }} />
-                </IconButton>
+                  <Image
+                    src="/logo.jpg"
+                    alt="Logo Biblioteca Municipal de Valdivia"
+                    width={48}
+                    height={48}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                </Box>
                 {/* Title - Always visible */}
                 <Box sx={{ minWidth: 0 }}>
                   <Typography
@@ -348,7 +363,26 @@ export function Header() {
         <Box sx={{ p: 3, bgcolor: 'primary.main', color: 'white' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <MenuBook />
+              <Box
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  overflow: 'hidden'
+                }}
+              >
+                <Image
+                  src="/logo.jpg"
+                  alt="Logo Biblioteca Municipal de Valdivia"
+                  width={32}
+                  height={32}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
+              </Box>
               <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>
                 Biblioteca Municipal de Valdivia
               </Typography>

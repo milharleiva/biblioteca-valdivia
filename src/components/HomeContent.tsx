@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import {
@@ -496,6 +497,115 @@ export default function HomeContent() {
             </MotionDiv>
           </Container>
         )}
+
+        {/* Gallery Section */}
+        <Box sx={{ bgcolor: 'grey.100', py: 8 }}>
+          <Container maxWidth="xl" sx={{ width: '100%', maxWidth: '100vw', px: { xs: 2, sm: 3 } }}>
+            <MotionDiv
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 6, textAlign: 'center', color: 'text.primary' }}>
+                Conoce Nuestro Espacio
+              </Typography>
+
+              <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  sm: 'repeat(2, 1fr)',
+                  md: 'repeat(3, 1fr)'
+                },
+                gap: { xs: 2, sm: 3, md: 4 },
+                mb: 4
+              }}>
+                {[
+                  { src: '/foto1.jpg', title: 'Área de Lectura' },
+                  { src: '/foto2.jpg', title: 'Sala de Estudio' },
+                  { src: '/foto3.jpg', title: 'Zona Infantil' }
+                ].map((photo, index) => (
+                  <MotionDiv
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.2, duration: 0.5 }}
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    viewport={{ once: true }}
+                  >
+                    <Paper
+                      elevation={4}
+                      sx={{
+                        overflow: 'hidden',
+                        borderRadius: 3,
+                        '&:hover': {
+                          elevation: 12,
+                          transition: 'all 0.3s ease-in-out'
+                        }
+                      }}
+                    >
+                      <Box sx={{ position: 'relative', height: { xs: 200, sm: 250, md: 300 } }}>
+                        <Image
+                          src={photo.src}
+                          alt={photo.title}
+                          fill
+                          style={{
+                            objectFit: 'cover'
+                          }}
+                        />
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                            p: 3,
+                            color: 'white'
+                          }}
+                        >
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              fontWeight: 'bold',
+                              textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
+                            }}
+                          >
+                            {photo.title}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Paper>
+                  </MotionDiv>
+                ))}
+              </Box>
+
+              <MotionDiv
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+                viewport={{ once: true }}
+              >
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{
+                      maxWidth: '600px',
+                      mx: 'auto',
+                      lineHeight: 1.6,
+                      fontSize: { xs: '1rem', md: '1.1rem' }
+                    }}
+                  >
+                    Un ambiente moderno y acogedor diseñado para el aprendizaje, la lectura y el encuentro comunitario.
+                    Nuestros espacios están pensados para brindar comodidad y fomentar el amor por la lectura.
+                  </Typography>
+                </Box>
+              </MotionDiv>
+            </MotionDiv>
+          </Container>
+        </Box>
 
         {/* Featured Workshops Section */}
         <Container maxWidth="xl" sx={{ py: 6, width: '100%', maxWidth: '100vw', px: { xs: 2, sm: 3 } }}>
