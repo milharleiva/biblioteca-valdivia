@@ -522,9 +522,9 @@ export default function HomeContent() {
                 mb: 4
               }}>
                 {[
-                  { src: '/foto1.jpg', title: 'Área de Lectura' },
-                  { src: '/foto2.jpg', title: 'Sala de Estudio' },
-                  { src: '/foto3.jpg', title: 'Zona Infantil' }
+                  { src: '/foto1.jpg', title: 'Fachada Principal' },
+                  { src: '/foto2.jpg', title: 'Vista Lateral' },
+                  { src: '/foto3.jpg', title: 'Vista General' }
                 ].map((photo, index) => (
                   <MotionDiv
                     key={index}
@@ -598,8 +598,8 @@ export default function HomeContent() {
                       fontSize: { xs: '1rem', md: '1.1rem' }
                     }}
                   >
-                    Un ambiente moderno y acogedor diseñado para el aprendizaje, la lectura y el encuentro comunitario.
-                    Nuestros espacios están pensados para brindar comodidad y fomentar el amor por la lectura.
+                    Un hermoso edificio histórico en el corazón de Valdivia que alberga nuestra biblioteca.
+                    Su arquitectura tradicional refleja la rica historia cultural de nuestra ciudad.
                   </Typography>
                 </Box>
               </MotionDiv>
