@@ -93,45 +93,6 @@ export function Header() {
         maxWidth: '100vw',
         overflowX: 'hidden'
       }}>
-        {/* Top info bar */}
-        <Box sx={{ bgcolor: '#f8f9fa', borderBottom: '1px solid #e0e0e0' }}>
-          <Container maxWidth="xl" sx={{ width: '100%', maxWidth: '100vw', px: { xs: 2, sm: 3 } }}>
-            <Box sx={{
-              display: 'flex',
-              justifyContent: { xs: 'center', md: 'space-between' },
-              alignItems: 'center',
-              py: { xs: 0.5, md: 1 },
-              flexDirection: { xs: 'column', md: 'row' },
-              gap: { xs: 1, md: 0 }
-            }}>
-              <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Phone sx={{ fontSize: 16, color: 'text.secondary' }} />
-                  <Typography variant="body2" color="text.secondary">(63) 221 7351</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Email sx={{ fontSize: 16, color: 'text.secondary' }} />
-                  <Typography variant="body2" color="text.secondary">biblioteca@valdivia.cl</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <AccessTime sx={{ fontSize: 16, color: 'text.secondary' }} />
-                  <Typography variant="body2" color="text.secondary">Lun-Vie 9:00-18:00</Typography>
-                </Box>
-              </Box>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{
-                  fontSize: { xs: '0.7rem', md: '0.75rem' },
-                  textAlign: 'center'
-                }}
-              >
-                Gobierno de Chile - Municipalidad de Valdivia
-              </Typography>
-            </Box>
-          </Container>
-        </Box>
-
         {/* Main header */}
         <Container maxWidth="xl" sx={{ width: '100%', maxWidth: '100vw', px: { xs: 2, sm: 3 } }}>
           <Toolbar sx={{ justifyContent: 'space-between', py: 2, px: { xs: 1, sm: 2 } }}>
