@@ -141,23 +141,25 @@ export function Header() {
                 {/* Logo - Always visible */}
                 <Box
                   sx={{
-                    width: { xs: 36, md: 48 },
-                    height: { xs: 36, md: 48 },
+                    width: { xs: 48, sm: 56, md: 64 },
+                    height: { xs: 48, sm: 56, md: 64 },
                     borderRadius: '50%',
                     overflow: 'hidden',
-                    border: '2px solid',
+                    border: '3px solid',
                     borderColor: 'primary.main',
+                    boxShadow: 2,
                     '&:hover': {
                       transform: 'scale(1.05)',
-                      transition: 'transform 0.3s ease'
+                      transition: 'transform 0.3s ease',
+                      boxShadow: 4
                     }
                   }}
                 >
                   <Image
                     src="/logo.jpg"
                     alt="Logo Biblioteca Municipal de Valdivia"
-                    width={48}
-                    height={48}
+                    width={64}
+                    height={64}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -365,17 +367,19 @@ export function Header() {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Box
                 sx={{
-                  width: 32,
-                  height: 32,
+                  width: 40,
+                  height: 40,
                   borderRadius: '50%',
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  border: '2px solid white',
+                  boxShadow: 1
                 }}
               >
                 <Image
                   src="/logo.jpg"
                   alt="Logo Biblioteca Municipal de Valdivia"
-                  width={32}
-                  height={32}
+                  width={40}
+                  height={40}
                   style={{
                     width: '100%',
                     height: '100%',
