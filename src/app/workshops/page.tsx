@@ -179,7 +179,7 @@ export default function WorkshopsPage() {
       <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5', py: 4 }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, color: 'text.primary' }}>
               Talleres Disponibles
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
@@ -252,7 +252,7 @@ export default function WorkshopsPage() {
             >
               Volver al Inicio
             </Button>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1, color: 'text.primary' }}>
               Talleres Disponibles
             </Typography>
             <Typography variant="body1" color="text.secondary">
