@@ -72,50 +72,65 @@ export async function searchInCache(searchTerm: string): Promise<CachedBook[]> {
         orderBy: { cachedAt: 'desc' }
       });
 
-      // Aplicar el mismo algoritmo de relevancia que en la búsqueda externa
+      // Aplicar el mismo algoritmo ESTRICTO de relevancia que en la búsqueda externa
       const relevantBooks = allCachedBooks.filter(book => {
         const titleNormalized = normalizeText(book.title);
         const authorNormalized = normalizeText(book.author);
 
-        // Usar mismo sistema de scoring
         let relevanceScore = 0;
+        let hasExactMatch = false;
 
-        // Coincidencia exacta del término completo
+        // 1. PRIORIDAD MÁXIMA: Coincidencia exacta del término completo
         if (titleNormalized.includes(normalizedSearchTerm)) {
           relevanceScore += 100;
+          hasExactMatch = true;
         }
         if (authorNormalized.includes(normalizedSearchTerm)) {
           relevanceScore += 80;
+          hasExactMatch = true;
         }
         if (titleNormalized.startsWith(normalizedSearchTerm)) {
           relevanceScore += 90;
+          hasExactMatch = true;
         }
 
-        // Solo usar palabras individuales si no hay coincidencia exacta
-        if (relevanceScore === 0) {
-          const searchWords = normalizedSearchTerm.split(' ').filter(word => word.length >= 3);
-          let wordMatches = 0;
+        // 3. SOLO SI NO HAY COINCIDENCIA EXACTA: buscar por palabras (MUY ESTRICTO)
+        if (!hasExactMatch) {
+          const searchWords = normalizedSearchTerm.split(' ').filter(word => word.length > 0);
+          const significantWords = searchWords.filter(word => normalizeText(word).length >= 3);
 
-          for (const word of searchWords) {
-            const normalizedWord = normalizeText(word);
-            if (titleNormalized.includes(normalizedWord)) {
-              wordMatches++;
-              relevanceScore += 15;
-            }
-            if (authorNormalized.includes(normalizedWord)) {
-              wordMatches++;
-              relevanceScore += 10;
-            }
-          }
+          if (significantWords.length === 0) {
+            relevanceScore = 0;
+          } else {
+            let titleWordMatches = 0;
+            let authorWordMatches = 0;
 
-          // Bonificación por mayoría de palabras
-          if (wordMatches >= searchWords.length * 0.7) {
-            relevanceScore += 20;
+            for (const word of significantWords) {
+              const normalizedWord = normalizeText(word);
+              if (titleNormalized.includes(normalizedWord)) {
+                titleWordMatches++;
+                relevanceScore += 15;
+              }
+              if (authorNormalized.includes(normalizedWord)) {
+                authorWordMatches++;
+                relevanceScore += 10;
+              }
+            }
+
+            const totalWordsMatched = titleWordMatches + authorWordMatches;
+            const requiredMatches = Math.ceil(significantWords.length * 0.8); // 80% requerido
+
+            // FILTRO ESTRICTO: Requiere al menos 80% de palabras
+            if (totalWordsMatched < requiredMatches) {
+              relevanceScore = 0;
+            } else if (totalWordsMatched >= significantWords.length) {
+              relevanceScore += 30; // Bonificación por todas las palabras
+            }
           }
         }
 
-        // Solo incluir libros con relevancia significativa
-        return relevanceScore >= 10;
+        // UMBRAL MÁS ALTO: Solo libros muy relevantes
+        return relevanceScore >= 25;
       });
 
       cachedBooks = relevantBooks.slice(0, 40);

@@ -194,57 +194,74 @@ export async function POST(request: NextRequest) {
         console.log(`  📝 Título normalizado: "${titleNormalized}"`);
         console.log(`  👤 Autor normalizado: "${authorNormalized}"`);
 
-        // Calcular relevancia del libro
+        // Calcular relevancia del libro - ALGORITMO MÁS ESTRICTO
         let relevanceScore = 0;
         let matchDetails = [];
+        let hasExactMatch = false;
 
-        // 1. Coincidencia exacta del término completo (máxima prioridad)
+        // 1. PRIORIDAD MÁXIMA: Coincidencia exacta del término completo
         if (titleNormalized.includes(searchTermNormalized)) {
           relevanceScore += 100;
           matchDetails.push('título exacto');
+          hasExactMatch = true;
         }
         if (authorNormalized.includes(searchTermNormalized)) {
           relevanceScore += 80;
           matchDetails.push('autor exacto');
+          hasExactMatch = true;
         }
 
-        // 2. Coincidencia exacta de título que comience con el término
+        // 2. SEGUNDA PRIORIDAD: Título que comience con el término
         if (titleNormalized.startsWith(searchTermNormalized)) {
           relevanceScore += 90;
           matchDetails.push('título comienza');
+          hasExactMatch = true;
         }
 
-        // 3. Solo si no hay coincidencia exacta, buscar por palabras individuales
-        if (relevanceScore === 0 && searchWords.length > 1) {
-          let wordMatches = 0;
-          const totalWords = searchWords.length;
+        // 3. SOLO SI NO HAY COINCIDENCIA EXACTA: buscar por palabras (MUY ESTRICTO)
+        if (!hasExactMatch) {
+          let titleWordMatches = 0;
+          let authorWordMatches = 0;
+          const significantWords = searchWords.filter(word => normalizeText(word).length >= 3);
 
-          for (const word of searchWords) {
-            const normalizedWord = normalizeText(word);
-            if (normalizedWord.length < 3) continue; // Ignorar palabras muy cortas
+          // Si no hay palabras significativas, rechazar
+          if (significantWords.length === 0) {
+            relevanceScore = 0;
+          } else {
+            for (const word of significantWords) {
+              const normalizedWord = normalizeText(word);
 
-            if (titleNormalized.includes(normalizedWord)) {
-              wordMatches++;
-              relevanceScore += 15;
-              matchDetails.push(`palabra "${normalizedWord}" en título`);
+              // Contar matches en título y autor por separado
+              if (titleNormalized.includes(normalizedWord)) {
+                titleWordMatches++;
+                relevanceScore += 15;
+                matchDetails.push(`"${normalizedWord}" en título`);
+              }
+              if (authorNormalized.includes(normalizedWord)) {
+                authorWordMatches++;
+                relevanceScore += 10;
+                matchDetails.push(`"${normalizedWord}" en autor`);
+              }
             }
-            if (authorNormalized.includes(normalizedWord)) {
-              wordMatches++;
-              relevanceScore += 10;
-              matchDetails.push(`palabra "${normalizedWord}" en autor`);
-            }
-          }
 
-          // Bonificación por tener la mayoría de palabras
-          if (wordMatches >= totalWords * 0.7) {
-            relevanceScore += 20;
-            matchDetails.push('mayoría de palabras');
+            const totalWordsMatched = titleWordMatches + authorWordMatches;
+            const requiredMatches = Math.ceil(significantWords.length * 0.8); // 80% de palabras requeridas
+
+            // FILTRO ESTRICTO: Requiere al menos 80% de palabras significativas
+            if (totalWordsMatched < requiredMatches) {
+              console.log(`  ❌ FILTRO ESTRICTO: Solo ${totalWordsMatched}/${significantWords.length} palabras coinciden (requiere ${requiredMatches})`);
+              relevanceScore = 0;
+            } else if (totalWordsMatched >= significantWords.length) {
+              // Bonificación por todas las palabras
+              relevanceScore += 30;
+              matchDetails.push('todas las palabras');
+            }
           }
         }
 
-        // 4. Solo incluir libros con relevancia significativa
-        if (relevanceScore < 10) {
-          console.log(`  ❌ SALTANDO: "${rawBook.title}" - relevancia muy baja (${relevanceScore})`);
+        // 4. UMBRAL MÁS ALTO: Solo incluir libros muy relevantes
+        if (relevanceScore < 25) {
+          console.log(`  ❌ SALTANDO: "${rawBook.title}" - relevancia insuficiente (${relevanceScore} < 25)`);
           continue;
         }
 
