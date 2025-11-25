@@ -147,7 +147,7 @@ export default function AdminUsersPage() {
         method: 'DELETE'
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({ error: 'Invalid server response' }));
       console.log('Delete response:', result);
 
       if (response.ok && result.success) {
@@ -197,7 +197,7 @@ export default function AdminUsersPage() {
         })
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({ error: 'Invalid server response' }));
       console.log('Update response:', result);
 
       if (response.ok && result.success) {
