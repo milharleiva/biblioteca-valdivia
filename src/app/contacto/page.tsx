@@ -40,8 +40,8 @@ export default function Contacto() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Dirección</h3>
                   <p className="text-gray-600">
-                    Avenida Los Robles N°4<br />
-                    Isla Teja, Valdivia<br />
+                    Av. Ramón Picarte 2102<br />
+                    5100402 Valdivia<br />
                     Los Ríos, Chile
                   </p>
                 </div>
@@ -55,7 +55,7 @@ export default function Contacto() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Teléfono</h3>
                   <p className="text-gray-600">
-                    63 2217351<br />
+                    (63) 221 7351<br />
                     <span className="text-sm">
                       Lun-Vie: 10:00-18:00
                     </span>
@@ -86,10 +86,18 @@ export default function Contacto() {
                     </svg>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Horarios</h3>
-                  <p className="text-gray-600">
-                    Lun-Vie: 10:00-18:00<br />
-                    Domingos: Cerrado
-                  </p>
+                  <div className="text-gray-600">
+                    <p className="font-medium">Horario:</p>
+                    <ul className="mt-2 space-y-1 text-sm">
+                      <li>Lunes: 10:00–18:00</li>
+                      <li>Martes: 10:00–18:00</li>
+                      <li>Miércoles: 10:00–18:00</li>
+                      <li>Jueves: 10:00–18:00</li>
+                      <li>Viernes: 10:00–18:00</li>
+                      <li>Sábado: Cerrado</li>
+                      <li>Domingo: Cerrado</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
@@ -140,7 +148,7 @@ export default function Contacto() {
                         <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
-                        Llamar directamente al 63 2217351
+                        Llamar directamente al (63) 221 7351
                       </li>
                       <li className="flex items-center">
                         <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -210,57 +218,10 @@ export default function Contacto() {
                 ></iframe>
               </div>
 
-              {/* Instrucciones */}
-              <div className="space-y-6">
-                <div className="bg-blue-50 p-6 rounded-xl">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                    🚌 Transporte Público
-                  </h3>
-                  <ul className="space-y-2 text-gray-700">
-                    <li>• Líneas de micro: 1, 7, 12, 20</li>
-                    <li>• Parada más cercana: &quot;Picarte con Independencia&quot;</li>
-                    <li>• Distancia desde terminal: 1.2 km (15 min caminando)</li>
-                  </ul>
-                </div>
-
-                <div className="bg-green-50 p-6 rounded-xl">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                    🚗 En Automóvil
-                  </h3>
-                  <ul className="space-y-2 text-gray-700">
-                    <li>• Estacionamiento gratuito en la calle</li>
-                    <li>• Estacionamiento Subterráneo Mall Paseo Valdivia (200m)</li>
-                    <li>• Zona de carga y descarga para personas con movilidad reducida</li>
-                  </ul>
-                </div>
-
-                <div className="bg-yellow-50 p-6 rounded-xl">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                    🚶‍♂️ Puntos de Referencia
-                  </h3>
-                  <ul className="space-y-2 text-gray-700">
-                    <li>• Frente al Parque Saval</li>
-                    <li>• A 2 cuadras de la Plaza de la República</li>
-                    <li>• Cerca del Mercado Fluvial (400m)</li>
-                    <li>• Al lado del Teatro Municipal</li>
-                  </ul>
-                </div>
-
-                <div className="bg-purple-50 p-6 rounded-xl">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                    ♿ Accesibilidad
-                  </h3>
-                  <ul className="space-y-2 text-gray-700">
-                    <li>• Acceso para sillas de ruedas</li>
-                    <li>• Ascensor a todos los pisos</li>
-                    <li>• Baños adaptados</li>
-                    <li>• Señalética en braille</li>
-                  </ul>
-                </div>
-              </div>
             </div>
           </div>
         </section>
+
       </main>
 
       <Footer />
