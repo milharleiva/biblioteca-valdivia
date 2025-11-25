@@ -450,14 +450,10 @@ export default function HomeContent() {
                             color="text.secondary"
                             sx={{
                               flex: 1,
-                              lineHeight: 1.5,
-                              overflow: 'hidden',
-                              display: '-webkit-box',
-                              WebkitLineClamp: 4,
-                              WebkitBoxOrient: 'vertical'
+                              lineHeight: 1.5
                             }}
                           >
-                            {announcement.excerpt || announcement.content.substring(0, 120) + '...'}
+                            {announcement.excerpt || announcement.content}
                           </Typography>
                         </CardContent>
                       </Card>

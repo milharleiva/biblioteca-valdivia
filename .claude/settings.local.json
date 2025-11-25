@@ -36,7 +36,10 @@
       "Bash(del test-cache.js check-cache.js)",
       "Bash(grep:*)",
       "Bash(findstr:*)",
-      "Bash(dir public)"
+      "Bash(dir public)",
+      "WebFetch(domain:bibliotecamunicipalvaldivia.vercel.app)",
+      "WebFetch(domain:www.bibliotecaspublicas.gob.cl)",
+      "WebFetch(domain:localhost)"
     ],
     "deny": [],
     "ask": []
