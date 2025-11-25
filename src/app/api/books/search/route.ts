@@ -188,25 +188,70 @@ export async function POST(request: NextRequest) {
 
         const titleNormalized = normalizeText(rawBook.title);
         const authorNormalized = normalizeText(rawBook.author);
+        const searchTermNormalized = normalizeText(normalizedSearchTerm);
 
-        console.log(`  🔍 Palabras de búsqueda: ${searchWords.join(', ')}`);
+        console.log(`  🔍 Término completo: "${searchTermNormalized}"`);
         console.log(`  📝 Título normalizado: "${titleNormalized}"`);
         console.log(`  👤 Autor normalizado: "${authorNormalized}"`);
 
-        const hasMatch = searchWords.some((word: string) => {
-          const normalizedWord = normalizeText(word);
-          const titleMatch = titleNormalized.includes(normalizedWord);
-          const authorMatch = authorNormalized.includes(normalizedWord);
-          console.log(`    - Palabra "${normalizedWord}": título=${titleMatch}, autor=${authorMatch}`);
-          return titleMatch || authorMatch;
-        });
+        // Calcular relevancia del libro
+        let relevanceScore = 0;
+        let matchDetails = [];
 
-        if (!hasMatch) {
-          console.log(`  ❌ SALTANDO: "${rawBook.title}" no contiene ninguna palabra de "${normalizedSearchTerm}"`);
+        // 1. Coincidencia exacta del término completo (máxima prioridad)
+        if (titleNormalized.includes(searchTermNormalized)) {
+          relevanceScore += 100;
+          matchDetails.push('título exacto');
+        }
+        if (authorNormalized.includes(searchTermNormalized)) {
+          relevanceScore += 80;
+          matchDetails.push('autor exacto');
+        }
+
+        // 2. Coincidencia exacta de título que comience con el término
+        if (titleNormalized.startsWith(searchTermNormalized)) {
+          relevanceScore += 90;
+          matchDetails.push('título comienza');
+        }
+
+        // 3. Solo si no hay coincidencia exacta, buscar por palabras individuales
+        if (relevanceScore === 0 && searchWords.length > 1) {
+          let wordMatches = 0;
+          const totalWords = searchWords.length;
+
+          for (const word of searchWords) {
+            const normalizedWord = normalizeText(word);
+            if (normalizedWord.length < 3) continue; // Ignorar palabras muy cortas
+
+            if (titleNormalized.includes(normalizedWord)) {
+              wordMatches++;
+              relevanceScore += 15;
+              matchDetails.push(`palabra "${normalizedWord}" en título`);
+            }
+            if (authorNormalized.includes(normalizedWord)) {
+              wordMatches++;
+              relevanceScore += 10;
+              matchDetails.push(`palabra "${normalizedWord}" en autor`);
+            }
+          }
+
+          // Bonificación por tener la mayoría de palabras
+          if (wordMatches >= totalWords * 0.7) {
+            relevanceScore += 20;
+            matchDetails.push('mayoría de palabras');
+          }
+        }
+
+        // 4. Solo incluir libros con relevancia significativa
+        if (relevanceScore < 10) {
+          console.log(`  ❌ SALTANDO: "${rawBook.title}" - relevancia muy baja (${relevanceScore})`);
           continue;
         }
 
-        console.log(`  ✅ COINCIDENCIA encontrada en: "${rawBook.title}"`);
+        console.log(`  ✅ RELEVANCIA: ${relevanceScore} - ${matchDetails.join(', ')}`);
+
+        // Guardar el score para ordenamiento posterior
+        (rawBook as any).relevanceScore = relevanceScore;
       }
 
       let detailUrl = '';
@@ -236,7 +281,26 @@ export async function POST(request: NextRequest) {
       console.log(`  ✅ LIBRO AGREGADO: "${rawBook.title}"`);
     }
 
-    const finalBooks = processedBooks.slice(0, 40);
+    // Ordenar libros por relevancia (mayor a menor)
+    const booksWithRelevance = rawBookData.books.filter(book => (book as any).relevanceScore >= 10);
+    booksWithRelevance.sort((a, b) => ((b as any).relevanceScore || 0) - ((a as any).relevanceScore || 0));
+
+    // Recrear processedBooks ordenados por relevancia
+    const orderedProcessedBooks: ProcessedBook[] = [];
+    for (const rawBook of booksWithRelevance) {
+      // Buscar el libro procesado correspondiente
+      const processedBook = processedBooks.find(pb => pb.title === rawBook.title);
+      if (processedBook) {
+        orderedProcessedBooks.push(processedBook);
+      }
+    }
+
+    const finalBooks = orderedProcessedBooks.slice(0, 40);
+
+    console.log(`\n📊 ORDENAMIENTO POR RELEVANCIA:`);
+    booksWithRelevance.slice(0, 5).forEach((book, index) => {
+      console.log(`  ${index + 1}. "${book.title}" - Score: ${(book as any).relevanceScore}`);
+    });
 
     // 3. GUARDAR EN CACHÉ PARA FUTURAS BÚSQUEDAS
     if (finalBooks.length > 0) {

@@ -47,7 +47,7 @@ export async function searchInCache(searchTerm: string): Promise<CachedBook[]> {
   const startCacheQuery = Date.now();
 
   try {
-    // 1. PRIMERO: Búsqueda exacta por searchTerm (más rápida)
+    // 1. PRIMERO: Búsqueda exacta por searchTerm (más rápida y precisa)
     console.log(`   Intentando búsqueda exacta...`);
     let cachedBooks = await prisma.bookCache.findMany({
       where: {
@@ -56,32 +56,70 @@ export async function searchInCache(searchTerm: string): Promise<CachedBook[]> {
           { searchTerm: { equals: normalizedSearchTerm, mode: 'insensitive' } }
         ]
       },
-      orderBy: { lastAccessed: 'desc' },
+      orderBy: { cachedAt: 'desc' }, // Cambio: ordenar por fecha de cache, no por acceso
       take: 40
     });
 
-    // 2. Si no hay coincidencia exacta, búsqueda parcial (más lenta)
+    // 2. Si no hay coincidencia exacta, aplicar filtrado más estricto
     if (cachedBooks.length === 0) {
-      console.log(`   Sin coincidencia exacta, intentando búsqueda parcial...`);
-      const searchWords = normalizedSearchTerm.split(' ').filter(word => word.length > 0);
+      console.log(`   Sin coincidencia exacta, aplicando filtros de relevancia...`);
 
-      // Solo buscar en searchTerm para evitar múltiples OR conditions
-      const orConditions = searchWords.map(word => ({
-        searchTerm: { contains: word, mode: 'insensitive' }
-      }));
-
-      cachedBooks = await prisma.bookCache.findMany({
+      // Obtener todos los libros en caché válidos
+      const allCachedBooks = await prisma.bookCache.findMany({
         where: {
-          AND: [
-            { expiresAt: { gt: now } },
-            {
-              OR: orConditions
-            }
-          ]
+          expiresAt: { gt: now }
         },
-        orderBy: { lastAccessed: 'desc' },
-        take: 40
+        orderBy: { cachedAt: 'desc' }
       });
+
+      // Aplicar el mismo algoritmo de relevancia que en la búsqueda externa
+      const relevantBooks = allCachedBooks.filter(book => {
+        const titleNormalized = normalizeText(book.title);
+        const authorNormalized = normalizeText(book.author);
+
+        // Usar mismo sistema de scoring
+        let relevanceScore = 0;
+
+        // Coincidencia exacta del término completo
+        if (titleNormalized.includes(normalizedSearchTerm)) {
+          relevanceScore += 100;
+        }
+        if (authorNormalized.includes(normalizedSearchTerm)) {
+          relevanceScore += 80;
+        }
+        if (titleNormalized.startsWith(normalizedSearchTerm)) {
+          relevanceScore += 90;
+        }
+
+        // Solo usar palabras individuales si no hay coincidencia exacta
+        if (relevanceScore === 0) {
+          const searchWords = normalizedSearchTerm.split(' ').filter(word => word.length >= 3);
+          let wordMatches = 0;
+
+          for (const word of searchWords) {
+            const normalizedWord = normalizeText(word);
+            if (titleNormalized.includes(normalizedWord)) {
+              wordMatches++;
+              relevanceScore += 15;
+            }
+            if (authorNormalized.includes(normalizedWord)) {
+              wordMatches++;
+              relevanceScore += 10;
+            }
+          }
+
+          // Bonificación por mayoría de palabras
+          if (wordMatches >= searchWords.length * 0.7) {
+            relevanceScore += 20;
+          }
+        }
+
+        // Solo incluir libros con relevancia significativa
+        return relevanceScore >= 10;
+      });
+
+      cachedBooks = relevantBooks.slice(0, 40);
+      console.log(`   Filtrado por relevancia: ${relevantBooks.length} libros relevantes encontrados`);
     }
 
     const cacheQueryTime = Date.now() - startCacheQuery;
