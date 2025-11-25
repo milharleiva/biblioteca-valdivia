@@ -203,12 +203,12 @@ export default function Contacto() {
               Cómo Llegar
             </h2>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 justify-items-center">
               {/* Mapa Interactivo */}
-              <div className="bg-gray-100 rounded-xl overflow-hidden">
+              <div className="bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center w-full">
                 <iframe
+                  className="w-full max-w-3xl"
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2558.6789!2d-73.2333!3d-39.8102!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9615eee7be0c75a7%3A0x5b4e89d635c3b3b3!2sAv.%20Ram%C3%B3n%20Picarte%202102%2C%20Valdivia%2C%20Los%20R%C3%ADos%2C%20Chile!5e0!3m2!1ses!2scl!4v1694798765432!5m2!1ses!2scl"
-                  width="100%"
                   height="400"
                   style={{ border: 0 }}
                   allowFullScreen
