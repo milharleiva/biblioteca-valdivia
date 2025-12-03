@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   Container,
@@ -12,32 +11,21 @@ import {
   Typography,
   Alert,
   Link as MuiLink,
-  IconButton,
   InputAdornment
 } from '@mui/material';
-import { Visibility, VisibilityOff, Email, Lock } from '@mui/icons-material';
+import { Email, ArrowBack } from '@mui/icons-material';
 import Link from 'next/link';
 import { MotionDiv } from '@/components/MotionWrapper';
+import { createClient } from '@/lib/supabase/client';
 
-function LoginForm() {
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [success, setSuccess] = useState(false);
 
-  const { signIn } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') || '/dashboard';
-
-  useEffect(() => {
-    const message = searchParams.get('message');
-    if (message === 'password-updated') {
-      setSuccessMessage('Tu contraseña ha sido actualizada exitosamente. Ya puedes iniciar sesión con tu nueva contraseña.');
-    }
-  }, [searchParams]);
+  const supabase = createClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,11 +33,14 @@ function LoginForm() {
     setError('');
 
     try {
-      const { error: signInError } = await signIn(email, password);
-      if (signInError) {
-        setError('Credenciales inválidas. Por favor verifica tu email y contraseña.');
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+
+      if (resetError) {
+        setError('Ocurrió un error al enviar el correo. Por favor verifica que el email sea correcto.');
       } else {
-        router.push(redirectTo);
+        setSuccess(true);
       }
     } catch {
       setError('Ocurrió un error inesperado. Por favor intenta nuevamente.');
@@ -57,6 +48,55 @@ function LoginForm() {
       setLoading(false);
     }
   };
+
+  if (success) {
+    return (
+      <Box sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #2e7d32 0%, #1976d2 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        py: 4
+      }}>
+        <Container maxWidth="sm">
+          <MotionDiv
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Paper elevation={8} sx={{ p: 4, borderRadius: 3, textAlign: 'center' }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'success.main', mb: 2 }}>
+                ¡Correo Enviado!
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                Te hemos enviado un enlace para restablecer tu contraseña a <strong>{email}</strong>.
+                Revisa tu bandeja de entrada y sigue las instrucciones.
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<ArrowBack />}
+                  onClick={() => router.push('/auth/login')}
+                >
+                  Volver al Login
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    setSuccess(false);
+                    setEmail('');
+                  }}
+                >
+                  Enviar Otro Correo
+                </Button>
+              </Box>
+            </Paper>
+          </MotionDiv>
+        </Container>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{
@@ -76,22 +116,16 @@ function LoginForm() {
           <Paper elevation={8} sx={{ p: 4, borderRadius: 3 }}>
             <Box sx={{ textAlign: 'center', mb: 4 }}>
               <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main', mb: 2 }}>
-                Iniciar Sesión
+                Recuperar Contraseña
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                Accede a tu cuenta en el Sistema de Bibliotecas
+                Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña
               </Typography>
             </Box>
 
             {error && (
               <Alert severity="error" sx={{ mb: 3 }}>
                 {error}
-              </Alert>
-            )}
-
-            {successMessage && (
-              <Alert severity="success" sx={{ mb: 3 }}>
-                {successMessage}
               </Alert>
             )}
 
@@ -103,38 +137,11 @@ function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                sx={{ mb: 3 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Email color="action" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-
-              <TextField
-                fullWidth
-                label="Contraseña"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
                 sx={{ mb: 4 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Lock color="action" />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
+                      <Email color="action" />
                     </InputAdornment>
                   ),
                 }}
@@ -145,26 +152,18 @@ function LoginForm() {
                 fullWidth
                 variant="contained"
                 size="large"
-                loading={loading}
                 sx={{ mb: 3, py: 1.5 }}
                 disabled={loading}
               >
-                {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                {loading ? 'Enviando correo...' : 'Enviar Enlace de Recuperación'}
               </Button>
 
               <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  <Link href="/auth/forgot-password" passHref>
-                    <MuiLink component="span" sx={{ fontWeight: 'medium' }}>
-                      ¿Olvidaste tu contraseña?
-                    </MuiLink>
-                  </Link>
-                </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  ¿No tienes una cuenta?{' '}
-                  <Link href="/auth/register" passHref>
+                  ¿Recordaste tu contraseña?{' '}
+                  <Link href="/auth/login" passHref>
                     <MuiLink component="span" sx={{ fontWeight: 'medium' }}>
-                      Regístrate aquí
+                      Inicia sesión aquí
                     </MuiLink>
                   </Link>
                 </Typography>
@@ -189,13 +188,5 @@ function LoginForm() {
         </Box>
       </Container>
     </Box>
-  );
-}
-
-export default function LoginPage() {
-  return (
-    <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>Cargando...</Box>}>
-      <LoginForm />
-    </Suspense>
   );
 }
