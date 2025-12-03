@@ -38,12 +38,24 @@ export default function ForgotPasswordPage() {
       });
 
       if (resetError) {
-        setError('Ocurrió un error al enviar el correo. Por favor verifica que el email sea correcto.');
+        console.error('Error al enviar correo de recuperación:', resetError);
+
+        // Manejo específico de diferentes tipos de error
+        if (resetError.message?.includes('rate_limit') || resetError.message?.includes('429')) {
+          setError('Has hecho demasiadas solicitudes de recuperación. Por favor espera unos minutos antes de intentar nuevamente.');
+        } else if (resetError.message?.includes('Invalid email')) {
+          setError('El email ingresado no es válido. Por favor verifica que esté escrito correctamente.');
+        } else if (resetError.message?.includes('User not found') || resetError.message?.includes('not registered')) {
+          setError('No existe una cuenta registrada con este email. Por favor verifica que sea correcto o regístrate.');
+        } else {
+          setError('Ocurrió un error al enviar el correo. Por favor verifica que el email sea correcto e intenta nuevamente.');
+        }
       } else {
         setSuccess(true);
       }
-    } catch {
-      setError('Ocurrió un error inesperado. Por favor intenta nuevamente.');
+    } catch (error) {
+      console.error('Error inesperado:', error);
+      setError('Ocurrió un error inesperado. Por favor intenta nuevamente en unos minutos.');
     } finally {
       setLoading(false);
     }
