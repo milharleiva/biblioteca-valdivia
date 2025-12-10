@@ -27,10 +27,7 @@ import {
   Email,
   Schedule,
   AutoStories,
-  People,
   Person,
-  CalendarMonth,
-  Announcement,
   PriorityHigh,
   Info,
   Warning
@@ -67,42 +64,17 @@ interface Announcement {
   endDate?: string;
 }
 
-interface Statistics {
-  userCount: number;
-  workshopCount: number;
-  totalWorkshopsThisYear: number;
-  activeAnnouncements: number;
-}
 
 export default function HomeContent() {
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [statistics, setStatistics] = useState<Statistics>({ userCount: 0, workshopCount: 0, totalWorkshopsThisYear: 0, activeAnnouncements: 0 });
   const [loading, setLoading] = useState(true);
 
-
   useEffect(() => {
-    fetchStatistics();
     fetchFeaturedWorkshops();
     fetchAnnouncements();
   }, []);
 
-  const fetchStatistics = async () => {
-    try {
-      const response = await fetch('/api/statistics');
-      const result = await response.json();
-
-      if (result.success) {
-        setStatistics(result.data);
-      } else {
-        console.error('Error fetching statistics:', result.error);
-        setStatistics({ userCount: 0, workshopCount: 0, totalWorkshopsThisYear: 0, activeAnnouncements: 0 });
-      }
-    } catch (error) {
-      console.error('Error fetching statistics:', error);
-      setStatistics({ userCount: 0, workshopCount: 0, totalWorkshopsThisYear: 0, activeAnnouncements: 0 });
-    }
-  };
 
   const fetchFeaturedWorkshops = async () => {
     try {
@@ -140,7 +112,7 @@ export default function HomeContent() {
                  (!endDate || endDate >= now);
         });
 
-        setAnnouncements(activeAnnouncements.slice(0, 3)); // Show only first 3
+        setAnnouncements(activeAnnouncements); // Show all active announcements
       } else {
         console.error('Error fetching announcements:', result.error);
         setAnnouncements([]);
@@ -199,14 +171,12 @@ export default function HomeContent() {
               animate="visible"
             >
               <Box sx={{
-                display: 'flex',
-                flexDirection: { xs: 'column', lg: 'row' },
-                gap: { xs: 4, md: 6 },
-                alignItems: { xs: 'center', lg: 'flex-start' },
-                textAlign: { xs: 'center', lg: 'left' }
+                textAlign: 'center',
+                maxWidth: '800px',
+                mx: 'auto'
               }}>
-                {/* Left Content */}
-                <Box sx={{ flex: 1, width: '100%' }}>
+                {/* Main Content */}
+                <Box sx={{ width: '100%' }}>
                   <MotionDiv variants={itemVariants}>
                     <Typography
                       variant="h2"
@@ -242,7 +212,7 @@ export default function HomeContent() {
                       gap: { xs: 2, sm: 3 },
                       flexDirection: { xs: 'column', sm: 'row' },
                       alignItems: 'center',
-                      justifyContent: { xs: 'center', lg: 'flex-start' },
+                      justifyContent: 'center',
                       width: '100%'
                     }}>
                       <Button
@@ -285,82 +255,6 @@ export default function HomeContent() {
                   </MotionDiv>
                 </Box>
 
-                {/* Right Content - Stats */}
-                <Box sx={{
-                  flex: { lg: 0.4 },
-                  width: { xs: '100%', lg: 'auto' },
-                  maxWidth: { xs: '100%', sm: '500px', lg: 'none' }
-                }}>
-                  <MotionDiv variants={itemVariants}>
-                    <Paper
-                      elevation={8}
-                      sx={{
-                        p: { xs: 3, sm: 4 },
-                        borderRadius: 3,
-                        bgcolor: 'rgba(255,255,255,0.95)',
-                        backdropFilter: 'blur(10px)',
-                        width: '100%'
-                      }}
-                    >
-                      <Typography variant="h6" sx={{
-                        fontWeight: 'bold',
-                        mb: 3,
-                        color: 'text.primary',
-                        fontSize: { xs: '1.1rem', sm: '1.25rem' }
-                      }}>
-                        Estadísticas en Vivo
-                      </Typography>
-
-                      <Box sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: { xs: 2.5, sm: 3 }
-                      }}>
-                        {[
-                          { icon: <People />, label: 'Usuarios Registrados', value: statistics.userCount, color: '#1976d2' },
-                          { icon: <Event />, label: 'Talleres Activos', value: statistics.workshopCount, color: '#2e7d32' },
-                          { icon: <CalendarMonth />, label: 'Talleres Este Año', value: statistics.totalWorkshopsThisYear, color: '#ed6c02' }
-                        ].map((stat, index) => (
-                          <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Box sx={{
-                              p: { xs: 1, sm: 1.5 },
-                              borderRadius: 2,
-                              bgcolor: stat.color + '20',
-                              color: stat.color,
-                              display: 'flex',
-                              alignItems: 'center',
-                              flexShrink: 0
-                            }}>
-                              {stat.icon}
-                            </Box>
-                            <Box sx={{ minWidth: 0, flex: 1 }}>
-                              <Typography
-                                variant="h4"
-                                sx={{
-                                  fontWeight: 'bold',
-                                  color: stat.color,
-                                  fontSize: { xs: '1.8rem', sm: '2.125rem' }
-                                }}
-                              >
-                                {loading ? <Skeleton width={40} /> : stat.value}
-                              </Typography>
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                sx={{
-                                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                                  lineHeight: 1.3
-                                }}
-                              >
-                                {stat.label}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        ))}
-                      </Box>
-                    </Paper>
-                  </MotionDiv>
-                </Box>
               </Box>
             </MotionDiv>
           </Container>
@@ -901,7 +795,7 @@ export default function HomeContent() {
                     {[
                       { icon: <LocationOn />, text: 'Av. Picarte 1785, Valdivia' },
                       { icon: <Phone />, text: '(63) 221-1234' },
-                      { icon: <Email />, text: 'biblioteca@valdivia.cl' }
+                      { icon: <Email />, text: 'bibliotecavaldivia@gmail.com' }
                     ].map((contact, index) => (
                       <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Box sx={{ color: 'primary.main' }}>
@@ -962,7 +856,7 @@ export default function HomeContent() {
                     {[
                       { icon: <LocationOn fontSize="small" />, text: 'Av. Picarte 1785, Valdivia' },
                       { icon: <Phone fontSize="small" />, text: '(63) 221-1234' },
-                      { icon: <Email fontSize="small" />, text: 'biblioteca@valdivia.cl' }
+                      { icon: <Email fontSize="small" />, text: 'bibliotecavaldivia@gmail.com' }
                     ].map((contact, index) => (
                       <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Box sx={{ color: 'text.secondary' }}>
