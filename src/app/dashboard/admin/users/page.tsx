@@ -283,10 +283,10 @@ export default function AdminUsersPage() {
             >
               Volver al Panel Admin
             </Button>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1, color: 'black' }}>
               Gestión de Usuarios
             </Typography>
-            <Typography variant="body1" color="text.primary">
+            <Typography variant="body1" sx={{ color: 'black' }}>
               Administra todos los usuarios del sistema
             </Typography>
           </Box>

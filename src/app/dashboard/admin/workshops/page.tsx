@@ -184,10 +184,10 @@ export default function AdminWorkshopsPage() {
             </Button>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Box>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1, color: 'black' }}>
                   Gestión de Talleres
                 </Typography>
-                <Typography variant="body1" color="text.primary">
+                <Typography variant="body1" sx={{ color: 'black' }}>
                   Administra todos los talleres del sistema
                 </Typography>
               </Box>

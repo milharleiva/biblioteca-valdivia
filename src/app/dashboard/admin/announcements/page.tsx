@@ -208,7 +208,7 @@ export default function AnnouncementsPage() {
               Volver al Panel Admin
             </Button>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'black' }}>
                 Gestión de Anuncios
               </Typography>
               <Button
@@ -221,7 +221,7 @@ export default function AnnouncementsPage() {
                 Crear Anuncio
               </Button>
             </Box>
-            <Typography variant="body1" color="text.primary">
+            <Typography variant="body1" sx={{ color: 'black' }}>
               Administra los anuncios e información importante para los usuarios
             </Typography>
           </Box>
