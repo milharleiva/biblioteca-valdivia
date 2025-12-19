@@ -27,120 +27,121 @@ export default function Servicios() {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-              {/* Salas de Estudio */}
+              {/* Préstamo Bibliográfico */}
+              <div className="bg-blue-50 p-8 rounded-xl text-center hover:bg-blue-100 transition-colors">
+                <div className="bg-blue-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Préstamo Bibliográfico</h3>
+                <p className="text-gray-600 mb-6">
+                  Servicios de préstamo de libros en sala y domicilio.
+                  Contamos con más de 14,500 libros en nuestra colección.
+                </p>
+                <div className="space-y-2 text-sm text-gray-700">
+                  <p><strong>Colección:</strong> 14,500+ libros</p>
+                  <p><strong>Modalidad:</strong> En sala y domicilio</p>
+                  <p><strong>Registro:</strong> Solo necesitas cédula de identidad</p>
+                </div>
+              </div>
+
+              {/* Capacitación en Computación */}
               <div className="bg-green-50 p-8 rounded-xl text-center hover:bg-green-100 transition-colors">
                 <div className="bg-green-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Salas de Estudio</h3>
-                <p className="text-gray-600 mb-6">
-                  Espacios silenciosos y cómodos para estudio individual y grupal,
-                  con WiFi gratuito y recursos digitales.
-                </p>
-                <div className="space-y-2 text-sm text-gray-700">
-                  <p><strong>Capacidades:</strong> Individual y grupal (4-8 personas)</p>
-                  <p><strong>Equipamiento:</strong> WiFi, enchufes, iluminación</p>
-                  <p><strong>Reserva:</strong> Hasta 3 horas por día</p>
-                </div>
-              </div>
-
-              {/* Talleres Culturales */}
-              <div className="bg-purple-50 p-8 rounded-xl text-center hover:bg-purple-100 transition-colors">
-                <div className="bg-purple-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Talleres Culturales</h3>
-                <p className="text-gray-600 mb-6">
-                  Actividades para todas las edades: club de lectura, talleres de escritura,
-                  cuentacuentos infantiles y más.
-                </p>
-                <div className="space-y-2 text-sm text-gray-700">
-                  <p><strong>Club de Lectura:</strong> Jueves 18:00</p>
-                  <p><strong>Cuentacuentos:</strong> Sábados 11:00</p>
-                  <p><strong>Talleres:</strong> Según programación mensual</p>
-                </div>
-                <Link href="/workshops" className="inline-block mt-4 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">
-                  Ver Talleres
-                </Link>
-              </div>
-
-              {/* Consulta y Referencia */}
-              <div className="bg-yellow-50 p-8 rounded-xl text-center hover:bg-yellow-100 transition-colors">
-                <div className="bg-yellow-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Consulta y Referencia</h3>
-                <p className="text-gray-600 mb-6">
-                  Asesoría especializada para investigaciones, trabajos académicos
-                  y consultas bibliográficas.
-                </p>
-                <div className="space-y-2 text-sm text-gray-700">
-                  <p><strong>Horario:</strong> Lunes a Viernes 9:00-17:00</p>
-                  <p><strong>Servicios:</strong> Búsquedas especializadas</p>
-                  <p><strong>Apoyo:</strong> Trabajos académicos y tesis</p>
-                </div>
-              </div>
-
-              {/* Archivo Histórico */}
-              <div className="bg-red-50 p-8 rounded-xl text-center hover:bg-red-100 transition-colors">
-                <div className="bg-red-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Archivo Histórico</h3>
-                <p className="text-gray-600 mb-6">
-                  Conservación y acceso a documentos históricos, fotografías
-                  y memoria local de Valdivia y Los Ríos.
-                </p>
-                <div className="space-y-2 text-sm text-gray-700">
-                  <p><strong>Colección:</strong> Documentos desde 1850</p>
-                  <p><strong>Fotografías:</strong> Archivo fotográfico regional</p>
-                  <p><strong>Acceso:</strong> Con cita previa</p>
-                </div>
-              </div>
-
-              {/* Acceso a Internet */}
-              <div className="bg-indigo-50 p-8 rounded-xl text-center hover:bg-indigo-100 transition-colors">
-                <div className="bg-indigo-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Acceso a Internet</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Capacitación en Computación</h3>
                 <p className="text-gray-600 mb-6">
-                  Computadores y WiFi gratuito para estudiantes y visitantes.
-                  Acceso a recursos educativos y herramientas digitales.
+                  Programa BiblioRedes que permite capacitar a la comunidad
+                  en el uso de computadores y herramientas digitales.
                 </p>
                 <div className="space-y-2 text-sm text-gray-700">
-                  <p><strong>WiFi:</strong> Acceso gratuito en toda la biblioteca</p>
-                  <p><strong>Computadores:</strong> 20 estaciones disponibles</p>
-                  <p><strong>Tiempo:</strong> Hasta 2 horas por sesión</p>
+                  <p><strong>Programa:</strong> BiblioRedes</p>
+                  <p><strong>WiFi:</strong> Acceso gratuito</p>
+                  <p><strong>Dirigido a:</strong> Toda la comunidad</p>
                 </div>
               </div>
 
-              {/* Eventos y Conferencias */}
+              {/* Actividades Culturales */}
+              <div className="bg-purple-50 p-8 rounded-xl text-center hover:bg-purple-100 transition-colors">
+                <div className="bg-purple-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m3 0h-2M5 4h2m0 0V3a1 1 0 011-1h8a1 1 0 011 1v1M5 8h14l-1 8a2 2 0 01-2 2H8a2 2 0 01-2-2L5 8z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Actividades Culturales</h3>
+                <p className="text-gray-600 mb-6">
+                  Programación regular de actividades culturales y educativas
+                  para todas las edades.
+                </p>
+                <div className="space-y-2 text-sm text-gray-700">
+                  <p><strong>La Hora del Cuento:</strong> En colegios y biblioteca</p>
+                  <p><strong>Cine Video:</strong> Proyecciones culturales</p>
+                  <p><strong>Eventos:</strong> Ferias de libros y presentaciones</p>
+                </div>
+                <Link href="/workshops" className="inline-block mt-4 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                  Ver Actividades
+                </Link>
+              </div>
+
+              {/* Sala Museográfica */}
+              <div className="bg-yellow-50 p-8 rounded-xl text-center hover:bg-yellow-100 transition-colors">
+                <div className="bg-yellow-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Sala Museográfica "Mira Valdivia"</h3>
+                <p className="text-gray-600 mb-6">
+                  Desde 2007, exhibe la historia y cultura local de Valdivia
+                  en el altillo de la casona histórica.
+                </p>
+                <div className="space-y-2 text-sm text-gray-700">
+                  <p><strong>Inaugurada:</strong> 2007</p>
+                  <p><strong>Temática:</strong> Historia local valdiviana</p>
+                  <p><strong>Visitas:</strong> Guiadas disponibles</p>
+                </div>
+              </div>
+
+              {/* Literatura Inglesa */}
+              <div className="bg-indigo-50 p-8 rounded-xl text-center hover:bg-indigo-100 transition-colors">
+                <div className="bg-indigo-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Rincón de Literatura Inglesa</h3>
+                <p className="text-gray-600 mb-6">
+                  Sección especializada con colección de literatura
+                  en idioma inglés para estudiantes y lectores.
+                </p>
+                <div className="space-y-2 text-sm text-gray-700">
+                  <p><strong>Idioma:</strong> Inglés</p>
+                  <p><strong>Contenido:</strong> Literatura clásica y contemporánea</p>
+                  <p><strong>Público:</strong> Estudiantes y lectores en inglés</p>
+                </div>
+              </div>
+
+              {/* Lectura Digital */}
               <div className="bg-orange-50 p-8 rounded-xl text-center hover:bg-orange-100 transition-colors">
                 <div className="bg-orange-600 w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-6">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Eventos y Conferencias</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">Lectura en Tablet</h3>
                 <p className="text-gray-600 mb-6">
-                  Programación cultural regular con autores, académicos y artistas
-                  locales e internacionales.
+                  Servicio de lectura digital para personas que prefieren
+                  la tecnología moderna para acceder a libros.
                 </p>
                 <div className="space-y-2 text-sm text-gray-700">
-                  <p><strong>Conferencias:</strong> Mensuales</p>
-                  <p><strong>Presentaciones:</strong> Libros y autores</p>
-                  <p><strong>Exposiciones:</strong> Arte y cultura local</p>
+                  <p><strong>Dispositivos:</strong> Tablets disponibles</p>
+                  <p><strong>Contenido:</strong> Libros digitales</p>
+                  <p><strong>Público:</strong> Amantes de la tecnología</p>
                 </div>
               </div>
             </div>
@@ -154,66 +155,132 @@ export default function Servicios() {
               Servicios Especiales
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
               <div className="bg-white p-8 rounded-xl shadow-lg">
-                <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-                  Biblioteca Itinerante
-                </h3>
+                <div className="flex items-center mb-4">
+                  <svg className="w-8 h-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21L6.3 11.27a11.054 11.054 0 005.43 5.43l1.838-3.924a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  <h3 className="text-2xl font-semibold text-gray-800">
+                    TeleBiblioteca
+                  </h3>
+                </div>
                 <p className="text-gray-600 mb-4">
-                  Llevamos la biblioteca a sectores rurales y comunidades alejadas de Valdivia,
-                  garantizando el acceso universal a la cultura y el conocimiento.
+                  Servicio de entrega a domicilio para adultos mayores y personas con problemas de movilidad.
+                  Eliminando barreras y llevando la lectura directamente a tu hogar.
                 </p>
                 <ul className="space-y-2 text-gray-700">
                   <li className="flex items-center">
                     <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
-                    Visitas programadas semanalmente
+                    Entrega gratuita a domicilio
                   </li>
                   <li className="flex items-center">
                     <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
-                    Colección móvil de 500+ títulos
+                    Servicio para adultos mayores
                   </li>
                   <li className="flex items-center">
                     <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
-                    Actividades culturales en terreno
+                    Apoyo a personas con movilidad reducida
                   </li>
                 </ul>
+                <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                  <p className="text-sm text-gray-700">
+                    <strong>Contacto:</strong> +56 9 35732611 (WhatsApp)<br/>
+                    <strong>Email:</strong> telebibliocci@gmail.com<br/>
+                    <strong>Web:</strong> www.ccm-valdivia.cl
+                  </p>
+                </div>
               </div>
 
               <div className="bg-white p-8 rounded-xl shadow-lg">
-                <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-                  Inclusión y Accesibilidad
-                </h3>
+                <div className="flex items-center mb-4">
+                  <svg className="w-8 h-8 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                  </svg>
+                  <h3 className="text-2xl font-semibold text-gray-800">
+                    Bibliomóvil
+                  </h3>
+                </div>
                 <p className="text-gray-600 mb-4">
-                  Servicios especializados para personas con discapacidad visual,
-                  auditiva y motora, garantizando el acceso equitativo a todos nuestros recursos.
+                  Biblioteca móvil que lleva libros y actividades culturales a escuelas rurales
+                  y sectores alejados de Valdivia desde 2003.
                 </p>
                 <ul className="space-y-2 text-gray-700">
                   <li className="flex items-center">
                     <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
-                    Libros en braille y macrotipo
+                    Visitas a 13 escuelas rurales
                   </li>
                   <li className="flex items-center">
                     <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
-                    Audiolibros y lectura asistida
+                    Actividades cada 2 semanas
                   </li>
                   <li className="flex items-center">
                     <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
-                    Acceso adaptado y señalética
+                    Cuentacuentos y actividades lúdicas
                   </li>
                 </ul>
+                <div className="mt-4 p-4 bg-green-50 rounded-lg">
+                  <p className="text-sm text-gray-700">
+                    <strong>Coordinador:</strong> Reinaldo Reinoso<br/>
+                    <strong>Email:</strong> bmvaldivia@gmail.com<br/>
+                    <strong>Teléfono:</strong> 974035703
+                  </p>
+                </div>
               </div>
+
+              <div className="bg-white p-8 rounded-xl shadow-lg">
+                <div className="flex items-center mb-4">
+                  <svg className="w-8 h-8 text-pink-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  <h3 className="text-2xl font-semibold text-gray-800">
+                    Bebeteca
+                  </h3>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  Sala especialmente diseñada para niños de 0 a 4 años, inaugurada en agosto 2016.
+                  Promueve la lectura temprana y fortalece el vínculo entre padres e hijos.
+                </p>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex items-center">
+                    <svg className="w-4 h-4 text-pink-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Para niños de 0 a 4 años
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-4 h-4 text-pink-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Actividades programadas regulares
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-4 h-4 text-pink-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Participación directa de padres y madres
+                  </li>
+                </ul>
+                <div className="mt-4 p-4 bg-pink-50 rounded-lg">
+                  <p className="text-sm text-gray-700">
+                    <strong>Inaugurada:</strong> Agosto 2016<br/>
+                    <strong>Objetivo:</strong> Fomentar la lectura temprana
+                  </p>
+                </div>
+              </div>
+
             </div>
           </div>
         </section>

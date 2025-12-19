@@ -22,16 +22,16 @@ export function Footer() {
   ];
 
   const quickLinks = [
-    'buscar Libros',
+    'Buscar Libros',
     'Actividades Culturales',
     'Servicios Digitales',
     'Talleres y Eventos'
   ];
 
   const contactInfo = [
-    { icon: <LocationOn fontSize="small" />, text: 'Av. Picarte 1785\nValdivia, Los Ríos' },
-    { icon: <Phone fontSize="small" />, text: '(63) 221-1234' },
-    { icon: <Email fontSize="small" />, text: 'bibliotecavaldivia@gmail.com' }
+    { icon: <LocationOn fontSize="small" />, text: 'Av. Picarte 2102\nValdivia, Los Ríos' },
+    { icon: <Phone fontSize="small" />, text: '(63) 221-7351' },
+    { icon: <Email fontSize="small" />, text: 'bpmvaldivia@gmail.com' }
   ];
 
   const legalLinks = ['Política de Privacidad', 'Términos de Uso', 'Accesibilidad'];

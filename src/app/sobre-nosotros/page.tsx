@@ -36,7 +36,7 @@ export default function SobreNosotros() {
                     ala de la Escuela N°1, marcando el inicio de décadas de servicio a la comunidad.
                   </p>
                   <p>
-                    Ubicada actualmente en <strong>Avenida Los Robles N°4, Isla Teja</strong>,
+                    Ubicada actualmente en <strong>Avenida Ramón Picarte N°2102</strong>,
                     nuestra biblioteca no solo conserva el patrimonio cultural regional, sino que
                     también se proyecta hacia el futuro con servicios innovadores y actividades
                     culturales que enriquecen nuestra comunidad.
@@ -66,7 +66,7 @@ export default function SobreNosotros() {
                     <div className="text-sm text-gray-600">Años de Servicio</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-600 mb-2">Isla Teja</div>
+                    <div className="text-3xl font-bold text-purple-600 mb-2">Av. Picarte</div>
                     <div className="text-sm text-gray-600">Ubicación Actual</div>
                   </div>
                   <div className="text-center">
@@ -180,7 +180,7 @@ export default function SobreNosotros() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
                   <h3 className="text-2xl font-semibold text-gray-800 mb-6">
-                    En el Corazón de Valdivia
+                    En una de las Principales Avenidas de Valdivia
                   </h3>
                   <div className="space-y-4">
                     <div className="flex items-start space-x-3">
@@ -190,7 +190,7 @@ export default function SobreNosotros() {
                       </svg>
                       <div>
                         <h4 className="font-semibold text-gray-800">Dirección</h4>
-                        <p className="text-gray-600">Avenida Los Robles N°4, Isla Teja, Valdivia, Los Ríos</p>
+                        <p className="text-gray-600">Avenida Ramón Picarte N°2102, Valdivia, Los Ríos</p>
                       </div>
                     </div>
 
@@ -201,7 +201,8 @@ export default function SobreNosotros() {
                       <div>
                         <h4 className="font-semibold text-gray-800">Horarios de Atención</h4>
                         <div className="text-gray-600">
-                          <p>Lunes a Viernes: 10:00 - 18:00</p>
+                          <p>Lunes a Viernes: 9:00 - 18:00</p>
+                          <p>Sábados: 9:00 - 14:00</p>
                           <p>Domingos: Cerrado</p>
                         </div>
                       </div>
@@ -214,7 +215,7 @@ export default function SobreNosotros() {
                       <div>
                         <h4 className="font-semibold text-gray-800">Contacto</h4>
                         <div className="text-gray-600">
-                          <p>Teléfono: 63 2217351</p>
+                          <p>Teléfono: (63) 221-7351</p>
                           <p>Email: bpmvaldivia@gmail.com</p>
                         </div>
                       </div>
@@ -224,7 +225,7 @@ export default function SobreNosotros() {
 
                 <div className="bg-gray-100 rounded-xl overflow-hidden">
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2558.6789!2d-73.2333!3d-39.8102!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9615eee7be0c75a7%3A0x5b4e89d635c3b3b3!2sAv.%20Ram%C3%B3n%20Picarte%202102%2C%20Valdivia%2C%20Los%20R%C3%ADos%2C%20Chile!5e0!3m2!1ses!2scl!4v1694798765432!5m2!1ses!2scl"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.835434509374!2d-73.23588068468147!3d-39.81421957943901!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9615eee6bb1f4f17%3A0x8a5d6b8c9a2b3c4d!2sAv.%20Picarte%202102%2C%20Valdivia%2C%20Los%20R%C3%ADos%2C%20Chile!5e0!3m2!1ses!2scl!4v1699123456789!5m2!1ses!2scl"
                     width="100%"
                     height="300"
                     style={{ border: 0 }}

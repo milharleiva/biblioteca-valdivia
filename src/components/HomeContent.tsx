@@ -793,9 +793,9 @@ export default function HomeContent() {
 
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     {[
-                      { icon: <LocationOn />, text: 'Av. Picarte 1785, Valdivia' },
-                      { icon: <Phone />, text: '(63) 221-1234' },
-                      { icon: <Email />, text: 'bibliotecavaldivia@gmail.com' }
+                      { icon: <LocationOn />, text: 'Av. Picarte 2102, Valdivia' },
+                      { icon: <Phone />, text: '(63) 221-7351' },
+                      { icon: <Email />, text: 'bpmvaldivia@gmail.com' }
                     ].map((contact, index) => (
                       <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Box sx={{ color: 'primary.main' }}>
@@ -854,9 +854,9 @@ export default function HomeContent() {
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {[
-                      { icon: <LocationOn fontSize="small" />, text: 'Av. Picarte 1785, Valdivia' },
-                      { icon: <Phone fontSize="small" />, text: '(63) 221-1234' },
-                      { icon: <Email fontSize="small" />, text: 'bibliotecavaldivia@gmail.com' }
+                      { icon: <LocationOn fontSize="small" />, text: 'Av. Picarte 2102, Valdivia' },
+                      { icon: <Phone fontSize="small" />, text: '(63) 221-7351' },
+                      { icon: <Email fontSize="small" />, text: 'bpmvaldivia@gmail.com' }
                     ].map((contact, index) => (
                       <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Box sx={{ color: 'text.secondary' }}>
