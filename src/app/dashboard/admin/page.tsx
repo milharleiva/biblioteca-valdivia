@@ -74,13 +74,7 @@ export default function AdminPage() {
       if (statsResult.success) {
         const basicStats = statsResult.data;
 
-        console.log('Setting statistics:', {
-          activeWorkshops: basicStats.workshopCount || 0,
-          totalUsers: basicStats.userCount || 0,
-          totalEnrollments: basicStats.totalEnrollments || 0,
-          activeEnrollments: basicStats.activeEnrollments || 0,
-          workshopsThisMonth: basicStats.totalWorkshopsThisYear || 0
-        });
+        console.log('Setting statistics:', basicStats);
 
         // Set statistics with available data
         setStatistics({
@@ -146,7 +140,7 @@ export default function AdminPage() {
           {/* Quick Stats */}
           <Box sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: 'repeat(4, 1fr)' },
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' },
             gap: 3,
             mb: 4
           }}>
@@ -200,6 +194,7 @@ export default function AdminPage() {
               </CardContent>
             </Card>
           </Box>
+
 
           {/* Management Sections */}
           <Box sx={{
@@ -299,26 +294,6 @@ export default function AdminPage() {
             </Paper>
           </Box>
 
-          {/* Analytics */}
-          <Paper elevation={2} sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <Analytics sx={{ mr: 2, color: 'info.main' }} />
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Estadísticas y Reportes
-              </Typography>
-            </Box>
-            <Typography variant="body2" color="text.primary" sx={{ mb: 3 }}>
-              Visualiza estadísticas de uso, inscripciones y actividad del sistema
-            </Typography>
-            <Button
-              variant="outlined"
-              color="info"
-              sx={{ px: 3 }}
-              disabled
-            >
-              Próximamente
-            </Button>
-          </Paper>
         </MotionDiv>
       </Container>
     </Box>

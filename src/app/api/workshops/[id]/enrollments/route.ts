@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma, isPrismaAvailable } from '@/lib/prisma';
+import { prisma, isPrismaAvailable, ensurePrismaConnection } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
@@ -11,6 +11,13 @@ export async function GET(
         { success: false, error: 'Database not available' },
         { status: 503 }
       )
+    }
+
+    if (!(await ensurePrismaConnection())) {
+      return NextResponse.json(
+        { success: false, error: 'Could not establish database connection' },
+        { status: 503 }
+      );
     }
 
     const { id } = await params;
@@ -68,6 +75,13 @@ export async function POST(
         { success: false, error: 'Database not available' },
         { status: 503 }
       )
+    }
+
+    if (!(await ensurePrismaConnection())) {
+      return NextResponse.json(
+        { success: false, error: 'Could not establish database connection' },
+        { status: 503 }
+      );
     }
 
     const { id } = await params;

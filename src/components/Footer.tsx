@@ -2,12 +2,23 @@
 
 import { Box, Container, Typography, IconButton, Divider, Link } from '@mui/material';
 import { MenuBook, Facebook, Instagram, LocationOn, Phone, Email } from '@mui/icons-material';
+import { SvgIcon } from '@mui/material';
 import { MotionDiv } from './MotionWrapper';
+
+// Componente personalizado para el icono de X (Twitter)
+function XIcon(props: any) {
+  return (
+    <SvgIcon {...props} viewBox="0 0 24 24">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </SvgIcon>
+  );
+}
 
 export function Footer() {
   const socialIcons = [
-    { icon: <Facebook />, href: 'https://www.facebook.com/bibliotecavaldiviacamilohenriquez/?locale=es_LA' },
-    { icon: <Instagram />, href: 'https://www.instagram.com/bibliotecavaldivia/?hl=es' }
+    { icon: <Facebook />, href: 'https://www.facebook.com/bibliotecavaldiviacamilohenriquez/?locale=es_LA', name: 'Facebook' },
+    { icon: <Instagram />, href: 'https://www.instagram.com/bibliotecavaldivia/?hl=es', name: 'Instagram' },
+    { icon: <XIcon />, href: 'https://x.com/bibliotecavaldi', name: 'X (Twitter)' }
   ];
 
   const quickLinks = [
@@ -20,7 +31,7 @@ export function Footer() {
   const contactInfo = [
     { icon: <LocationOn fontSize="small" />, text: 'Av. Picarte 1785\nValdivia, Los Ríos' },
     { icon: <Phone fontSize="small" />, text: '(63) 221-1234' },
-    { icon: <Email fontSize="small" />, text: 'info@bibliotecaslosrios.cl' }
+    { icon: <Email fontSize="small" />, text: 'bibliotecavaldivia@gmail.com' }
   ];
 
   const legalLinks = ['Política de Privacidad', 'Términos de Uso', 'Accesibilidad'];
@@ -69,6 +80,9 @@ export function Footer() {
                 >
                   <IconButton
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.name}
                     sx={{
                       color: 'grey.300',
                       '&:hover': { color: 'white', bgcolor: 'primary.main' }

@@ -102,13 +102,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           emergency_phone: profile.emergencyPhone,
         });
       } else {
-        // Profile doesn't exist - create it (lazy creation)
-        console.log('👤 Profile not found, creating new profile for user:', userId);
+        // Profile doesn't exist - this could mean the user was deleted by an admin
+        console.log('👤 Profile not found for user:', userId);
 
-        // Get user data from Supabase Auth to get the name and email
-        const { data: authUser } = await supabase.auth.getUser();
+        // Get user data from Supabase Auth to verify the user exists
+        const { data: authUser, error: authError } = await supabase.auth.getUser();
+
+        // If there's an auth error or no user data, the user might have been deleted
+        if (authError || !authUser.user) {
+          console.log('🚫 User appears to have been deleted from auth, signing out...');
+          await signOut();
+          return;
+        }
+
         const userName = authUser.user?.user_metadata?.name || 'Usuario';
         const userEmail = authUser.user?.email || '';
+
+        console.log('👤 User exists in auth but no profile found, attempting to create profile...');
 
         try {
           const createResponse = await fetch('/api/profile', {
@@ -143,23 +153,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             console.log('✅ New profile created successfully');
           } else {
-            throw new Error(createResult.error);
+            // If profile creation fails, it might be because user was deleted
+            console.warn('❌ Profile creation failed:', createResult.error);
+            console.log('🚫 User may have been deleted by admin, signing out...');
+            await signOut();
+            return;
           }
         } catch (createError) {
           console.error('❌ Error creating profile:', createError);
-          // Set a fallback profile
-          setProfile({
-            id: 'fallback-' + userId,
-            user_id: userId,
-            email: userEmail,
-            name: userName,
-            role: 'user'
-          });
+          console.log('🚫 Profile creation failed, user may have been deleted, signing out...');
+          await signOut();
+          return;
         }
       }
     } catch (error) {
       console.error('❌ Error fetching profile:', error);
-      // Set a default profile as fallback
+
+      // Check if this is a 404 error (profile not found) which might indicate user was deleted
+      if (error instanceof Error && (error.message.includes('404') || error.message.includes('not found'))) {
+        console.log('🚫 Profile fetch returned 404, user may have been deleted, signing out...');
+        await signOut();
+        return;
+      }
+
+      // For other errors, create fallback profile
       setProfile({
         id: 'error-' + userId,
         user_id: userId,

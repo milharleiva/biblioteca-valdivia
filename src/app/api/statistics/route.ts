@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma, isPrismaAvailable } from '@/lib/prisma'
+import { prisma, isPrismaAvailable, withPrisma } from '@/lib/prisma'
 import { createClient } from '@/lib/supabase/server'
 
 // GET /api/statistics - Obtener estadísticas del sistema
@@ -11,63 +11,146 @@ export async function GET() {
     if (prismaAvailable) {
       // Use Prisma if available
       console.log('Using Prisma for statistics')
-      const userCount = await prisma!.userProfile.count()
-      const workshopCount = await prisma!.workshop.count({
-        where: {
-          isActive: true,
-          endDate: {
-            gte: new Date()
+
+      try {
+        const statistics = await withPrisma(async (client) => {
+          const userCount = await client.userProfile.count()
+
+          const workshopCount = await client.workshop.count({
+            where: {
+              isActive: true,
+              endDate: {
+                gte: new Date()
+              }
+            }
+          })
+
+          const currentYear = new Date().getFullYear()
+          const startOfYear = new Date(currentYear, 0, 1)
+          const totalWorkshopsThisYear = await client.workshop.count({
+            where: {
+              createdAt: {
+                gte: startOfYear
+              }
+            }
+          })
+
+          const activeAnnouncements = await client.announcement.count({
+            where: {
+              isActive: true,
+              startDate: {
+                lte: new Date()
+              },
+              OR: [
+                { endDate: null },
+                { endDate: { gte: new Date() } }
+              ]
+            }
+          })
+
+          const totalEnrollments = await client.workshopEnrollment.count()
+
+          const activeEnrollments = await client.workshopEnrollment.count({
+            where: {
+              status: 'ENROLLED'
+            }
+          })
+
+          const completedEnrollments = await client.workshopEnrollment.count({
+            where: {
+              status: 'COMPLETED'
+            }
+          })
+
+          // Nuevas estadísticas
+          const attendanceRate = totalEnrollments > 0 ?
+            Math.round((completedEnrollments / totalEnrollments) * 100) : 0
+
+          const thirtyDaysAgo = new Date()
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+          const activeUsersLastMonth = await client.workshopEnrollment.findMany({
+            where: {
+              enrollmentDate: {
+                gte: thirtyDaysAgo
+              }
+            },
+            distinct: ['userId'],
+            select: {
+              userId: true
+            }
+          }).then(result => result.length)
+
+          const currentMonth = new Date()
+          const startOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
+
+          const newUsersThisMonth = await client.userProfile.count({
+            where: {
+              createdAt: {
+                gte: startOfMonth
+              }
+            }
+          })
+
+          const workshopsByCategory = await client.workshop.groupBy({
+            by: ['category'],
+            _count: {
+              category: true
+            },
+            where: {
+              isActive: true
+            }
+          })
+
+
+          const pinnedAnnouncements = await client.announcement.count({
+            where: {
+              isPinned: true,
+              isActive: true
+            }
+          })
+
+          return {
+            userCount,
+            workshopCount,
+            totalWorkshopsThisYear,
+            activeAnnouncements,
+            totalEnrollments,
+            activeEnrollments,
+            completedEnrollments,
+            attendanceRate,
+            activeUsersLastMonth,
+            newUsersThisMonth,
+            workshopsByCategory,
+            pinnedAnnouncements
           }
-        }
-      })
+        })
 
-      const currentYear = new Date().getFullYear()
-      const startOfYear = new Date(currentYear, 0, 1)
-      const totalWorkshopsThisYear = await prisma!.workshop.count({
-        where: {
-          createdAt: {
-            gte: startOfYear
+        return NextResponse.json({
+          success: true,
+          data: statistics
+        })
+      } catch (error) {
+        console.error('Error in Prisma statistics:', error)
+        // Fallback to default values
+        return NextResponse.json({
+          success: true,
+          data: {
+            userCount: 0,
+            workshopCount: 0,
+            totalWorkshopsThisYear: 0,
+            activeAnnouncements: 0,
+            totalEnrollments: 0,
+            activeEnrollments: 0,
+            completedEnrollments: 0,
+            attendanceRate: 0,
+            activeUsersLastMonth: 0,
+            newUsersThisMonth: 0,
+            workshopsByCategory: [],
+            pinnedAnnouncements: 0
           }
-        }
-      })
-
-      const activeAnnouncements = await prisma!.announcement.count({
-        where: {
-          isActive: true,
-          startDate: {
-            lte: new Date()
-          },
-          OR: [
-            { endDate: null },
-            { endDate: { gte: new Date() } }
-          ]
-        }
-      })
-
-      const totalEnrollments = await prisma!.workshopEnrollment.count()
-      const activeEnrollments = await prisma!.workshopEnrollment.count({
-        where: {
-          status: 'ENROLLED'
-        }
-      })
-      const completedEnrollments = await prisma!.workshopEnrollment.count({
-        where: {
-          status: 'COMPLETED'
-        }
-      })
-
-      return NextResponse.json({
-        success: true,
-        data: {
-          userCount,
-          workshopCount,
-          totalWorkshopsThisYear,
-          activeAnnouncements,
-          totalEnrollments,
-          activeEnrollments,
-          completedEnrollments
-        }
-      })
+        })
+      }
     } else {
       // Fallback to Supabase
       console.log('Using Supabase for statistics')
@@ -115,6 +198,10 @@ export async function GET() {
         .select('*', { count: 'exact', head: true })
         .eq('status', 'completed')
 
+      // Calculate new statistics for Supabase
+      const attendanceRate = (totalEnrollments || 0) > 0 ?
+        Math.round(((completedEnrollments || 0) / (totalEnrollments || 0)) * 100) : 0
+
       return NextResponse.json({
         success: true,
         data: {
@@ -124,7 +211,12 @@ export async function GET() {
           activeAnnouncements: activeAnnouncements || 0,
           totalEnrollments: totalEnrollments || 0,
           activeEnrollments: activeEnrollments || 0,
-          completedEnrollments: completedEnrollments || 0
+          completedEnrollments: completedEnrollments || 0,
+          attendanceRate,
+          activeUsersLastMonth: 0, // Would need additional queries for Supabase
+          newUsersThisMonth: 0,
+          workshopsByCategory: [],
+          pinnedAnnouncements: 0
         }
       })
     }

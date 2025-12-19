@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma, isPrismaAvailable } from '@/lib/prisma'
+import { prisma, isPrismaAvailable, withPrisma } from '@/lib/prisma'
 
 // GET /api/announcements - Obtener todos los anuncios
 export async function GET(request: NextRequest) {
@@ -14,10 +14,29 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 
-    // Si hay ID, obtener anuncio específico
-    if (id) {
-      const announcement = await prisma!.announcement.findUnique({
-        where: { id },
+    const result = await withPrisma(async (client) => {
+      // Si hay ID, obtener anuncio específico
+      if (id) {
+        const announcement = await client.announcement.findUnique({
+          where: { id },
+          include: {
+            creator: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        })
+
+        if (!announcement) {
+          return { type: 'error', error: 'Anuncio no encontrado', status: 404 }
+        }
+
+        return { type: 'single', data: announcement }
+      }
+
+      // Si no hay ID, obtener todos los anuncios
+      const announcements = await client.announcement.findMany({
         include: {
           creator: {
             select: {
@@ -25,40 +44,26 @@ export async function GET(request: NextRequest) {
             },
           },
         },
+        orderBy: [
+          { isPinned: 'desc' },
+          { priority: 'desc' },
+          { startDate: 'desc' },
+        ],
       })
 
-      if (!announcement) {
-        return NextResponse.json(
-          { success: false, error: 'Anuncio no encontrado' },
-          { status: 404 }
-        )
-      }
-
-      return NextResponse.json({
-        success: true,
-        data: announcement,
-      })
-    }
-
-    // Si no hay ID, obtener todos los anuncios
-    const announcements = await prisma!.announcement.findMany({
-      include: {
-        creator: {
-          select: {
-            name: true,
-          },
-        },
-      },
-      orderBy: [
-        { isPinned: 'desc' },
-        { priority: 'desc' },
-        { startDate: 'desc' },
-      ],
+      return { type: 'list', data: announcements }
     })
+
+    if (result.type === 'error') {
+      return NextResponse.json(
+        { success: false, error: result.error },
+        { status: result.status || 500 }
+      )
+    }
 
     return NextResponse.json({
       success: true,
-      data: announcements,
+      data: result.data,
     })
   } catch (error) {
     console.error('Error fetching announcements:', error)
@@ -131,30 +136,32 @@ export async function POST(request: NextRequest) {
       'staff': 'STAFF'
     }
 
-    const announcement = await prisma!.announcement.create({
-      data: {
-        title,
-        content,
-        excerpt,
-        type: typeMapping[type] || 'GENERAL',
-        priority,
-        isActive: is_active,
-        isPinned: is_pinned,
-        startDate: new Date(start_date),
-        endDate: end_date ? new Date(end_date) : null,
-        imageUrl: image_url,
-        linkUrl: link_url,
-        linkText: link_text,
-        targetAudience: targetAudienceMapping[target_audience] || 'ALL',
-        createdBy: created_by,
-      },
-      include: {
-        creator: {
-          select: {
-            name: true,
+    const announcement = await withPrisma(async (client) => {
+      return await client.announcement.create({
+        data: {
+          title,
+          content,
+          excerpt,
+          type: typeMapping[type] || 'GENERAL',
+          priority,
+          isActive: is_active,
+          isPinned: is_pinned,
+          startDate: new Date(start_date),
+          endDate: end_date ? new Date(end_date) : null,
+          imageUrl: image_url,
+          linkUrl: link_url,
+          linkText: link_text,
+          targetAudience: targetAudienceMapping[target_audience] || 'ALL',
+          createdBy: created_by,
+        },
+        include: {
+          creator: {
+            select: {
+              name: true,
+            },
           },
         },
-      },
+      })
     })
 
     return NextResponse.json({
@@ -229,30 +236,32 @@ export async function PUT(request: NextRequest) {
       'staff': 'STAFF'
     }
 
-    const announcement = await prisma!.announcement.update({
-      where: { id },
-      data: {
-        title,
-        content,
-        excerpt,
-        type: typeMapping[type] || 'GENERAL',
-        priority,
-        isActive: is_active,
-        isPinned: is_pinned,
-        startDate: new Date(start_date),
-        endDate: end_date ? new Date(end_date) : null,
-        imageUrl: image_url,
-        linkUrl: link_url,
-        linkText: link_text,
-        targetAudience: targetAudienceMapping[target_audience] || 'ALL',
-      },
-      include: {
-        creator: {
-          select: {
-            name: true,
+    const announcement = await withPrisma(async (client) => {
+      return await client.announcement.update({
+        where: { id },
+        data: {
+          title,
+          content,
+          excerpt,
+          type: typeMapping[type] || 'GENERAL',
+          priority,
+          isActive: is_active,
+          isPinned: is_pinned,
+          startDate: new Date(start_date),
+          endDate: end_date ? new Date(end_date) : null,
+          imageUrl: image_url,
+          linkUrl: link_url,
+          linkText: link_text,
+          targetAudience: targetAudienceMapping[target_audience] || 'ALL',
+        },
+        include: {
+          creator: {
+            select: {
+              name: true,
+            },
           },
         },
-      },
+      })
     })
 
     return NextResponse.json({
@@ -291,8 +300,10 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    await prisma!.announcement.delete({
-      where: { id }
+    await withPrisma(async (client) => {
+      return await client.announcement.delete({
+        where: { id }
+      })
     })
 
     return NextResponse.json({
@@ -331,9 +342,11 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    const announcement = await prisma!.announcement.update({
-      where: { id },
-      data: { isActive }
+    const announcement = await withPrisma(async (client) => {
+      return await client.announcement.update({
+        where: { id },
+        data: { isActive }
+      })
     })
 
     return NextResponse.json({

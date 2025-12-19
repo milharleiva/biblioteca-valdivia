@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { withPrisma } from '@/lib/prisma';
+import { createClient } from '@supabase/supabase-js';
 
 export async function GET(request: NextRequest) {
   try {
     console.log('Admin users API called - Using Prisma');
 
-    // Use the correct Prisma model name from schema
-    const users = await prisma.userProfile.findMany({
-      orderBy: {
-        createdAt: 'desc'
-      }
+    const users = await withPrisma(async (client) => {
+      return await client.userProfile.findMany({
+        orderBy: {
+          createdAt: 'desc'
+        }
+      });
     });
 
     console.log(`Successfully fetched ${users?.length || 0} users via Prisma`);
@@ -25,8 +27,6 @@ export async function GET(request: NextRequest) {
       { success: false, error: 'Error interno del servidor', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -83,11 +83,13 @@ export async function PUT(request: NextRequest) {
       updateData.birthDate = null;
     }
 
-    const updatedUser = await prisma.userProfile.update({
-      where: {
-        userId: userId
-      },
-      data: updateData
+    const updatedUser = await withPrisma(async (client) => {
+      return await client.userProfile.update({
+        where: {
+          userId: userId
+        },
+        data: updateData
+      });
     });
 
     console.log(`Successfully updated user ${userId} via Prisma`);
@@ -103,8 +105,6 @@ export async function PUT(request: NextRequest) {
       { success: false, error: 'Error interno del servidor', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -122,30 +122,73 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // First, check if the user exists
-    const existingUser = await prisma.userProfile.findUnique({
-      where: { userId }
+    // Use withPrisma for database operations
+    await withPrisma(async (client) => {
+      // First, check if the user exists
+      const existingUser = await client.userProfile.findUnique({
+        where: { userId }
+      });
+
+      if (!existingUser) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      // Delete all related data first (workshopEnrollments, etc.)
+      // This will cascade delete if configured in schema, but let's be explicit
+      await client.workshopEnrollment.deleteMany({
+        where: { userId }
+      });
+
+      // Delete the user profile
+      await client.userProfile.delete({
+        where: { userId }
+      });
+
+      console.log(`Successfully deleted user profile ${userId} via Prisma`);
     });
 
-    if (!existingUser) {
-      return NextResponse.json(
-        { success: false, error: 'Usuario no encontrado' },
-        { status: 404 }
+    // Delete from Supabase auth - use service role key for admin operations
+    try {
+      const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        }
       );
+
+      console.log(`🔄 Attempting to delete auth user ${userId} from Supabase...`);
+
+      // First, force sign out all sessions for this user
+      try {
+        const { error: signOutError } = await supabaseAdmin.auth.admin.signOut(userId);
+        if (signOutError) {
+          console.warn(`⚠️ Could not sign out user ${userId}:`, signOutError.message);
+        } else {
+          console.log(`✅ Successfully signed out all sessions for user ${userId}`);
+        }
+      } catch (signOutErr) {
+        console.warn(`⚠️ Error signing out user ${userId}:`, signOutErr);
+      }
+
+      // Then delete the user completely
+      const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+
+      if (authError) {
+        console.error(`❌ Could not delete auth user ${userId}:`, authError.message);
+        console.error(`❌ Auth error details:`, authError);
+        // Don't fail the whole operation if auth deletion fails
+        // The profile is already deleted, which is the main goal
+      } else {
+        console.log(`✅ Successfully deleted auth user ${userId} from Supabase`);
+      }
+    } catch (authError) {
+      console.error(`❌ Error deleting auth user ${userId}:`, authError);
+      // Continue execution - profile deletion was successful
     }
-
-    // Delete all related data first (workshopEnrollments, etc.)
-    // This will cascade delete if configured in schema, but let's be explicit
-    await prisma.workshopEnrollment.deleteMany({
-      where: { userId }
-    });
-
-    // Delete the user profile
-    await prisma.userProfile.delete({
-      where: { userId }
-    });
-
-    console.log(`Successfully deleted user ${userId} via Prisma`);
 
     return NextResponse.json({
       success: true,
@@ -158,7 +201,5 @@ export async function DELETE(request: NextRequest) {
       { success: false, error: 'Error interno del servidor', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma, ensurePrismaConnection } from '@/lib/prisma';
 
 export async function DELETE(request: NextRequest) {
   try {
     console.log('Admin announcements DELETE API called - Using Prisma');
+
+    if (!(await ensurePrismaConnection())) {
+      return NextResponse.json(
+        { success: false, error: 'Could not establish database connection' },
+        { status: 503 }
+      );
+    }
 
     const body = await request.json();
     const { id } = body;

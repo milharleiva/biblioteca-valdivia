@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma, isPrismaAvailable } from '@/lib/prisma'
+import { prisma, isPrismaAvailable, withPrisma } from '@/lib/prisma'
 
 // GET /api/workshops - Obtener todos los talleres o uno específico por ID
 export async function GET(request: NextRequest) {
@@ -18,7 +18,8 @@ export async function GET(request: NextRequest) {
 
     // Si hay ID, obtener taller específico
     if (id) {
-      const workshop = await prisma!.workshop.findUnique({
+      const workshop = await withPrisma(async (client) => {
+        return await client.workshop.findUnique({
         where: { id },
         include: {
           creator: {
@@ -36,6 +37,7 @@ export async function GET(request: NextRequest) {
             },
           },
         },
+        })
       })
 
       if (!workshop) {
@@ -63,7 +65,8 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const workshops = await prisma!.workshop.findMany({
+    const workshops = await withPrisma(async (client) => {
+      return await client.workshop.findMany({
       where: whereClause,
       include: {
         creator: {
@@ -86,6 +89,7 @@ export async function GET(request: NextRequest) {
         { startDate: 'asc' },
       ],
       take: limit ? parseInt(limit) : undefined,
+      })
     })
 
     return NextResponse.json({
@@ -155,28 +159,30 @@ export async function POST(request: NextRequest) {
       'cultura': 'CULTURE'
     };
 
-    const workshop = await prisma!.workshop.create({
-      data: {
-        title,
-        description,
-        instructor,
-        category: categoryMapping[category] || 'GENERAL',
-        maxParticipants: max_participants,
-        startDate: new Date(start_date),
-        endDate: new Date(end_date),
-        schedule: schedule || '', // Campo opcional para compatibilidad
-        location,
-        imageUrl: image_url,
-        isActive: is_active,
-        createdBy: created_by,
-      },
-      include: {
-        creator: {
-          select: {
-            name: true,
+    const workshop = await withPrisma(async (client) => {
+      return await client.workshop.create({
+        data: {
+          title,
+          description,
+          instructor,
+          category: categoryMapping[category] || 'GENERAL',
+          maxParticipants: max_participants,
+          startDate: new Date(start_date),
+          endDate: new Date(end_date),
+          schedule: schedule || '', // Campo opcional para compatibilidad
+          location,
+          imageUrl: image_url,
+          isActive: is_active,
+          createdBy: created_by,
+        },
+        include: {
+          creator: {
+            select: {
+              name: true,
+            },
           },
         },
-      },
+      })
     })
 
     return NextResponse.json({
@@ -215,8 +221,10 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    await prisma!.workshop.delete({
-      where: { id }
+    await withPrisma(async (client) => {
+      return await client.workshop.delete({
+        where: { id }
+      })
     })
 
     return NextResponse.json({
@@ -283,28 +291,30 @@ export async function PUT(request: NextRequest) {
       'cultura': 'CULTURE'
     };
 
-    const workshop = await prisma!.workshop.update({
-      where: { id },
-      data: {
-        title,
-        description,
-        instructor,
-        category: categoryMapping[category] || 'GENERAL',
-        maxParticipants: max_participants,
-        startDate: new Date(start_date),
-        endDate: new Date(end_date),
-        schedule: schedule || '',
-        location,
-        imageUrl: image_url,
-        isActive: is_active,
-      },
-      include: {
-        creator: {
-          select: {
-            name: true,
+    const workshop = await withPrisma(async (client) => {
+      return await client.workshop.update({
+        where: { id },
+        data: {
+          title,
+          description,
+          instructor,
+          category: categoryMapping[category] || 'GENERAL',
+          maxParticipants: max_participants,
+          startDate: new Date(start_date),
+          endDate: new Date(end_date),
+          schedule: schedule || '',
+          location,
+          imageUrl: image_url,
+          isActive: is_active,
+        },
+        include: {
+          creator: {
+            select: {
+              name: true,
+            },
           },
         },
-      },
+      })
     })
 
     return NextResponse.json({
@@ -343,9 +353,11 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    const workshop = await prisma!.workshop.update({
-      where: { id },
-      data: { isActive }
+    const workshop = await withPrisma(async (client) => {
+      return await client.workshop.update({
+        where: { id },
+        data: { isActive }
+      })
     })
 
     return NextResponse.json({

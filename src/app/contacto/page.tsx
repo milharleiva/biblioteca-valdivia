@@ -40,8 +40,8 @@ export default function Contacto() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Dirección</h3>
                   <p className="text-gray-600">
-                    Av. Ramón Picarte 2102<br />
-                    5100402 Valdivia<br />
+                    Av. Picarte 1785<br />
+                    Valdivia<br />
                     Los Ríos, Chile
                   </p>
                 </div>
@@ -55,9 +55,9 @@ export default function Contacto() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Teléfono</h3>
                   <p className="text-gray-600">
-                    (63) 221 7351<br />
+                    (63) 221-1234<br />
                     <span className="text-sm">
-                      Lun-Vie: 10:00-18:00
+                      Lun-Vie: 9:00-18:00
                     </span>
                   </p>
                 </div>
@@ -71,7 +71,7 @@ export default function Contacto() {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">Email</h3>
                   <p className="text-gray-600">
-                    bpmvaldivia@gmail.com<br />
+                    bibliotecavaldivia@gmail.com<br />
                     <span className="text-sm">
                       Respuesta en 24-48 hrs
                     </span>
@@ -89,12 +89,12 @@ export default function Contacto() {
                   <div className="text-gray-600">
                     <p className="font-medium">Horario:</p>
                     <ul className="mt-2 space-y-1 text-sm">
-                      <li>Lunes: 10:00–18:00</li>
-                      <li>Martes: 10:00–18:00</li>
-                      <li>Miércoles: 10:00–18:00</li>
-                      <li>Jueves: 10:00–18:00</li>
-                      <li>Viernes: 10:00–18:00</li>
-                      <li>Sábado: Cerrado</li>
+                      <li>Lunes: 9:00–18:00</li>
+                      <li>Martes: 9:00–18:00</li>
+                      <li>Miércoles: 9:00–18:00</li>
+                      <li>Jueves: 9:00–18:00</li>
+                      <li>Viernes: 9:00–18:00</li>
+                      <li>Sábado: 9:00–14:00</li>
                       <li>Domingo: Cerrado</li>
                     </ul>
                   </div>
@@ -129,7 +129,7 @@ export default function Contacto() {
                     </div>
                     <div>
                       <h4 className="font-medium text-gray-800">Contacto General</h4>
-                      <p className="text-gray-600 text-sm">bpmvaldivia@gmail.com</p>
+                      <p className="text-gray-600 text-sm">bibliotecavaldivia@gmail.com</p>
                     </div>
                   </div>
                 </div>
@@ -148,7 +148,7 @@ export default function Contacto() {
                         <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
-                        Llamar directamente al (63) 221 7351
+                        Llamar directamente al (63) 221-1234
                       </li>
                       <li className="flex items-center">
                         <svg className="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -208,7 +208,7 @@ export default function Contacto() {
               <div className="bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center w-full">
                 <iframe
                   className="w-full max-w-3xl"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2558.6789!2d-73.2333!3d-39.8102!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9615eee7be0c75a7%3A0x5b4e89d635c3b3b3!2sAv.%20Ram%C3%B3n%20Picarte%202102%2C%20Valdivia%2C%20Los%20R%C3%ADos%2C%20Chile!5e0!3m2!1ses!2scl!4v1694798765432!5m2!1ses!2scl"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.835434509374!2d-73.23588068468147!3d-39.81421957943901!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9615eee6bb1f4f17%3A0x8a5d6b8c9a2b3c4d!2sAv.%20Picarte%201785%2C%20Valdivia%2C%20Los%20R%C3%ADos%2C%20Chile!5e0!3m2!1ses!2scl!4v1699123456789!5m2!1ses!2scl"
                   height="400"
                   style={{ border: 0 }}
                   allowFullScreen

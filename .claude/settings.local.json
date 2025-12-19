@@ -39,7 +39,10 @@
       "Bash(dir public)",
       "WebFetch(domain:bibliotecamunicipalvaldivia.vercel.app)",
       "WebFetch(domain:www.bibliotecaspublicas.gob.cl)",
-      "WebFetch(domain:localhost)"
+      "WebFetch(domain:localhost)",
+      "Bash(dir:*)",
+      "WebFetch(domain:duhthdwmswbeimgbxguw.supabase.co)",
+      "Read(//c/**)"
     ],
     "deny": [],
     "ask": []

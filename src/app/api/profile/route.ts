@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma, isPrismaAvailable } from '@/lib/prisma'
+import { prisma, isPrismaAvailable, withPrisma } from '@/lib/prisma'
 
 // GET /api/profile?userId=xxx - Get user profile
 export async function GET(request: NextRequest) {
@@ -21,32 +21,30 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    let profile = await prisma!.userProfile.findUnique({
-      where: { userId },
-      select: {
-        id: true,
-        userId: true,
-        email: true,
-        name: true,
-        phone: true,
-        address: true,
-        birthDate: true,
-        emergencyContact: true,
-        emergencyPhone: true,
-        role: true,
-        isActive: true,
-        createdAt: true,
-        updatedAt: true
-      }
-    })
+    const profile = await withPrisma(async (client) => {
+      let foundProfile = await client.userProfile.findUnique({
+        where: { userId },
+        select: {
+          id: true,
+          userId: true,
+          email: true,
+          name: true,
+          phone: true,
+          address: true,
+          birthDate: true,
+          emergencyContact: true,
+          emergencyPhone: true,
+          role: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      })
 
-    // Si no existe el perfil, intentar crearlo
-    if (!profile) {
-      console.log('Profile not found, attempting to create one for userId:', userId)
-      try {
-        // Obtener datos del usuario de Supabase auth
-        // Por ahora crear con datos básicos
-        profile = await prisma!.userProfile.create({
+      // Si no existe el perfil, intentar crearlo
+      if (!foundProfile) {
+        console.log('Profile not found, attempting to create one for userId:', userId)
+        foundProfile = await client.userProfile.create({
           data: {
             userId,
             email: `user-${userId}@temp.com`, // Email temporal
@@ -70,12 +68,10 @@ export async function GET(request: NextRequest) {
           }
         })
         console.log('Profile created successfully for userId:', userId)
-      } catch (createError) {
-        console.error('Error creating profile:', createError)
-        // Si falla la creación, devolver null
-        profile = null
       }
-    }
+
+      return foundProfile
+    })
 
     return NextResponse.json({
       success: true,
@@ -116,30 +112,65 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('🟡 Creando perfil en base de datos...');
-    const profile = await prisma!.userProfile.create({
-      data: {
-        userId,
-        email,
-        name,
-        role: role.toUpperCase(),
-      },
-    })
 
-    console.log('🟢 Perfil creado exitosamente:', profile.id);
+    // First check if a user with this ID was recently deleted (optional safety check)
+    // This could prevent recreation of deleted users
+    try {
+      const existingCheck = await withPrisma(async (client) => {
+        return await client.userProfile.findUnique({
+          where: { userId },
+          select: { id: true }
+        })
+      })
+
+      if (existingCheck) {
+        console.log('🔴 Perfil ya existe para userId:', userId);
+        return NextResponse.json(
+          { success: false, error: 'User profile already exists' },
+          { status: 409 }
+        );
+      }
+    } catch (checkError) {
+      console.log('⚠️ Error checking existing profile (continuing):', checkError);
+    }
+
+    let profile;
+    try {
+      profile = await withPrisma(async (client) => {
+        return await client.userProfile.create({
+          data: {
+            userId,
+            email,
+            name,
+            role: (role.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER') as 'USER' | 'ADMIN',
+          },
+        })
+      })
+      console.log('🟢 Perfil creado exitosamente:', profile.id);
+    } catch (prismaError) {
+      console.error('🔴 Error específico de Prisma:', prismaError);
+      throw new Error(`Database error: ${prismaError instanceof Error ? prismaError.message : 'Unknown database error'}`);
+    }
 
     return NextResponse.json({
       success: true,
       data: profile,
     })
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('🔴 Error creating profile:', error)
     console.error('🔴 Error details:', {
-      message: (error as Error)?.message,
+      message: errorMessage,
       stack: (error as Error)?.stack,
       name: (error as Error)?.name
     });
+
     return NextResponse.json(
-      { success: false, error: 'Error al crear perfil' },
+      {
+        success: false,
+        error: `Error al crear perfil: ${errorMessage}`,
+        details: errorMessage
+      },
       { status: 500 }
     )
   }
@@ -174,11 +205,13 @@ export async function PUT(request: NextRequest) {
     if (updates.birth_date) prismaUpdates.birthDate = new Date(updates.birth_date)
     if (updates.emergency_contact) prismaUpdates.emergencyContact = updates.emergency_contact
     if (updates.emergency_phone) prismaUpdates.emergencyPhone = updates.emergency_phone
-    if (updates.role) prismaUpdates.role = updates.role.toUpperCase()
+    if (updates.role) prismaUpdates.role = (updates.role.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'USER') as 'USER' | 'ADMIN'
 
-    const profile = await prisma!.userProfile.update({
-      where: { userId },
-      data: prismaUpdates,
+    const profile = await withPrisma(async (client) => {
+      return await client.userProfile.update({
+        where: { userId },
+        data: prismaUpdates,
+      })
     })
 
     return NextResponse.json({
